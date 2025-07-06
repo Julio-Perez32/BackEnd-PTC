@@ -1,6 +1,7 @@
 package ptc2025.backend.Respositories;
 
-public interface UserRespository {
-    //Archivo creado para mostrar carpeta en el push
-    //Igual tenemos la tabla de usuarios asi que aja
+import org.springframework.data.jpa.repository.JpaRepository;
+import ptc2025.backend.Entities.UserEntity;
+
+public interface UserRespository extends JpaRepository<UserEntity, String> {
 }
