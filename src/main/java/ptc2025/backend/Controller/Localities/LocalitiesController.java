@@ -1,4 +1,4 @@
-package ptc2025.backend.Controller.EventTypes;
+package ptc2025.backend.Controller.Localities;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -7,8 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ptc2025.backend.Models.DTO.EventTypes.eventTypesDTO;
-import ptc2025.backend.Services.EventTypes.eventTypesService;
+import ptc2025.backend.Models.DTO.Localities.LocalitiesDTO;
+import ptc2025.backend.Services.Localities.LocalitiesService;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -16,28 +16,26 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/apiEventTypes")
-public class eventTypesController {
+@RequestMapping("/apiLocality")
+public class LocalitiesController {
     @Autowired
-    eventTypesService service;
+    LocalitiesService service;
 
-    //Get
-    @GetMapping("/getDataEventType")
-    public List<eventTypesDTO> getEventTypes(){
-        return service.getEventTypes();
+    @GetMapping("/getDataLocality")
+    public List<LocalitiesDTO> getLocality(){
+        return service.getLocalitiesService();
     }
-    //Post
-    @PostMapping("/newEventType")
-    public ResponseEntity<Map<String, Object>> registrarTipoEvento(
-            @Valid @RequestBody eventTypesDTO dtoEvento,
-            HttpServletRequest request){
+    @PostMapping("/newLocality")
+    public ResponseEntity<Map<String, Object>> registrarLocalidad(
+            @Valid @RequestBody LocalitiesDTO dtoLocal,
+            HttpServletRequest  request){
         try{
-            eventTypesDTO respuesta = service.insertarEvento(dtoEvento);
+            LocalitiesDTO respuesta = service.insertarLocalidad(dtoLocal);
             if(respuesta == null){
                 return ResponseEntity.badRequest().body(Map.of(
                         "status", "Inserción fallida",
                         "errorType", "VALIDATION_ERROR",
-                        "message" , "Datos del evento invalidos"
+                        "message" , "Datos de localidad invalidos"
                 ));
             }
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
@@ -47,62 +45,59 @@ public class eventTypesController {
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "status", "error",
-                    "message", "Error al resgistar el evento",
+                    "message", "Error al resgistar la localidad",
                     "detail", e.getMessage()
             ));
         }
     }
-
-    //PUT
-    @PutMapping("/uploadEventTypes/{id}")
-    public ResponseEntity <?> modificarTipoEvento(
+    @PutMapping("/updateLocality/{id}")
+    public ResponseEntity<?> modificarLocalidad(
             @PathVariable String id,
-            @Valid @RequestBody eventTypesDTO dto,
+            @Valid @RequestBody LocalitiesDTO dto,
             BindingResult result){
-        if (result.hasErrors()){
+        if(result.hasErrors()){
             Map<String, String> errores = new HashMap<>();
             result.getFieldErrors().forEach(error ->
                     errores.put(error.getField(), error.getDefaultMessage()));
             return ResponseEntity.badRequest().body(errores);
         }
-        try {
-            eventTypesDTO actualizado =service.modificarEvento(id, dto);
+        try{
+            LocalitiesDTO actualizado = service.modificarLocalidad(id, dto);
             return ResponseEntity.ok().body(Map.of(
                     "status", "sucess",
                     "datos", actualizado
             ));
-        }catch (RuntimeException e) {
+        }catch (RuntimeException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
                     "status", "error",
-                    "message", "Evento no encontrada",
+                    "message", "Localidad no encontrada",
                     "detail", e.getMessage()
             ));
         }
     }
-    @DeleteMapping("/deleteEventType/{id}")
-    public ResponseEntity <Map<String, Object>> eliminarTipoEvento(@PathVariable String id){
-        try {
-            if (!service.eliminarEvento(id)){
+    @DeleteMapping("/deleteLocation/{id}")
+    public ResponseEntity<Map<String, Object>> eliminarLocalidad(@PathVariable String id){
+        try{
+            if(!service.eliminarLocalidad(id)){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .header("Message-Error", "Tipo de Evento no encontado")
+                        .header("Message-Error", "Localidad no encontrada")
                         .body(Map.of(
                                 "error", "Not found",
-                                "message", "El tipo  no fue encontrada",
+                                "message", "La localidad no fue encontrada",
                                 "timestamp", Instant.now().toString()
                         ));
+
             }
             return ResponseEntity.ok().body(Map.of(
                     "status", "Proceso completado",  // Estado de la operación
-                    "message", "Evento eliminado exitosamente"  // Mensaje de éxito
+                    "message", "Localidad eliminada exitosamente"  // Mensaje de éxito
             ));
-        }catch (Exception e) {
+        }catch (Exception e){
             return ResponseEntity.internalServerError().body(Map.of(
                     "status", "Error",
-                    "message", "Error al eliminar universidad",
+                    "message", "Error al eliminar localidad",
                     "detail", e.getMessage()
             ));
         }
     }
 }
-
-

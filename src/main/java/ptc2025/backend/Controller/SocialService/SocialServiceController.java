@@ -1,4 +1,4 @@
-package ptc2025.backend.Controller.EventTypes;
+package ptc2025.backend.Controller.SocialService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -7,8 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ptc2025.backend.Models.DTO.EventTypes.eventTypesDTO;
-import ptc2025.backend.Services.EventTypes.eventTypesService;
+import ptc2025.backend.Models.DTO.SocialService.SocialServiceDTO;
+import ptc2025.backend.Services.SocialService.SocialServiceServices;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -16,28 +16,26 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/apiEventTypes")
-public class eventTypesController {
+@RequestMapping("/apiSocialService")
+public class SocialServiceController {
     @Autowired
-    eventTypesService service;
+    private SocialServiceServices services;
 
-    //Get
-    @GetMapping("/getDataEventType")
-    public List<eventTypesDTO> getEventTypes(){
-        return service.getEventTypes();
+    @GetMapping("/getDataSocialService")
+    public List<SocialServiceDTO> getSocialService(){
+        return services.getSocialService();
     }
-    //Post
-    @PostMapping("/newEventType")
-    public ResponseEntity<Map<String, Object>> registrarTipoEvento(
-            @Valid @RequestBody eventTypesDTO dtoEvento,
+    @PostMapping("/newSocialService")
+    public ResponseEntity<Map<String, Object>> registrarServicioSocial(
+            @Valid @RequestBody SocialServiceDTO dtoServicio,
             HttpServletRequest request){
         try{
-            eventTypesDTO respuesta = service.insertarEvento(dtoEvento);
+            SocialServiceDTO respuesta = services.insertarServicioSocial(dtoServicio);
             if(respuesta == null){
                 return ResponseEntity.badRequest().body(Map.of(
                         "status", "Inserción fallida",
                         "errorType", "VALIDATION_ERROR",
-                        "message" , "Datos del evento invalidos"
+                        "message" , "Datos de proyecto de servicio social invalidos"
                 ));
             }
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
@@ -47,26 +45,24 @@ public class eventTypesController {
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "status", "error",
-                    "message", "Error al resgistar el evento",
+                    "message", "Error al resgistar el proyecto de servicio social",
                     "detail", e.getMessage()
             ));
         }
     }
-
-    //PUT
-    @PutMapping("/uploadEventTypes/{id}")
-    public ResponseEntity <?> modificarTipoEvento(
+    @PutMapping("/updateSocialService/{id}")
+    public ResponseEntity<?> modificarServicioSocial(
             @PathVariable String id,
-            @Valid @RequestBody eventTypesDTO dto,
+            @Valid @RequestBody SocialServiceDTO dto,
             BindingResult result){
-        if (result.hasErrors()){
+        if(result.hasErrors()){
             Map<String, String> errores = new HashMap<>();
             result.getFieldErrors().forEach(error ->
                     errores.put(error.getField(), error.getDefaultMessage()));
             return ResponseEntity.badRequest().body(errores);
         }
         try {
-            eventTypesDTO actualizado =service.modificarEvento(id, dto);
+            SocialServiceDTO actualizado = services.modificarServicioSocial(id, dto);
             return ResponseEntity.ok().body(Map.of(
                     "status", "sucess",
                     "datos", actualizado
@@ -74,35 +70,34 @@ public class eventTypesController {
         }catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
                     "status", "error",
-                    "message", "Evento no encontrada",
+                    "message", "Proyecto de servicio social no encontrado",
                     "detail", e.getMessage()
             ));
         }
     }
-    @DeleteMapping("/deleteEventType/{id}")
-    public ResponseEntity <Map<String, Object>> eliminarTipoEvento(@PathVariable String id){
-        try {
-            if (!service.eliminarEvento(id)){
+    @DeleteMapping("/deleteLocation/{id}")
+    public ResponseEntity<Map<String, Object>> eliminarLocalidad(@PathVariable String id){
+        try{
+            if(!services.eliminarServicioSocial(id)){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .header("Message-Error", "Tipo de Evento no encontado")
+                        .header("Message-Error", "Localidad no encontrada")
                         .body(Map.of(
                                 "error", "Not found",
-                                "message", "El tipo  no fue encontrada",
+                                "message", "El proyecto de servicio social no fue encontrad",
                                 "timestamp", Instant.now().toString()
                         ));
+
             }
             return ResponseEntity.ok().body(Map.of(
                     "status", "Proceso completado",  // Estado de la operación
-                    "message", "Evento eliminado exitosamente"  // Mensaje de éxito
+                    "message", "Proyecto de servicio social eliminado exitosamente"  // Mensaje de éxito
             ));
-        }catch (Exception e) {
+        }catch (Exception e){
             return ResponseEntity.internalServerError().body(Map.of(
                     "status", "Error",
-                    "message", "Error al eliminar universidad",
+                    "message", "Error al eliminar el proyecto de servicio social",
                     "detail", e.getMessage()
             ));
         }
     }
 }
-
-
