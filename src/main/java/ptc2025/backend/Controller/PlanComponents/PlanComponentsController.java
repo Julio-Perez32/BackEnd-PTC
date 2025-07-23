@@ -1,14 +1,13 @@
-package ptc2025.backend.Controller.EventTypes;
+package ptc2025.backend.Controller.PlanComponents;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ptc2025.backend.Models.DTO.EventTypes.eventTypesDTO;
-import ptc2025.backend.Services.EventTypes.eventTypesService;
+import ptc2025.backend.Models.DTO.PlanComponents.PlanComponentsDTO;
+import ptc2025.backend.Services.PlanComponents.PlanComponentsService;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -16,28 +15,24 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/apiEventTypes")
-public class eventTypesController {
-    @Autowired
-    eventTypesService service;
-
-    //Get
-    @GetMapping("/getDataEventType")
-    public List<eventTypesDTO> getEventTypes(){
-        return service.getEventTypes();
+@RequestMapping("/apiEvaluationPlanComponents")
+public class PlanComponentsController {
+    PlanComponentsService service;
+    @GetMapping("/getEvaluationPlanComponents")
+    public List<PlanComponentsDTO> getEvaluationPlanComponents(){
+        return  service.getPlanComponent();
     }
-    //Post
-    @PostMapping("/newEventType")
-    public ResponseEntity<Map<String, Object>> registrarTipoEvento(
-            @Valid @RequestBody eventTypesDTO dtoEvento,
+    @PostMapping("/newEvaluationPlanComponents")
+    public ResponseEntity<Map<String, Object>> newEvaluationPlanComponents(
+            @Valid @RequestBody PlanComponentsDTO dto,
             HttpServletRequest request){
-        try{
-            eventTypesDTO respuesta = service.insertarEvento(dtoEvento);
+        try {
+            PlanComponentsDTO respuesta = service.insertPlanComponents(dto);
             if(respuesta == null){
                 return ResponseEntity.badRequest().body(Map.of(
                         "status", "Inserción fallida",
                         "errorType", "VALIDATION_ERROR",
-                        "message" , "Datos del evento invalidos"
+                        "message" , "Datos del componente de evaluación invalidos"
                 ));
             }
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
@@ -47,17 +42,16 @@ public class eventTypesController {
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "status", "error",
-                    "message", "Error al resgistar el evento",
+                    "message", "Error al resgistar el componente de evaluación",
                     "detail", e.getMessage()
             ));
         }
-    }
 
-    //PUT
-    @PutMapping("/uploadEventTypes/{id}")
-    public ResponseEntity <?> modificarTipoEvento(
+    }
+    @PutMapping("/uploadEvaluationPlanComponents/{id}")
+    public ResponseEntity<?> uploadEvaluationPlanComponents (
             @PathVariable String id,
-            @Valid @RequestBody eventTypesDTO dto,
+            @Valid @RequestBody PlanComponentsDTO dto,
             BindingResult result){
         if (result.hasErrors()){
             Map<String, String> errores = new HashMap<>();
@@ -66,7 +60,7 @@ public class eventTypesController {
             return ResponseEntity.badRequest().body(errores);
         }
         try {
-            eventTypesDTO actualizado =service.modificarEvento(id, dto);
+            PlanComponentsDTO actualizado =service.updatePlanComponents(id, dto);
             return ResponseEntity.ok().body(Map.of(
                     "status", "sucess",
                     "datos", actualizado
@@ -74,35 +68,36 @@ public class eventTypesController {
         }catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
                     "status", "error",
-                    "message", "Evento no encontrada",
+                    "message", "Componente de evaluación no encontrad",
                     "detail", e.getMessage()
             ));
         }
+
     }
-    @DeleteMapping("/deleteEventType/{id}")
-    public ResponseEntity <Map<String, Object>> eliminarTipoEvento(@PathVariable String id){
+    @DeleteMapping("/deleteEvaluationPlanComponents/{id}")
+    public ResponseEntity<Map<String, Object>> deleteEvaluationPlanComponents( @PathVariable String id){
         try {
-            if (!service.eliminarEvento(id)){
+            if (!service.deletePlanComponents(id)){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .header("Message-Error", "Tipo de Evento no encontado")
+                        .header("Message-Error", "Tipo de componente de evaluación no encontado")
                         .body(Map.of(
                                 "error", "Not found",
-                                "message", "El tipo  no fue encontrada",
+                                "message", "El componente de evaluación no fue encontrado",
                                 "timestamp", Instant.now().toString()
                         ));
             }
             return ResponseEntity.ok().body(Map.of(
                     "status", "Proceso completado",  // Estado de la operación
-                    "message", "Evento eliminado exitosamente"  // Mensaje de éxito
+                    "message", "Componente de evaluación eliminado exitosamente"  // Mensaje de éxito
             ));
         }catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of(
                     "status", "Error",
-                    "message", "Error al eliminar universidad",
+                    "message", "Error al eliminar componente de evaluación",
                     "detail", e.getMessage()
             ));
         }
     }
 }
-
-
+//EvaluationPlanComponents
+//componente de evaluación
