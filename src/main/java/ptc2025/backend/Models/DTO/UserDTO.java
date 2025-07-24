@@ -14,8 +14,6 @@ import java.util.Date;
 @Setter
 public class UserDTO {
 
-
-    @NotNull
     private String id;
     @NotNull
     private String universityID;

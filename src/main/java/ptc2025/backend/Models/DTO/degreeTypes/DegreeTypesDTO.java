@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DegreeTypesDTO {
-    @NotBlank
     private String id;
     @NotBlank
     private String universityID;
