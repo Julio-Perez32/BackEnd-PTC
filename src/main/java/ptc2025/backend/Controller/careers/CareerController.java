@@ -1,46 +1,66 @@
 package ptc2025.backend.Controller.careers;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ptc2025.backend.Entities.careers.CareerEntity;
+import ptc2025.backend.Models.DTO.careers.CareerDTO;
 import ptc2025.backend.Services.careers.CareerService;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/careers")
-@CrossOrigin
+@RequestMapping("/careers")
+@RequiredArgsConstructor
+@Slf4j
 public class CareerController {
 
-    private final CareerService careerService;
+    private final CareerService servicio;
 
-    public CareerController(CareerService careerService) {
-        this.careerService = careerService;
+    @GetMapping("/getCareers")
+    public ResponseEntity<List<CareerDTO>> obtenerCarreras() {
+        return ResponseEntity.ok(servicio.obtenerTodos());
     }
 
-    @GetMapping
-    public List<CareerEntity> getAll() {
-        return careerService.findAll();
+    @PostMapping("/insertCareer")
+    public ResponseEntity<?> insertar(@RequestBody @Valid CareerDTO dto, BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", "Datos inválidos", "error", result.getAllErrors()));
+        }
+        try {
+            CareerDTO creado = servicio.insertar(dto);
+            return ResponseEntity.ok(Map.of("mensaje", "Carrera registrada", "data", creado));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", e.getMessage()));
+        }
     }
 
-    @GetMapping("/{id}")
-    public Optional<CareerEntity> getById(@PathVariable Long id) {
-        return careerService.findById(id);
+    @PutMapping("/updateCareer/{id}")
+    public ResponseEntity<?> actualizar(@PathVariable String id, @RequestBody @Valid CareerDTO dto, BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", "Datos inválidos", "error", result.getAllErrors()));
+        }
+        try {
+            CareerDTO actualizado = servicio.actualizar(id, dto);
+            return ResponseEntity.ok(Map.of("mensaje", "Carrera actualizada", "data", actualizado));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.internalServerError().body(Map.of("mensaje", "Error al actualizar"));
+        }
     }
 
-    @PostMapping
-    public CareerEntity create(@Valid @RequestBody CareerEntity career) {
-        return careerService.save(career);
-    }
-
-    @PutMapping("/{id}")
-    public CareerEntity update(@PathVariable Long id, @Valid @RequestBody CareerEntity career) {
-        return careerService.update(id, career);
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        careerService.delete(id);
+    @DeleteMapping("/deleteCareer/{id}")
+    public ResponseEntity<?> eliminar(@PathVariable String id) {
+        boolean resultado = servicio.eliminar(id);
+        if (resultado) {
+            return ResponseEntity.ok(Map.of("mensaje", "Carrera eliminada"));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", "No se encontró la carrera"));
+        }
     }
 }
+
