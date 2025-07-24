@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class employeeRolesDTO {
-    @NotNull
     private String id;
     @NotNull
     private String universityID;
