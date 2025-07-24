@@ -1,47 +1,64 @@
 package ptc2025.backend.Controller.employees;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ptc2025.backend.Entities.employees.EmployeeEntity;
-import ptc2025.backend.Respositories.employees.EmployeeRepository;
+import ptc2025.backend.Models.DTO.employees.EmployeeDTO;
 import ptc2025.backend.Services.employees.EmployeeService;
 
 import java.util.List;
-import java.util.Optional;
-
+import java.util.Map;
 @RestController
-@RequestMapping("/api/employees")
-@CrossOrigin
+@RequestMapping("/employees")
+@RequiredArgsConstructor
+@Slf4j
 public class EmployeeController {
 
-    private final EmployeeService employeeService;
+    private final EmployeeService servicio;
 
-    public EmployeeController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
+    @GetMapping("/getEmployees")
+    public ResponseEntity<List<EmployeeDTO>> obtenerTodos() {
+        return ResponseEntity.ok(servicio.obtenerTodos());
     }
 
-    @GetMapping
-    public List<EmployeeEntity> getAll() {
-        return employeeService.findAll();
+    @PostMapping("/insertEmployee")
+    public ResponseEntity<?> insertar(@RequestBody @Valid EmployeeDTO dto, BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", "Datos inválidos", "error", result.getAllErrors()));
+        }
+        try {
+            EmployeeDTO creado = servicio.insertar(dto);
+            return ResponseEntity.ok(Map.of("mensaje", "Empleado registrado", "data", creado));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", e.getMessage()));
+        }
     }
 
-    @GetMapping("/{id}")
-    public Optional<EmployeeEntity> getById(@PathVariable Long id) {
-        return employeeService.findById(id);
+    @PutMapping("/updateEmployee/{id}")
+    public ResponseEntity<?> actualizar(@PathVariable String id, @RequestBody @Valid EmployeeDTO dto, BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", "Datos inválidos", "error", result.getAllErrors()));
+        }
+        try {
+            EmployeeDTO actualizado = servicio.actualizar(id, dto);
+            return ResponseEntity.ok(Map.of("mensaje", "Empleado actualizado", "data", actualizado));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.internalServerError().body(Map.of("mensaje", "Error al actualizar"));
+        }
     }
 
-    @PostMapping
-    public EmployeeEntity create(@Valid @RequestBody EmployeeEntity employee) {
-        return employeeService.save(employee);
-    }
-
-    @PutMapping("/{id}")
-    public EmployeeEntity update(@PathVariable Long id, @Valid @RequestBody EmployeeEntity employee) {
-        return employeeService.update(id, employee);
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        employeeService.delete(id);
+    @DeleteMapping("/deleteEmployee/{id}")
+    public ResponseEntity<?> eliminar(@PathVariable String id) {
+        boolean resultado = servicio.eliminar(id);
+        if (resultado) {
+            return ResponseEntity.ok(Map.of("mensaje", "Empleado eliminado"));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", "No se encontró el empleado"));
+        }
     }
 }
