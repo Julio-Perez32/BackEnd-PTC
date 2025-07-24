@@ -9,7 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class cycleTypesDTO {
-    @NotNull
     private String id;
     @NotNull
     private String universityID;

@@ -37,7 +37,7 @@ public class PlanComponentsService {
             throw new IllegalArgumentException("Todos los campos obligatorios deben estar completos y válidos");
         }
         try {
-            PlanComponentsEntity entity = new PlanComponentsEntity();
+            PlanComponentsEntity entity = convertirAEntity(dto);
             PlanComponentsEntity guardardo = repo.save(entity);
 
             return convertirADTO (guardardo);
