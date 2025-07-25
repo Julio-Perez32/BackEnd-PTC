@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import ptc2025.backend.Entities.employees.EmployeeEntity;
 
 @Repository
-public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long> {
+public interface EmployeeRepository extends JpaRepository<EmployeeEntity, String> {
 }

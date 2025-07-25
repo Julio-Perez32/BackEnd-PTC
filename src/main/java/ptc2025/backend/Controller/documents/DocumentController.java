@@ -2,48 +2,65 @@ package ptc2025.backend.Controller.documents;
 
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ptc2025.backend.Entities.documents.DocumentEntity;
+import ptc2025.backend.Models.DTO.documents.DocumentDTO;
 import ptc2025.backend.Services.documents.DocumentService;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/documents")
-@CrossOrigin
+@RequiredArgsConstructor
+@Slf4j
 public class DocumentController {
 
-    private final DocumentService documentService;
+    private final DocumentService servicio;
 
-    //Constructor
-
-    public DocumentController(DocumentService documentService) {
-        this.documentService = documentService;
+    @GetMapping("/getDocuments")
+    public ResponseEntity<List<DocumentDTO>> obtenerDocumentos() {
+        return ResponseEntity.ok(servicio.obtenerTodos());
     }
 
-    @GetMapping
-    public List<DocumentEntity> getAll() {
-        return documentService.findAll();
+    @PostMapping("/insertDocument")
+    public ResponseEntity<?> insertar(@RequestBody @Valid DocumentDTO dto, BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", "Datos inválidos", "errores", result.getAllErrors()));
+        }
+        try {
+            DocumentDTO creado = servicio.insertar(dto);
+            return ResponseEntity.ok(Map.of("mensaje", "Documento registrado", "data", creado));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", e.getMessage()));
+        }
     }
 
-    @GetMapping("/{id}")
-    public Optional<DocumentEntity> getById(@PathVariable Long id) {
-        return documentService.findById(id);
+    @PutMapping("/updateDocument/{id}")
+    public ResponseEntity<?> actualizar(@PathVariable String id, @RequestBody @Valid DocumentDTO dto, BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", "Datos inválidos", "errores", result.getAllErrors()));
+        }
+        try {
+            DocumentDTO actualizado = servicio.actualizar(id, dto);
+            return ResponseEntity.ok(Map.of("mensaje", "Documento actualizado", "data", actualizado));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.internalServerError().body(Map.of("mensaje", "Error interno al actualizar"));
+        }
     }
 
-    @PostMapping
-    public DocumentEntity create( @Valid @RequestBody DocumentEntity document) {
-        return documentService.save(document);
-    }
-
-    @PutMapping("/{id}")
-    public DocumentEntity update(@PathVariable Long id, @Valid @RequestBody DocumentEntity document) {
-        return documentService.update(id, document);
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        documentService.delete(id);
+    @DeleteMapping("/deleteDocument/{id}")
+    public ResponseEntity<?> eliminar(@PathVariable String id) {
+        boolean resultado = servicio.eliminar(id);
+        if (resultado) {
+            return ResponseEntity.ok(Map.of("mensaje", "Documento eliminado"));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", "No se encontró el documento"));
+        }
     }
 }
