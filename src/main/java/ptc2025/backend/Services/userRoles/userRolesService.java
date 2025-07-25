@@ -66,7 +66,7 @@ public class userRolesService {
                 return false;
             }
         }catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("No se encontraron ningun rol d usuario con el id: ", 1);
+            throw new EmptyResultDataAccessException("No se encontraron ningun rol de usuario con el id: ", 1);
 
         }
     }
