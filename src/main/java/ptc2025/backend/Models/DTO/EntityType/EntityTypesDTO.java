@@ -22,6 +22,4 @@ public class EntityTypesDTO {
     @Size(max = 60, message = "No debe tener más de 60 caracteres")
     private String entityType;
 
-    @Pattern(regexp = "^[YN]$", message = "Solo puede responder 'Y' o 'N'")
-    private String isAutoCodeEnabled;
 }

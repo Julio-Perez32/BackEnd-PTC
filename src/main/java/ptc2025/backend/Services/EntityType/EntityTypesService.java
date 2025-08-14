@@ -38,12 +38,6 @@ public class EntityTypesService {
         }
 
 
-        if (dto.getIsAutoCodeEnabled() != null &&
-                !(dto.getIsAutoCodeEnabled().equals("Y") || dto.getIsAutoCodeEnabled().equals("N"))) {
-            throw new IllegalArgumentException("Solo puede ser 'Y' o 'N'");
-        }
-
-
         try {
             EntityTypesEntity entity = convertirAEntity(dto);
             EntityTypesEntity guardado = repo.save(entity);
@@ -57,7 +51,6 @@ public class EntityTypesService {
         EntityTypesEntity existente = new EntityTypesEntity();
         existente.setUniversityID(dto.getUniversityID());
         existente.setEntityType(dto.getEntityType());
-        existente.setIsAutoCodeEnabled(dto.getIsAutoCodeEnabled());
         EntityTypesEntity actualizar = repo.save(existente);
         return convertirADTO(actualizar);
     }
@@ -81,14 +74,12 @@ public class EntityTypesService {
         dto.setEntityTypeID(entity.getEntityTypeID());
         dto.setUniversityID(entity.getUniversityID());
         dto.setEntityType(entity.getEntityType());
-        dto.setIsAutoCodeEnabled(entity.getIsAutoCodeEnabled());
         return dto;
     }
     public EntityTypesEntity convertirAEntity(EntityTypesDTO dto) {
         EntityTypesEntity entity = new EntityTypesEntity();
         entity.setUniversityID(dto.getUniversityID());
         entity.setEntityType(dto.getEntityType());
-        entity.setIsAutoCodeEnabled(dto.getIsAutoCodeEnabled());
         return entity;
     }
 }
