@@ -27,6 +27,4 @@ public class EntityTypesEntity {
     @Column(name = "ENTITYTYPE")
     private String entityType;
 
-    @Column(name = "ISAUTOCODEENABLED")
-    private String isAutoCodeEnabled;
 }
