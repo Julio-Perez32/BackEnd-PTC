@@ -1,0 +1,9 @@
+package ptc2025.backend.Respositories.SubjectFamilies;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import ptc2025.backend.Entities.SubjectFamilies.SubjectFamiliesEntity;
+
+@Repository
+public interface SubjectFamiliesRepository extends JpaRepository<SubjectFamiliesEntity, String> {
+}

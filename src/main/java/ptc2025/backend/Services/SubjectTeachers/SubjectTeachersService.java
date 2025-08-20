@@ -1,0 +1,82 @@
+package ptc2025.backend.Services.SubjectTeachers;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.SubjectTeachers.SubjectTeachersEntity;
+import ptc2025.backend.Models.DTO.SubjectTeachers.SubjectTeachersDTO;
+import ptc2025.backend.Respositories.SubjectTeachers.SubjectTeachersRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@Slf4j
+public class SubjectTeachersService {
+
+    @Autowired
+    SubjectTeachersRepository repo;
+
+    public SubjectTeachersDTO convertToSubjectTeachersDTO(SubjectTeachersEntity entity){
+        SubjectTeachersDTO dto = new SubjectTeachersDTO();
+        dto.setSubjectTeacherID(entity.getSubjectTeacherID());
+        dto.setSubjectID(entity.getSubjectID());
+        dto.setEmployeeID(entity.getEmployeeID());
+        return dto;
+    }
+
+    public SubjectTeachersEntity convertToSubjectEntity(SubjectTeachersDTO dto){
+        SubjectTeachersEntity entity = new SubjectTeachersEntity();
+        entity.setSubjectTeacherID(dto.getSubjectTeacherID());
+        entity.setSubjectID(dto.getSubjectID());
+        entity.setEmployeeID(dto.getEmployeeID());
+        return entity;
+    }
+
+    public List<SubjectTeachersDTO> getAllSubjectTeachers(){
+        List<SubjectTeachersEntity> subTeachers = repo.findAll();
+        return subTeachers.stream()
+                .map(this::convertToSubjectTeachersDTO)
+                .collect(Collectors.toList());
+    }
+
+    public SubjectTeachersDTO insertSubjectTeacher(SubjectTeachersDTO dto){
+        if(dto == null || dto.getSubjectID() == null || dto.getSubjectID().isBlank() ||
+                dto.getEmployeeID() == null || dto.getEmployeeID().isBlank()){
+            throw new IllegalArgumentException("Los campos no pueden ser nulos");
+        }
+        try{
+            SubjectTeachersEntity entity = convertToSubjectEntity(dto);
+            SubjectTeachersEntity saved = repo.save(entity);
+            return convertToSubjectTeachersDTO(saved);
+        }catch (Exception e){
+            log.error("Error al registrar al profesor de la materia " + e.getMessage());
+            throw new IllegalArgumentException("Error al registrar al maestro");
+        }
+    }
+
+    public SubjectTeachersDTO updateSubjectTeacher(String id, SubjectTeachersDTO json){
+        SubjectTeachersEntity exists = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Maestro no encontrado"));
+        exists.setSubjectID(json.getSubjectID());
+        exists.setEmployeeID(json.getEmployeeID());
+
+        SubjectTeachersEntity updateSubTeacher = repo.save(exists);
+
+        return convertToSubjectTeachersDTO(updateSubTeacher);
+    }
+
+    public boolean deleteSubjectTeacher(String id){
+        try{
+            SubjectTeachersEntity exists = repo.findById(id).orElse(null);
+            if(exists != null){
+                repo.deleteById(id);
+                return true;
+            }else{
+                return false;
+            }
+        }catch (EmptyResultDataAccessException e){
+            throw new EmptyResultDataAccessException("No se encontró maestro con ID " + id + " para eliminar",1);
+        }
+    }
+}
