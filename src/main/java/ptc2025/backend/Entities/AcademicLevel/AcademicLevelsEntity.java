@@ -4,13 +4,12 @@ import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "ACADEMICLEVELS")
-@Getter
-@Setter
-@EqualsAndHashCode
+@Getter @Setter @EqualsAndHashCode @ToString
 public class AcademicLevelsEntity {
 
     @Id
