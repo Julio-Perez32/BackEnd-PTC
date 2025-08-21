@@ -1,17 +1,17 @@
 package ptc2025.backend.Entities.documents;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "documents")
+@Table(name = "DOCUMENTS")
+@Getter @Setter
+@ToString @EqualsAndHashCode
 public class DocumentEntity {
 
     @Id
@@ -32,6 +32,4 @@ public class DocumentEntity {
 
     @Column(name = "ISACTIVE")
     private Boolean isActive;
-
-
 }

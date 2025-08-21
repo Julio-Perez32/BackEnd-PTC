@@ -1,15 +1,17 @@
 package ptc2025.backend.Entities.careers;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "CAREERS")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
 public class CareerEntity {
 
     @Id
@@ -28,4 +30,3 @@ public class CareerEntity {
     @Column(name = "ISACTIVE")
     private Boolean isActive;
 }
-

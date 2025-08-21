@@ -1,33 +1,30 @@
 package ptc2025.backend.Models.DTO.careers;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
 public class CareerDTO {
 
-    @NotBlank(message = "El ID de la carrera es obligatorio")
     private String id;
 
-    @NotBlank(message = "El nombre de la carrera es obligatorio")
+    @NotNull(message = "El nombre de la carrera no puede ser nulo")
+    @NotBlank(message = "El nombre de la carrera no puede estar vacío")
     private String name;
 
     private String description;
 
-    @NotBlank(message = "La facultad asociada es obligatoria")
+    @NotNull(message = "La facultad asociada no puede ser nula")
+    @NotBlank(message = "La facultad asociada no puede estar vacía")
     private String facultyId;
 
-    @NotBlank(message = "El estado de actividad es obligatorio")
+    @NotNull(message = "El estado de actividad es obligatorio")
     private Boolean isActive = true;
-
-    public CareerDTO() {
-    }
-
-    public CareerDTO(String id, String name, String description, String facultyId, Boolean isActive) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.facultyId = facultyId;
-        this.isActive = isActive;
-    }
 }

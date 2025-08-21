@@ -1,17 +1,19 @@
 package ptc2025.backend.Entities.studentCycleEnrollments;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "STUDENTCYCLEENROLLMENTS")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
 public class StudentCycleEnrollmentEntity {
 
     @Id
@@ -33,5 +35,3 @@ public class StudentCycleEnrollmentEntity {
     @Column(name = "ISACTIVE")
     private Boolean isActive;
 }
-
-

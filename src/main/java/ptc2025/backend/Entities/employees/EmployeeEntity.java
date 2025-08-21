@@ -1,15 +1,17 @@
 package ptc2025.backend.Entities.employees;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
-@Table(name = "employees")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "EMPLOYEES")
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
 public class EmployeeEntity {
 
     @Id

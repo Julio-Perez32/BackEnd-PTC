@@ -1,9 +1,11 @@
 package ptc2025.backend.Models.DTO.cyclicStudentPerformances;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class CyclicStudentPerformanceDTO {
 
     private String id;
@@ -18,7 +20,4 @@ public class CyclicStudentPerformanceDTO {
     private Double averageGrade;
     private Boolean passed;
     private Boolean isActive = true;
-
-    public CyclicStudentPerformanceDTO(String id, String studentId, String cycleCode, String academicYearId, Double averageGrade, Boolean passed, Boolean isActive) {
-    }
 }

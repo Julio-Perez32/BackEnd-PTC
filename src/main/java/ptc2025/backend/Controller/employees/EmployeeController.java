@@ -1,64 +1,91 @@
 package ptc2025.backend.Controller.employees;
 
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ptc2025.backend.Models.DTO.employees.EmployeeDTO;
 import ptc2025.backend.Services.employees.EmployeeService;
 
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 @RestController
 @RequestMapping("/employees")
-@RequiredArgsConstructor
-@Slf4j
 public class EmployeeController {
 
-    private final EmployeeService servicio;
+    @Autowired
+    private EmployeeService service;
 
+    // GET
     @GetMapping("/getEmployees")
-    public ResponseEntity<List<EmployeeDTO>> obtenerTodos() {
-        return ResponseEntity.ok(servicio.obtenerTodos());
+    public List<EmployeeDTO> getEmployees() {
+        return service.getEmployees();
     }
 
+    // POST
     @PostMapping("/insertEmployee")
-    public ResponseEntity<?> insertar(@RequestBody @Valid EmployeeDTO dto, BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(Map.of("mensaje", "Datos inválidos", "error", result.getAllErrors()));
+    public ResponseEntity<Map<String, Object>> insertEmployee(@Valid @RequestBody EmployeeDTO dto, BindingResult binding) {
+        if (binding.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            binding.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("status", "error", "errors", errors));
         }
         try {
-            EmployeeDTO creado = servicio.insertar(dto);
-            return ResponseEntity.ok(Map.of("mensaje", "Empleado registrado", "data", creado));
+            EmployeeDTO answer = service.insertEmployee(dto);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(Map.of("status", "success", "data", answer));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("mensaje", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("status", "error", "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("status", "server error", "message", "Error interno del servidor", "detail", e.getMessage()));
         }
     }
 
+    // PUT
     @PutMapping("/updateEmployee/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable String id, @RequestBody @Valid EmployeeDTO dto, BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(Map.of("mensaje", "Datos inválidos", "error", result.getAllErrors()));
+    public ResponseEntity<Map<String, Object>> updateEmployee(@PathVariable String id, @Valid @RequestBody EmployeeDTO dto, BindingResult binding) {
+        if (binding.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            binding.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("status", "error", "errors", errors));
         }
         try {
-            EmployeeDTO actualizado = servicio.actualizar(id, dto);
-            return ResponseEntity.ok(Map.of("mensaje", "Empleado actualizado", "data", actualizado));
+            EmployeeDTO answer = service.updateEmployee(id, dto);
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .body(Map.of("status", "success", "data", answer));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("mensaje", e.getMessage()));
-        } catch (RuntimeException e) {
-            return ResponseEntity.internalServerError().body(Map.of("mensaje", "Error al actualizar"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("status", "error", "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("status", "server error", "message", "Error interno del servidor", "detail", e.getMessage()));
         }
     }
 
+    // DELETE
     @DeleteMapping("/deleteEmployee/{id}")
-    public ResponseEntity<?> eliminar(@PathVariable String id) {
-        boolean resultado = servicio.eliminar(id);
-        if (resultado) {
-            return ResponseEntity.ok(Map.of("mensaje", "Empleado eliminado"));
-        } else {
-            return ResponseEntity.badRequest().body(Map.of("mensaje", "No se encontró el empleado"));
+    public ResponseEntity<Map<String, Object>> deleteEmployee(@PathVariable String id) {
+        try {
+            if (!service.deleteEmployee(id)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of(
+                                "status", "error",
+                                "message", "No se encontró el empleado",
+                                "timestamp", Instant.now().toString()
+                        ));
+            }
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(Map.of("status", "success", "message", "Empleado eliminado con éxito"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("status", "server error", "message", "Error interno del servidor", "detail", e.getMessage()));
         }
     }
 }

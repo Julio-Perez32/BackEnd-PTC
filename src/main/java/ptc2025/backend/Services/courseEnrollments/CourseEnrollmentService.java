@@ -11,72 +11,83 @@ import ptc2025.backend.Respositories.courseEnrollments.CourseEnrollmentRepositor
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
 @Slf4j
+@Service
 public class CourseEnrollmentService {
 
     @Autowired
-    private CourseEnrollmentRepository repository;
+    private CourseEnrollmentRepository repo;
 
-    public List<CourseEnrollmentDTO> obtenerTodos() {
-        return repository.findAll().stream()
-                .map(this::convertirADTO)
+    // Get
+    public List<CourseEnrollmentDTO> getEnrollments() {
+        List<CourseEnrollmentEntity> list = repo.findAll();
+        return list.stream()
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    public CourseEnrollmentDTO insertar(CourseEnrollmentDTO dto) {
-        if (repository.existsById(dto.getId())) {
-            throw new IllegalArgumentException("La inscripción ya existe");
+    // Post
+    public CourseEnrollmentDTO insertEnrollment(CourseEnrollmentDTO dto) {
+        if(dto == null) throw new IllegalArgumentException("Inscripción no puede ser nula");
+        try {
+            CourseEnrollmentEntity entity = convertToEntity(dto);
+            return convertToDTO(repo.save(entity));
+        } catch(Exception e) {
+            throw new RuntimeException("No se pudo crear la inscripción: " + e.getMessage());
         }
-        CourseEnrollmentEntity entity = convertirAEntity(dto);
-        return convertirADTO(repository.save(entity));
     }
 
-    public CourseEnrollmentDTO actualizar(String id, CourseEnrollmentDTO dto) {
-        if (!repository.existsById(id)) {
-            throw new IllegalArgumentException("No se encontró la inscripción con ID: " + id);
+    // Put
+    public CourseEnrollmentDTO updateEnrollment(String id, CourseEnrollmentDTO dto) {
+        try {
+            if(repo.existsById(id)) {
+                CourseEnrollmentEntity entity = repo.getById(id);
+                entity.setStudentId(dto.getStudentId());
+                entity.setOfferingId(dto.getOfferingId());
+                entity.setEnrollmentDate(dto.getEnrollmentDate());
+                entity.setGrade(dto.getGrade());
+                entity.setIsActive(dto.getIsActive());
+                return convertToDTO(repo.save(entity));
+            }
+            throw new IllegalArgumentException("La inscripción con ID " + id + " no pudo ser actualizada");
+        } catch(Exception e) {
+            throw new RuntimeException("No se pudo actualizar la inscripción: " + e.getMessage());
         }
+    }
 
-        CourseEnrollmentEntity entity = repository.findById(id).orElseThrow(() ->
-                new RuntimeException("Error interno al acceder a la inscripción"));
+    // Delete
+    public boolean deleteEnrollment(String id) {
+        try {
+            if(repo.existsById(id)) {
+                repo.deleteById(id);
+                return true;
+            } else return false;
+        } catch(EmptyResultDataAccessException e) {
+            throw new EmptyResultDataAccessException("La inscripción con ID " + id + " no existe", 1);
+        }
+    }
 
+    // Convert to DTO
+    private CourseEnrollmentDTO convertToDTO(CourseEnrollmentEntity entity) {
+        CourseEnrollmentDTO dto = new CourseEnrollmentDTO();
+        dto.setEnrollmentId(entity.getEnrollmentId());
+        dto.setStudentId(entity.getStudentId());
+        dto.setOfferingId(entity.getOfferingId());
+        dto.setEnrollmentDate(entity.getEnrollmentDate());
+        dto.setGrade(entity.getGrade());
+        dto.setIsActive(entity.getIsActive());
+        return dto;
+    }
+
+    private CourseEnrollmentEntity convertToEntity(CourseEnrollmentDTO dto) {
+        CourseEnrollmentEntity entity = new CourseEnrollmentEntity();
+        entity.setEnrollmentId(dto.getEnrollmentId());
         entity.setStudentId(dto.getStudentId());
         entity.setOfferingId(dto.getOfferingId());
         entity.setEnrollmentDate(dto.getEnrollmentDate());
         entity.setGrade(dto.getGrade());
         entity.setIsActive(dto.getIsActive());
-
-        return convertirADTO(repository.save(entity));
+        return entity;
     }
 
-    public boolean eliminar(String id) {
-        try {
-            repository.deleteById(id);
-            return true;
-        } catch (EmptyResultDataAccessException e) {
-            return false;
-        }
-    }
-
-    private CourseEnrollmentDTO convertirADTO(CourseEnrollmentEntity entity) {
-        return new CourseEnrollmentDTO(
-                entity.getId(),
-                entity.getStudentId(),
-                entity.getOfferingId(),
-                entity.getEnrollmentDate(),
-                entity.getGrade(),
-                entity.getIsActive()
-        );
-    }
-
-    private CourseEnrollmentEntity convertirAEntity(CourseEnrollmentDTO dto) {
-        return new CourseEnrollmentEntity(
-                dto.getId(),
-                dto.getStudentId(),
-                dto.getOfferingId(),
-                dto.getEnrollmentDate(),
-                dto.getGrade(),
-                dto.getIsActive()
-        );
-    }
 }

@@ -1,8 +1,5 @@
 package ptc2025.backend.Services.documents;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -14,53 +11,73 @@ import ptc2025.backend.Respositories.documents.DocumentRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Data
-@Service
 @Slf4j
+@Service
 public class DocumentService {
 
     @Autowired
     private DocumentRepository repository;
 
-    public List<DocumentDTO> obtenerTodos() {
-        return repository.findAll().stream()
-                .map(this::convertirADTO)
+    // GET
+    public List<DocumentDTO> getDocuments() {
+        List<DocumentEntity> docs = repository.findAll();
+        return docs.stream()
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    public DocumentDTO insertar(DocumentDTO dto) {
-        if(repository.existsById(dto.getId())) {
-            throw new IllegalArgumentException("El documento ya existe");
+    // POST
+    public DocumentDTO insertDocument(DocumentDTO dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("Documento no puede ser nulo o vacío");
         }
-        DocumentEntity entity = convertirAEntity(dto);
-        return convertirADTO(repository.save(entity));
-    }
-
-    public DocumentDTO actualizar(String id, DocumentDTO dto) {
-        if (!repository.existsById(id)) {
-            throw new IllegalArgumentException("No se encontró el documento con ID: " + id);
-        }
-        DocumentEntity entity = repository.findById(id).orElseThrow(() ->
-                new RuntimeException("Error interno al acceder al documento"));
-        entity.setName(dto.getName());
-        entity.setType(dto.getType());
-        entity.setUploadDate(dto.getUploadDate());
-        entity.setOwnerId(dto.getOwnerId());
-        entity.setIsActive(dto.getIsActive());
-
-        return convertirADTO(repository.save(entity));
-    }
-
-    public boolean eliminar(String id) {
         try {
-            repository.deleteById(id);
-            return true;
-        } catch (EmptyResultDataAccessException e) {
-            return false;
+            if(repository.existsById(dto.getId())){
+                throw new IllegalArgumentException("El documento con ID " + dto.getId() + " ya existe");
+            }
+            DocumentEntity entity = convertToEntity(dto);
+            DocumentEntity saved = repository.save(entity);
+            return convertToDTO(saved);
+        } catch (Exception e) {
+            throw new RuntimeException("No se pudo crear documento: " + e.getMessage());
         }
     }
 
-    private DocumentDTO convertirADTO(DocumentEntity entity) {
+    // PUT
+    public DocumentDTO updateDocument(String id, DocumentDTO dto) {
+        try {
+            if (repository.existsById(id)) {
+                DocumentEntity entity = repository.getById(id);
+                entity.setName(dto.getName());
+                entity.setType(dto.getType());
+                entity.setUploadDate(dto.getUploadDate());
+                entity.setOwnerId(dto.getOwnerId());
+                entity.setIsActive(dto.getIsActive());
+
+                DocumentEntity saved = repository.save(entity);
+                return convertToDTO(saved);
+            }
+            throw new IllegalArgumentException("El documento con ID " + id + " no existe");
+        } catch (Exception e) {
+            throw new RuntimeException("No se pudo actualizar documento: " + e.getMessage());
+        }
+    }
+
+    // DELETE
+    public boolean deleteDocument(String id) {
+        try {
+            if (repository.existsById(id)) {
+                repository.deleteById(id);
+                return true;
+            }
+            return false;
+        } catch (EmptyResultDataAccessException e) {
+            throw new EmptyResultDataAccessException("El documento con ID " + id + " no existe", 1);
+        }
+    }
+
+    // Convertir a DTO
+    private DocumentDTO convertToDTO(DocumentEntity entity) {
         DocumentDTO dto = new DocumentDTO();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
@@ -71,7 +88,8 @@ public class DocumentService {
         return dto;
     }
 
-    private DocumentEntity convertirAEntity(DocumentDTO dto) {
+    // Convertir a Entity
+    private DocumentEntity convertToEntity(DocumentDTO dto) {
         DocumentEntity entity = new DocumentEntity();
         entity.setId(dto.getId());
         entity.setName(dto.getName());

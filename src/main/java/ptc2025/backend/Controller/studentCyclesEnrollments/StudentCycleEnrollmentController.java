@@ -1,67 +1,93 @@
 package ptc2025.backend.Controller.studentCyclesEnrollments;
 
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ptc2025.backend.Models.DTO.studentCycleEnrollments.StudentCycleEnrollmentDTO;
 import ptc2025.backend.Services.studentCycleEnrollments.StudentCycleEnrollmentService;
 
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/studentCycleEnrollments")
-@RequiredArgsConstructor
-@Slf4j
 public class StudentCycleEnrollmentController {
 
-    private final StudentCycleEnrollmentService servicio;
+    @Autowired
+    private StudentCycleEnrollmentService service;
 
+    // GET
     @GetMapping("/getEnrollments")
-    public ResponseEntity<List<StudentCycleEnrollmentDTO>> obtenerTodos() {
-        return ResponseEntity.ok(servicio.obtenerTodos());
+    public List<StudentCycleEnrollmentDTO> getEnrollments() {
+        return service.getEnrollments();
     }
 
+    // POST
     @PostMapping("/insertEnrollment")
-    public ResponseEntity<?> insertar(@RequestBody @Valid StudentCycleEnrollmentDTO dto, BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(Map.of("mensaje", "Datos inválidos", "error", result.getAllErrors()));
+    public ResponseEntity<Map<String, Object>> insertEnrollment(@Valid @RequestBody StudentCycleEnrollmentDTO dto, BindingResult binding) {
+        if (binding.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            binding.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("status", "error", "errors", errors));
         }
-
         try {
-            StudentCycleEnrollmentDTO creado = servicio.insertar(dto);
-            return ResponseEntity.ok(Map.of("mensaje", "Inscripción registrada", "data", creado));
+            StudentCycleEnrollmentDTO answer = service.insertEnrollment(dto);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(Map.of("status", "success", "data", answer));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("mensaje", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("status", "error", "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("status", "server error", "message", "Error interno del servidor", "detail", e.getMessage()));
         }
     }
 
+    // PUT
     @PutMapping("/updateEnrollment/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable String id, @RequestBody @Valid StudentCycleEnrollmentDTO dto, BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(Map.of("mensaje", "Datos inválidos", "error", result.getAllErrors()));
+    public ResponseEntity<Map<String, Object>> updateEnrollment(@PathVariable String id, @Valid @RequestBody StudentCycleEnrollmentDTO dto, BindingResult binding) {
+        if (binding.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            binding.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("status", "error", "errors", errors));
         }
-
         try {
-            StudentCycleEnrollmentDTO actualizado = servicio.actualizar(id, dto);
-            return ResponseEntity.ok(Map.of("mensaje", "Inscripción actualizada", "data", actualizado));
+            StudentCycleEnrollmentDTO answer = service.updateEnrollment(id, dto);
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .body(Map.of("status", "success", "data", answer));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("mensaje", e.getMessage()));
-        } catch (RuntimeException e) {
-            return ResponseEntity.internalServerError().body(Map.of("mensaje", "Error al actualizar"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("status", "error", "message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("status", "server error", "message", "Error interno del servidor", "detail", e.getMessage()));
         }
     }
 
+    // DELETE
     @DeleteMapping("/deleteEnrollment/{id}")
-    public ResponseEntity<?> eliminar(@PathVariable String id) {
-        boolean resultado = servicio.eliminar(id);
-        if (resultado) {
-            return ResponseEntity.ok(Map.of("mensaje", "Inscripción eliminada"));
-        } else {
-            return ResponseEntity.badRequest().body(Map.of("mensaje", "No se encontró la inscripción"));
+    public ResponseEntity<Map<String, Object>> deleteEnrollment(@PathVariable String id) {
+        try {
+            if (!service.deleteEnrollment(id)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of(
+                                "status", "error",
+                                "message", "No se encontró la inscripción",
+                                "timestamp", Instant.now().toString()
+                        ));
+            }
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(Map.of("status", "success", "message", "Inscripción eliminada con éxito"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("status", "server error", "message", "Error interno del servidor", "detail", e.getMessage()));
         }
     }
 }

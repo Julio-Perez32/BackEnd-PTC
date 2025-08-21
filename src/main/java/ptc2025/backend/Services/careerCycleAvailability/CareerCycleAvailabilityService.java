@@ -1,6 +1,5 @@
 package ptc2025.backend.Services.careerCycleAvailability;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -12,72 +11,76 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 public class CareerCycleAvailabilityService {
 
     @Autowired
-    private CareerCycleAvailabilityRepository repository;
+    private CareerCycleAvailabilityRepository repo;
 
-    public List<CareerCycleAvailabilityDTO> obtenerTodos() {
-        return repository.findAll().stream()
-                .map(this::convertirADTO)
+    public List<CareerCycleAvailabilityDTO> getAvailability(){
+        return repo.findAll().stream()
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    public CareerCycleAvailabilityDTO insertar(CareerCycleAvailabilityDTO dto) {
-        if (repository.existsById(dto.getId())) {
-            throw new IllegalArgumentException("La disponibilidad ya existe");
+    public CareerCycleAvailabilityDTO insertAvailability(CareerCycleAvailabilityDTO dto){
+        if(dto == null) throw new IllegalArgumentException("Disponibilidad no puede ser nula");
+        if(repo.existsById(dto.getId())) throw new IllegalArgumentException("Ya existe disponibilidad con ese ID");
+        try{
+            CareerCycleAvailabilityEntity entity = convertToEntity(dto);
+            return convertToDTO(repo.save(entity));
+        } catch(Exception e){
+            throw new RuntimeException("No se pudo crear disponibilidad: " + e.getMessage());
         }
-        CareerCycleAvailabilityEntity entity = convertirAEntity(dto);
-        return convertirADTO(repository.save(entity));
     }
 
-    public CareerCycleAvailabilityDTO actualizar(String id, CareerCycleAvailabilityDTO dto) {
-        if (!repository.existsById(id)) {
+    public CareerCycleAvailabilityDTO updateAvailability(String id, CareerCycleAvailabilityDTO dto){
+        try{
+            if(repo.existsById(id)){
+                CareerCycleAvailabilityEntity entity = repo.getById(id);
+                entity.setCareerId(dto.getCareerId());
+                entity.setAcademicYearId(dto.getAcademicYearId());
+                entity.setCycleCode(dto.getCycleCode());
+                entity.setMaxCapacity(dto.getMaxCapacity());
+                entity.setIsActive(dto.getIsActive());
+                return convertToDTO(repo.save(entity));
+            }
             throw new IllegalArgumentException("No se encontró disponibilidad con ID: " + id);
+        } catch(Exception e){
+            throw new RuntimeException("No se pudo actualizar disponibilidad: " + e.getMessage());
         }
+    }
 
-        CareerCycleAvailabilityEntity entity = repository.findById(id).orElseThrow(() ->
-                new RuntimeException("Error interno al acceder a la disponibilidad"));
+    public boolean deleteAvailability(String id){
+        try{
+            if(repo.existsById(id)){
+                repo.deleteById(id);
+                return true;
+            }
+            return false;
+        } catch(EmptyResultDataAccessException e){
+            throw new EmptyResultDataAccessException("La disponibilidad con id "+ id + " no existe", 1);
+        }
+    }
 
+    private CareerCycleAvailabilityDTO convertToDTO(CareerCycleAvailabilityEntity entity){
+        CareerCycleAvailabilityDTO dto = new CareerCycleAvailabilityDTO();
+        dto.setId(entity.getId());
+        dto.setCareerId(entity.getCareerId());
+        dto.setAcademicYearId(entity.getAcademicYearId());
+        dto.setCycleCode(entity.getCycleCode());
+        dto.setMaxCapacity(entity.getMaxCapacity());
+        dto.setIsActive(entity.getIsActive());
+        return dto;
+    }
+
+    private CareerCycleAvailabilityEntity convertToEntity(CareerCycleAvailabilityDTO dto){
+        CareerCycleAvailabilityEntity entity = new CareerCycleAvailabilityEntity();
+        entity.setId(dto.getId());
         entity.setCareerId(dto.getCareerId());
         entity.setAcademicYearId(dto.getAcademicYearId());
         entity.setCycleCode(dto.getCycleCode());
         entity.setMaxCapacity(dto.getMaxCapacity());
         entity.setIsActive(dto.getIsActive());
-
-        return convertirADTO(repository.save(entity));
-    }
-
-    public boolean eliminar(String id) {
-        try {
-            repository.deleteById(id);
-            return true;
-        } catch (EmptyResultDataAccessException e) {
-            return false;
-        }
-    }
-
-    private CareerCycleAvailabilityDTO convertirADTO(CareerCycleAvailabilityEntity entity) {
-        return new CareerCycleAvailabilityDTO(
-                entity.getId(),
-                entity.getCareerId(),
-                entity.getAcademicYearId(),
-                entity.getCycleCode(),
-                entity.getMaxCapacity(),
-                entity.getIsActive()
-        );
-    }
-
-    private CareerCycleAvailabilityEntity convertirAEntity(CareerCycleAvailabilityDTO dto) {
-        return new CareerCycleAvailabilityEntity(
-                dto.getId(),
-                dto.getCareerId(),
-                dto.getAcademicYearId(),
-                dto.getCycleCode(),
-                dto.getMaxCapacity(),
-                dto.getIsActive()
-        );
+        return entity;
     }
 }
-

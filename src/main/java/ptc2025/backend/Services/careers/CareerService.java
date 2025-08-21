@@ -9,72 +9,81 @@ import ptc2025.backend.Models.DTO.careers.CareerDTO;
 import ptc2025.backend.Respositories.careers.CareerRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Service
 @Slf4j
+@Service
 public class CareerService {
 
     @Autowired
-    private CareerRepository repository;
+    private CareerRepository repo;
 
-    public List<CareerDTO> obtenerTodos() {
-        return repository.findAll().stream()
+    // GET
+    public List<CareerDTO> getCareers() {
+        return repo.findAll().stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    public CareerDTO insertar(CareerDTO dto) {
-        if (repository.existsById(dto.getId())) {
-            throw new IllegalArgumentException("La carrera ya existe");
-        }
+    // POST
+    public CareerDTO insertCareer(CareerDTO dto) {
+        if (dto == null) throw new IllegalArgumentException("Carrera no puede ser nula");
+        if (repo.existsById(dto.getId())) throw new IllegalArgumentException("La carrera ya existe");
         CareerEntity entity = convertirAEntity(dto);
-        return convertirADTO(repository.save(entity));
+        CareerEntity saved = repo.save(entity);
+        return convertirADTO(saved);
     }
 
-    public CareerDTO actualizar(String id, CareerDTO dto) {
-        if (!repository.existsById(id)) {
-            throw new IllegalArgumentException("No se encontró la carrera con ID: " + id);
+    // PUT
+    public CareerDTO updateCareer(String id, CareerDTO dto) {
+        try {
+            if (repo.existsById(id)) {
+                CareerEntity entity = repo.getById(id);
+                entity.setName(dto.getName());
+                entity.setDescription(dto.getDescription());
+                entity.setFacultyId(dto.getFacultyId());
+                entity.setIsActive(dto.getIsActive());
+                CareerEntity saved = repo.save(entity);
+                return convertirADTO(saved);
+            }
+            throw new IllegalArgumentException("La carrera con ID " + id + " no pudo ser actualizada");
+        } catch (Exception e) {
+            throw new RuntimeException("No se pudo actualizar la carrera: " + e.getMessage());
         }
-        CareerEntity entity = repository.findById(id).orElseThrow(() ->
-                new RuntimeException("Error interno al acceder a la carrera"));
+    }
 
+    // DELETE
+    public boolean deleteCareer(String id) {
+        try {
+            if (repo.existsById(id)) {
+                repo.deleteById(id);
+                return true;
+            } else {
+                return false;
+            }
+        } catch (EmptyResultDataAccessException e) {
+            throw new EmptyResultDataAccessException("La carrera con ID " + id + " no existe", 1);
+        }
+    }
+
+    // CONVERSIONES
+    private CareerDTO convertirADTO(CareerEntity entity) {
+        CareerDTO dto = new CareerDTO();
+        dto.setId(entity.getId());
+        dto.setName(entity.getName());
+        dto.setDescription(entity.getDescription());
+        dto.setFacultyId(entity.getFacultyId());
+        dto.setIsActive(entity.getIsActive());
+        return dto;
+    }
+
+    private CareerEntity convertirAEntity(CareerDTO dto) {
+        CareerEntity entity = new CareerEntity();
+        entity.setId(dto.getId());
         entity.setName(dto.getName());
         entity.setDescription(dto.getDescription());
         entity.setFacultyId(dto.getFacultyId());
         entity.setIsActive(dto.getIsActive());
-
-        return convertirADTO(repository.save(entity));
-    }
-
-    public boolean eliminar(String id) {
-        try {
-            repository.deleteById(id);
-            return true;
-        } catch (EmptyResultDataAccessException e) {
-            return false;
-        }
-    }
-
-    private CareerDTO convertirADTO(CareerEntity entity) {
-        return new CareerDTO(
-                entity.getId(),
-                entity.getName(),
-                entity.getDescription(),
-                entity.getFacultyId(),
-                entity.getIsActive()
-        );
-    }
-
-    private CareerEntity convertirAEntity(CareerDTO dto) {
-        return new CareerEntity(
-                dto.getId(),
-                dto.getName(),
-                dto.getDescription(),
-                dto.getFacultyId(),
-                dto.getIsActive()
-        );
+        return entity;
     }
 }
-
