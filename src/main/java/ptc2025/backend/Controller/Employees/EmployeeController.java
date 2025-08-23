@@ -1,4 +1,4 @@
-package ptc2025.backend.Controller.careers;
+package ptc2025.backend.Controller.Employees;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,8 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ptc2025.backend.Models.DTO.careers.CareerDTO;
-import ptc2025.backend.Services.careers.CareerService;
+import ptc2025.backend.Models.DTO.employees.EmployeeDTO;
+import ptc2025.backend.Services.employees.EmployeeService;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -15,29 +15,28 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/careers")
-public class CareerController {
+@RequestMapping("/api/Employees")
+public class EmployeeController {
 
     @Autowired
-    private CareerService service;
+    private EmployeeService service;
 
     // GET
-    @GetMapping("/getCareers")
-    public List<CareerDTO> getCareers() {
-        return service.getCareers();
+    @GetMapping("/getEmployees")
+    public List<EmployeeDTO> getEmployees() {
+        return service.getEmployees();
     }
 
     // POST
-    @PostMapping("/insertCareer")
-    public ResponseEntity<Map<String, Object>> insertCareer(@Valid @RequestBody CareerDTO dto, BindingResult binding) {
+    @PostMapping("/insertEmployee")
+    public ResponseEntity<Map<String, Object>> insertEmployee(@Valid @RequestBody EmployeeDTO dto, BindingResult binding) {
         if (binding.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             binding.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("status", "error", "errors", errors));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("status", "error", "errors", errors));
         }
         try {
-            CareerDTO answer = service.insertCareer(dto);
+            EmployeeDTO answer = service.insertEmployee(dto);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(Map.of("status", "success", "data", answer));
         } catch (IllegalArgumentException e) {
@@ -50,16 +49,15 @@ public class CareerController {
     }
 
     // PUT
-    @PutMapping("/updateCareer/{id}")
-    public ResponseEntity<Map<String, Object>> updateCareer(@PathVariable String id, @Valid @RequestBody CareerDTO dto, BindingResult binding) {
+    @PutMapping("/updateEmployee/{id}")
+    public ResponseEntity<Map<String, Object>> updateEmployee(@PathVariable String id, @Valid @RequestBody EmployeeDTO dto, BindingResult binding) {
         if (binding.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             binding.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("status", "error", "errors", errors));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("status", "error", "errors", errors));
         }
         try {
-            CareerDTO answer = service.updateCareer(id, dto);
+            EmployeeDTO answer = service.updateEmployee(id, dto);
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body(Map.of("status", "success", "data", answer));
         } catch (IllegalArgumentException e) {
@@ -72,19 +70,19 @@ public class CareerController {
     }
 
     // DELETE
-    @DeleteMapping("/deleteCareer/{id}")
-    public ResponseEntity<Map<String, Object>> deleteCareer(@PathVariable String id) {
+    @DeleteMapping("/deleteEmployee/{id}")
+    public ResponseEntity<Map<String, Object>> deleteEmployee(@PathVariable String id) {
         try {
-            if (!service.deleteCareer(id)) {
+            if (!service.deleteEmployee(id)) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of(
                                 "status", "error",
-                                "message", "No se encontró la carrera",
+                                "message", "No se encontró el empleado",
                                 "timestamp", Instant.now().toString()
                         ));
             }
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(Map.of("status", "success", "message", "Carrera eliminada con éxito"));
+                    .body(Map.of("status", "success", "message", "Empleado eliminado con éxito"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("status", "server error", "message", "Error interno del servidor", "detail", e.getMessage()));

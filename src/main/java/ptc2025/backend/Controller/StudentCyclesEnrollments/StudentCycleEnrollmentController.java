@@ -1,4 +1,4 @@
-package ptc2025.backend.Controller.studentCyclesEnrollments;
+package ptc2025.backend.Controller.StudentCyclesEnrollments;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/studentCycleEnrollments")
+@RequestMapping("/api/StudentCycleEnrollments")
 public class StudentCycleEnrollmentController {
 
     @Autowired

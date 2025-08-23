@@ -1,4 +1,4 @@
-package ptc2025.backend.Controller.documents;
+package ptc2025.backend.Controller.Documents;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/apiDocuments")
+@RequestMapping("/api/Documents")
 public class DocumentController {
 
     @Autowired

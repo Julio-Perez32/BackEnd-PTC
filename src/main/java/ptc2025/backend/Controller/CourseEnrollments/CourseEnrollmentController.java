@@ -1,4 +1,4 @@
-package ptc2025.backend.Controller.courseEnrollments;
+package ptc2025.backend.Controller.CourseEnrollments;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/apiCourseEnrollments")
+@RequestMapping("/api/CourseEnrollments")
 public class CourseEnrollmentController {
 
     @Autowired

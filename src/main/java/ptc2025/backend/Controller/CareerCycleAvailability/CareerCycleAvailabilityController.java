@@ -1,4 +1,4 @@
-package ptc2025.backend.Controller.careerCycleAvailability;
+package ptc2025.backend.Controller.CareerCycleAvailability;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/apiCareerCycleAvailability")
+@RequestMapping("/api/CareerCycleAvailability")
 public class CareerCycleAvailabilityController {
 
     @Autowired
