@@ -6,10 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.People.PeopleEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Entities.systemRoles.SystemRolesEntity;
-
-import java.util.Date;
 
 @Entity
 @Table(name = "USERS")
@@ -24,7 +23,7 @@ public class UsersEntity {
     @Column(name = "UNIVERSITYID")
     private String universityID;
     @Column(name = "PERSONID")
-    private String personid;
+    private String personId;
     @Column (name = "ROLEID")
     private String roleId;
     @Column(name = "EMAIL")
@@ -32,13 +31,20 @@ public class UsersEntity {
     @Column(name = "PASSWORD")
     private String contrasena;
 
-    @ManyToOne
-    @JoinColumn(name = "ROLEID", referencedColumnName = "ROLEID")
-    private SystemRolesEntity systemRoles;
 
     @ManyToOne
     @JoinColumn(name = "UNIVERSITYID", referencedColumnName = "UNIVERSITYID")
     private UniversityEntity university;
+
+    @ManyToOne
+    @JoinColumn(name = "PERSONID", referencedColumnName = "PERSONID")
+    private PeopleEntity people;
+
+    @ManyToOne
+    @JoinColumn(name = "ROLEID", referencedColumnName = "ROLEID")
+    private SystemRolesEntity systemRoles;
+
+
 
 
 }

@@ -5,10 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.People.PeopleEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Entities.Users.UsersEntity;
 import ptc2025.backend.Entities.systemRoles.SystemRolesEntity;
 import ptc2025.backend.Models.DTO.Users.UsersDTO;
+import ptc2025.backend.Respositories.People.PeopleRepository;
 import ptc2025.backend.Respositories.Universities.UniversityRespository;
 import ptc2025.backend.Respositories.Users.UsersRespository;
 import ptc2025.backend.Respositories.systemRoles.systemRolesRespository;
@@ -27,6 +29,9 @@ public class UsersService {
 
     @Autowired //Se inyecta el repositorio de University
     systemRolesRespository repoSystemRoles;
+
+    @Autowired
+    PeopleRepository repoPeople;
 
     public List<UsersDTO> getAllUsers(){
         List<UsersEntity> users = repo.findAll();
@@ -47,6 +52,13 @@ public class UsersService {
         }else {
             dto.setUniversityName("Sin Universidad Asignada");
             dto.setUniversityID(null);
+        }
+        if(usuario.getPersonId() != null){
+            dto.setPersonName(usuario.getPeople().getFirstName());
+            dto.setPersonId(usuario.getPeople().getPersonID());
+        }else {
+            dto.setPersonName("Sin Persona Asignada");
+            dto.setPersonId(null);
         }
         //para convertir a DTO el rol del sistema del usuario
         if(usuario.getRoleId() != null){
@@ -84,39 +96,59 @@ public class UsersService {
                     .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + data.getUniversityID()));
             entity.setUniversity(university);
         }
+        if(data.getPersonId() != null){
+            PeopleEntity people = repoPeople.findById(data.getPersonId())
+                    .orElseThrow(() -> new IllegalArgumentException("Rol del sistema no encontrada con ID: " + data.getPersonId()));
+            entity.setPeople(people);
+        }
         //para obtener el id rol del sistema
         if(data.getRoleId() != null){
             SystemRolesEntity systemRoles = repoSystemRoles.findById(data.getRoleId())
                     .orElseThrow(() -> new IllegalArgumentException("Rol del sistema no encontrada con ID: " + data.getRoleId()));
             entity.setSystemRoles(systemRoles);
         }
+
         return entity;
     }
 
     // Actualizar
     public UsersDTO actualizarDatos(String id, UsersDTO json) {
-        UsersEntity existente = repo.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        UsersEntity existente = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
         existente.setEmail(json.getEmail());
         existente.setContrasena(json.getContrasena());
-        //para obtener el id de la universidad
+
+        // Universidad
         if(json.getUniversityID() != null){
             UniversityEntity university = repoUniversity.findById(json.getUniversityID())
-                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + json.getRoleId()));
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + json.getUniversityID()));
             existente.setUniversity(university);
-        }else {
+        } else {
             existente.setUniversity(null);
         }
-        //para obtener el rol que tiene el usuario en el sistema
+        // Persona asociada
+        if (json.getPersonId() != null){
+            PeopleEntity person = repoPeople.findById(json.getPersonId())
+                    .orElseThrow(() -> new IllegalArgumentException("Cargo no encontrado con ID proporcionado: " + json.getPersonId()));
+            existente.setPeople(person);
+        }else {
+            existente.setPeople(null);
+        }
+        // Rol en el sistema
         if(json.getRoleId() != null){
             SystemRolesEntity systemRoles = repoSystemRoles.findById(json.getRoleId())
-                    .orElseThrow(() -> new IllegalArgumentException("Rol del sistema no encontrado con ID: " + json.getRoleId()));
+                    .orElseThrow(() -> new IllegalArgumentException("Rol del sistema no encontrado con ID proporcionado: " + json.getRoleId()));
             existente.setSystemRoles(systemRoles);
-        }else {
-            existente.setUniversity(null);
+        } else {
+            existente.setSystemRoles(null);
         }
+
+
         UsersEntity usuarioActualizado = repo.save(existente);
         return convertirUsuarioADTO(usuarioActualizado);
     }
+
 
     public boolean eliminarUsuario(String id) {
         try {
