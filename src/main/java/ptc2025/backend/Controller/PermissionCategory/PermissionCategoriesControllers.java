@@ -23,10 +23,10 @@ public class PermissionCategoriesControllers {
     private PermissionCategoriesService service;
 
     @GetMapping("/getPermissionCategories")
-    public List<PermissionCategoriesDTO> getPermissions(){return service.getAllPermissions();}
+    public List<PermissionCategoriesDTO> getPermissionCategories(){return service.getAllPermissions();}
 
     @PostMapping("/newPermissionCategories")
-    public ResponseEntity<?> newCategory (@Valid @RequestBody PermissionCategoriesDTO json, HttpServletRequest request){
+    public ResponseEntity<?> newPermissionCategory(@Valid @RequestBody PermissionCategoriesDTO json, HttpServletRequest request){
         try{
             PermissionCategoriesDTO response = service.insertPermission(json);
             if(response == null){
@@ -49,8 +49,8 @@ public class PermissionCategoriesControllers {
         }
     }
 
-    @PutMapping("/updatePermissionCategories/{ID}")
-    public ResponseEntity<?> modificarUsuario(@PathVariable String ID, @Valid @RequestBody PermissionCategoriesDTO json, BindingResult bindingResult){
+    @PutMapping("/updatePermissionCategories/{id}")
+    public ResponseEntity<?> updatePermissionCategory(@PathVariable String ID, @Valid @RequestBody PermissionCategoriesDTO json, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
@@ -70,8 +70,8 @@ public class PermissionCategoriesControllers {
         }
     }
 
-    @DeleteMapping("/deletePermissionCategories/{ID}")
-    public ResponseEntity<?> eliminarUsuario(@PathVariable String ID){
+    @DeleteMapping("/deletePermissionCategories/{id}")
+    public ResponseEntity<?> deletePermissionCategory(@PathVariable String ID){
         try{
             if(!service.deletePermission(ID)){
                 //Error

@@ -26,7 +26,7 @@ public class DepartmentsController {
     public List<DepartmentsDTO> getDepartments(){return service.getAllDepartments();}
 
     @PostMapping("/newDepartment")
-    public ResponseEntity<?> newwDepartment(@Valid @RequestBody DepartmentsDTO json, HttpServletRequest request){
+    public ResponseEntity<?> newDepartment(@Valid @RequestBody DepartmentsDTO json, HttpServletRequest request){
         try{
             DepartmentsDTO response = service.insertDepartment(json);
             if (response == null){
@@ -48,8 +48,8 @@ public class DepartmentsController {
             ));
         }
     }
-    @PutMapping("/updateDepartment/{ID}")
-    public ResponseEntity<?> modificarUsuario(@PathVariable String ID, @Valid @RequestBody DepartmentsDTO json, BindingResult bindingResult){
+    @PutMapping("/updateDepartment/{id}")
+    public ResponseEntity<?> updateDepartment(@PathVariable String ID, @Valid @RequestBody DepartmentsDTO json, BindingResult bindingResult){
 
         if(bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
@@ -72,8 +72,8 @@ public class DepartmentsController {
         }
     }
 
-    @DeleteMapping("/deleteDeparment/{ID}")
-    public ResponseEntity<?> eliminarUsuario(@PathVariable String ID){
+    @DeleteMapping("/deleteDeparment/{id}")
+    public ResponseEntity<?> deleteDepartment(@PathVariable String ID){
         try{
             if(!service.deleteDepartment(ID)){
                 //Error

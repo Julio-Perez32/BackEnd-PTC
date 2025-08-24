@@ -49,7 +49,7 @@ public class PeopleController {
             ));
         }
     }
-    @PutMapping("/updatePeople/{ID}")
+    @PutMapping("/updatePeople/{id}")
     public ResponseEntity<?> updatePeople(@PathVariable String ID, @Valid @RequestBody PeopleDTO json, BindingResult bindingResult){
 
         if(bindingResult.hasErrors()){
@@ -71,7 +71,7 @@ public class PeopleController {
         }
     }
 
-    @DeleteMapping("/deletePeople/{ID}")
+    @DeleteMapping("/deletePeople/{id}")
     public ResponseEntity<?> deletePeople(@PathVariable String ID){
         try{
             if(!service.deletePeople(ID)){

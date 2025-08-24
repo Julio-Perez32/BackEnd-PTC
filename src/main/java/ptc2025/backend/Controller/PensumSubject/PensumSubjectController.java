@@ -24,7 +24,7 @@ public class PensumSubjectController {
     PensumSubjectService service;
 
     @GetMapping("/getPenumSubjects")
-    public List<PensumSubjectDTO> getPensa(){return service.getPensumSubjects();}
+    public List<PensumSubjectDTO> getPensumSubjects(){return service.getPensumSubjects();}
 
     @PostMapping("/insertPensumSubject")
     public ResponseEntity<?> newPensumSubject(@Valid @RequestBody PensumSubjectDTO json, HttpServletRequest request){
@@ -50,7 +50,7 @@ public class PensumSubjectController {
         }
     }
 
-    @PutMapping("/updatePensumSubject/{ID}")
+    @PutMapping("/updatePensumSubject/{id}")
     public ResponseEntity<?> updatePensumSubject(@Valid String id, @RequestBody PensumSubjectDTO json, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
@@ -71,7 +71,7 @@ public class PensumSubjectController {
         }
     }
 
-    @DeleteMapping("/deletePensumSubject/{ID}")
+    @DeleteMapping("/deletePensumSubject/{id}")
     public ResponseEntity<?> deletePensumSubject(@PathVariable String id){
         try{
             if(!service.removePensumSubject(id)){

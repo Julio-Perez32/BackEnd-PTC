@@ -49,7 +49,7 @@ public class PensumController {
         }
     }
 
-    @PutMapping("/updatePensum/{ID}")
+    @PutMapping("/updatePensum/{id}")
     public ResponseEntity<?> updatePensum(@PathVariable String ID, @Valid @RequestBody PensumDTO json, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
@@ -68,7 +68,7 @@ public class PensumController {
         }
     }
 
-    @DeleteMapping("/deletePensum/{ID}")
+    @DeleteMapping("/deletePensum/{id}")
     public ResponseEntity<?> deletePensum(@PathVariable String ID){
         try{
             if(!service.deletePensum(ID)){

@@ -45,7 +45,7 @@ public class SubjectTeachersController {
         }
     }
 
-    @PutMapping("/updateSubjectTeacher/{ID}")
+    @PutMapping("/updateSubjectTeacher/{id}")
     public ResponseEntity<?> updateSubjectTeacher(@PathVariable String id, @Valid @RequestBody SubjectTeachersDTO dto, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
@@ -68,7 +68,7 @@ public class SubjectTeachersController {
         }
     }
 
-    @DeleteMapping("/deleteSubjectTeacher/{ID}")
+    @DeleteMapping("/deleteSubjectTeacher/{id}")
     public ResponseEntity<?> deleteSubjectTeacher(@PathVariable String id){
         try{
             if(!service.deleteSubjectTeacher(id)){

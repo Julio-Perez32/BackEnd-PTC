@@ -26,7 +26,7 @@ public class FacultiesController {
     public List<FacultiesDTO> getFaculties(){return service.getAllFaculties();}
 
     @PostMapping("/newFaculties")
-    public ResponseEntity<?> newFacult(@Valid @RequestBody FacultiesDTO json, HttpServletRequest request){
+    public ResponseEntity<?> newFaculty(@Valid @RequestBody FacultiesDTO json, HttpServletRequest request){
         try{
             FacultiesDTO response = service.insertFaculty(json);
             if(response == null){
@@ -48,8 +48,8 @@ public class FacultiesController {
             ));
         }
     }
-    @PutMapping("/updateFaculty/{ID}")
-    public ResponseEntity<?> modificarUsuario(@PathVariable String ID, @Valid @RequestBody FacultiesDTO json, BindingResult bindingResult){
+    @PutMapping("/updateFaculty/{id}")
+    public ResponseEntity<?> updateFaculty(@PathVariable String ID, @Valid @RequestBody FacultiesDTO json, BindingResult bindingResult){
 
         if(bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
@@ -70,8 +70,8 @@ public class FacultiesController {
         }
     }
 
-    @DeleteMapping("/deleteFaculty/{ID}")
-    public ResponseEntity<?> eliminarUsuario(@PathVariable String ID){
+    @DeleteMapping("/deleteFaculty/{id}")
+    public ResponseEntity<?> deleteFaculty(@PathVariable String ID){
         try{
             if(!service.deleteFaculty(ID)){
                 //Error
