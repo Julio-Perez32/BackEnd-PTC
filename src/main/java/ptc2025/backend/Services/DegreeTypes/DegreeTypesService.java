@@ -5,8 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.DegreeTypes.DegreeTypesEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Models.DTO.DegreeTypes.DegreeTypesDTO;
 import ptc2025.backend.Respositories.DegreeTypes.DegreeTypesRepository;
+import ptc2025.backend.Respositories.Universities.UniversityRespository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +18,9 @@ public class DegreeTypesService {
 
     @Autowired
     private DegreeTypesRepository repo;
+
+    @Autowired //Se inyecta el repositorio de University
+    UniversityRespository repoUniversity;
 
     public List<DegreeTypesDTO> getAllDegreeTypes(){
         List<DegreeTypesEntity> degreetype = repo.findAll();
@@ -40,8 +45,13 @@ public class DegreeTypesService {
 
     private DegreeTypesEntity convertirAEntity(DegreeTypesDTO data){
         DegreeTypesEntity entity = new DegreeTypesEntity();
-        entity.setUniversityID(data.getUniversityID());
         entity.setDegreeTypeName(data.getDegreeTypeName());
+
+        if(data.getUniversityID() != null){
+            UniversityEntity university = repoUniversity.findById(data.getUniversityID())
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + data.getUniversityID()));
+            entity.setUniversity(university);
+        }
         return entity;
     }
 
@@ -49,15 +59,28 @@ public class DegreeTypesService {
 
         DegreeTypesDTO dto = new DegreeTypesDTO();
         dto.setId(degreeT.getId());
-        dto.setUniversityID(degreeT.getUniversityID());
         dto.setDegreeTypeName(degreeT.getDegreeTypeName());
+
+        if(degreeT.getUniversity() != null){
+            dto.setUniversityName(degreeT.getUniversity().getUniversityName());
+            dto.setUniversityID(degreeT.getUniversity().getUniversityID());
+        }else {
+            dto.setUniversityName("Sin Universidad Asignada");
+            dto.setUniversityID(null);
+        }
         return dto;
     }
 
     public DegreeTypesDTO actualizarDegreeType(String id, DegreeTypesDTO json) {
         DegreeTypesEntity existente = repo.findById(id).orElseThrow(() -> new RuntimeException("DegreeType not found"));
-        existente.setUniversityID(json.getUniversityID());
         existente.setDegreeTypeName(json.getDegreeTypeName());
+        if(json.getUniversityID() != null){
+            UniversityEntity university = repoUniversity.findById(json.getUniversityID())
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + json.getUniversityID()));
+            existente.setUniversity(university);
+        }else {
+            existente.setUniversity(null);
+        }
         DegreeTypesEntity degreeTypeAtualizado = repo.save(existente);
         return hacerdegreestypeADTO(degreeTypeAtualizado);
     }

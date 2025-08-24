@@ -5,8 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.SocialService.SocialServiceEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Models.DTO.SocialService.SocialServiceDTO;
 import ptc2025.backend.Respositories.SocialService.SocialServiceRespository;
+import ptc2025.backend.Respositories.Universities.UniversityRespository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +18,10 @@ import java.util.stream.Collectors;
 public class SocialServiceServices {
     @Autowired
     SocialServiceRespository repo;
+
+    @Autowired //Se inyecta el repositorio de University
+    UniversityRespository repoUniversity;
+
     public List<SocialServiceDTO> getSocialService(){
         List<SocialServiceEntity> servicioSocial = repo.findAll();
         return servicioSocial.stream()
@@ -39,10 +45,17 @@ public class SocialServiceServices {
     }
     public SocialServiceDTO modificarServicioSocial(String id, SocialServiceDTO dto){
         SocialServiceEntity servicioExistente = repo.findById(id).orElseThrow(() -> new RuntimeException("El dato no pudo ser actualizado. Localidad no encontrada"));
-        servicioExistente.setUniversityID(dto.getUniversityID());
+
         servicioExistente.setSocialServiceProjectName(dto.getSocialServiceProjectName());
         servicioExistente.setDescription(dto.getDescription());
         SocialServiceEntity actualizado = repo.save(servicioExistente);
+        if(dto.getUniversityID() != null){
+            UniversityEntity university = repoUniversity.findById(dto.getUniversityID())
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + dto.getUniversityID()));
+            servicioExistente.setUniversity(university);
+        }else {
+            servicioExistente.setUniversity(null);
+        }
         return convertirSSDTO(actualizado);
     }
     public boolean eliminarServicioSocial(String id){
@@ -62,17 +75,31 @@ public class SocialServiceServices {
     private SocialServiceDTO convertirSSDTO(SocialServiceEntity entity){
         SocialServiceDTO dto = new SocialServiceDTO();
         dto.setSocialServiceProjectID(entity.getSocialServiceProjectID());
-        dto.setUniversityID(entity.getUniversityID());
         dto.setSocialServiceProjectName(entity.getSocialServiceProjectName());
         dto.setDescription(entity.getDescription());
+
+        if(entity.getUniversity() != null){
+            dto.setUniversityName(entity.getUniversity().getUniversityName());
+            dto.setUniversityID(entity.getUniversity().getUniversityID());
+        }else {
+            dto.setUniversityName("Sin Universidad Asignada");
+            dto.setUniversityID(null);
+        }
         return dto;
 
     }
     private SocialServiceEntity convertirSSEntity (SocialServiceDTO dto){
         SocialServiceEntity entity = new SocialServiceEntity();
-        entity.setUniversityID(dto.getUniversityID());
         entity.setSocialServiceProjectName(dto.getSocialServiceProjectName());
         entity.setDescription(dto.getDescription());
+
+        if(dto.getUniversityID() != null){
+            UniversityEntity university = repoUniversity.findById(dto.getUniversityID())
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + dto.getUniversityID()));
+            entity.setUniversity(university);
+        }
+
+
         return entity;
     }
 }

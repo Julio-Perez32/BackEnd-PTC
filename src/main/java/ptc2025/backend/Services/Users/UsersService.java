@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Entities.Users.UsersEntity;
 import ptc2025.backend.Models.DTO.Users.UsersDTO;
+import ptc2025.backend.Respositories.Universities.UniversityRespository;
 import ptc2025.backend.Respositories.Users.UsersRespository;
 
 import java.util.List;
@@ -18,6 +20,9 @@ public class UsersService {
     @Autowired
     private UsersRespository repo;
 
+    @Autowired //Se inyecta el repositorio de University
+    UniversityRespository repoUniversity;
+
     public List<UsersDTO> getAllUsers(){
         List<UsersEntity> users = repo.findAll();
         return users.stream()
@@ -28,11 +33,18 @@ public class UsersService {
     public UsersDTO convertirUsuarioADTO(UsersEntity usuario){
         UsersDTO dto = new UsersDTO();
         dto.setId(usuario.getId());
-        dto.setUniversityID(usuario.getUniversityID());
         dto.setEmail(usuario.getEmail());
         dto.setUsuario(usuario.getUsuario());
         dto.setContrasena(usuario.getContrasena());
         dto.setFechaCreacion(usuario.getFechaCreacion());
+
+        if(usuario.getUniversity() != null){
+            dto.setUniversityName(usuario.getUniversity().getUniversityName());
+            dto.setUniversityID(usuario.getUniversity().getUniversityID());
+        }else {
+            dto.setUniversityName("Sin Universidad Asignada");
+            dto.setUniversityID(null);
+        }
         return dto;
     }
 
@@ -63,11 +75,17 @@ public class UsersService {
 
     public UsersDTO actualizarDatos(String id, UsersDTO json) {
         UsersEntity existente = repo.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        existente.setUniversityID(json.getUniversityID());
         existente.setEmail(json.getEmail());
         existente.setUsuario(json.getUsuario());
         existente.setContrasena(json.getContrasena());
         existente.setFechaCreacion(json.getFechaCreacion());
+        if(json.getUniversityID() != null){
+            UniversityEntity university = repoUniversity.findById(json.getUniversityID())
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + json.getUniversityID()));
+            existente.setUniversity(university);
+        }else {
+            existente.setUniversity(null);
+        }
         UsersEntity usuarioActualizado = repo.save(existente);
         return convertirUsuarioADTO(usuarioActualizado);
     }
