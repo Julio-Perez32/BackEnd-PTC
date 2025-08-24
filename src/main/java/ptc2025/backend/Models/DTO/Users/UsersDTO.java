@@ -19,7 +19,7 @@ public class UsersDTO {
     @NotNull
     private String universityID;
     @NotNull
-    private String personid;
+    private String personId;
     @NotNull
     private String roleId;
     @NotNull @Email
