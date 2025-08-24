@@ -5,8 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.DocumentCategories.DocumentCategoriesEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Models.DTO.DocumentCategories.DocumentCategoriesDTO;
 import ptc2025.backend.Respositories.DocumentCategories.DocumentCategoriesRepository;
+import ptc2025.backend.Respositories.Universities.UniversityRespository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +18,8 @@ public class DocumentCategoriesService {
 
     @Autowired
     private DocumentCategoriesRepository repo;
+    @Autowired
+    private UniversityRespository repoUniversity;
 
     public List<DocumentCategoriesDTO> getDocumentCategories() {
         List<DocumentCategoriesEntity> documentCtype = repo.findAll();
@@ -28,12 +32,23 @@ public class DocumentCategoriesService {
         DocumentCategoriesDTO dto = new DocumentCategoriesDTO();
         dto.setId(documentType.getId());
         dto.setDocumentCategory(documentType.getDocumentCategory());
+        if(documentType.getUniversity() != null){
+            dto.setUniversityName(documentType.getUniversity().getUniversityName());
+            dto.setUniversityID(documentType.getUniversity().getUniversityID());
+        }else {
+            dto.setUniversityName("Sin Universidad Asignada");
+            dto.setUniversityID(null);
+        }
         return dto;
     }
     private DocumentCategoriesEntity convertirAEntity(DocumentCategoriesDTO data) {
         DocumentCategoriesEntity entity = new DocumentCategoriesEntity();
-
         entity.setDocumentCategory(data.getDocumentCategory());
+        if(data.getUniversityID() != null){
+            UniversityEntity university = repoUniversity.findById(data.getUniversityID())
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + data.getUniversityID()));
+            entity.setUniversity(university);
+        }
         return entity;
     }
 
@@ -55,6 +70,13 @@ public class DocumentCategoriesService {
     public DocumentCategoriesDTO actualizarDocumentCategory(String id, DocumentCategoriesDTO json) {
         DocumentCategoriesEntity existente = repo.findById(id).orElseThrow(() -> new RuntimeException("No se encontro el DocumentCategory"));
         existente.setDocumentCategory(json.getDocumentCategory());
+        if(json.getUniversityID() != null){
+            UniversityEntity university = repoUniversity.findById(json.getUniversityID())
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + json.getUniversityID()));
+            existente.setUniversity(university);
+        }else {
+            existente.setUniversity(null);
+        }
         DocumentCategoriesEntity documentCategoryActualizada = repo.save(existente);
         return ConvertDocumentCategoriesDTO(documentCategoryActualizada);
     }
