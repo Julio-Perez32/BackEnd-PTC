@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Modalities.ModalitiesEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Models.DTO.Modalities.ModalitiesDTO;
 import ptc2025.backend.Respositories.Modalities.ModalityRepository;
+import ptc2025.backend.Respositories.Universities.UniversityRespository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +19,9 @@ public class ModalityService {
 
     @Autowired
     private ModalityRepository repo;
+
+    @Autowired
+    private UniversityRespository repoUniversity;
 
     public List<ModalitiesDTO> getAllModalities(){
         List<ModalitiesEntity> modalities = repo.findAll();
@@ -28,8 +33,15 @@ public class ModalityService {
     public ModalitiesDTO convertirModalidadesADTO(ModalitiesEntity modalida){
         ModalitiesDTO dto = new ModalitiesDTO();
         dto.setId(modalida.getId());
-        dto.setUniversityID(modalida.getUniversityID());
         dto.setModalityName(modalida.getModalityName());
+
+        if(modalida.getUniversity() != null){
+            dto.setUniversityName(modalida.getUniversity().getUniversityName());
+            dto.setUniversityID(modalida.getUniversity().getUniversityID());
+        }else {
+            dto.setUniversityName("Sin Universidad Asignada");
+            dto.setUniversityID(null);
+        }
         return dto;
     }
 
@@ -49,15 +61,25 @@ public class ModalityService {
 
     private ModalitiesEntity convertirAEntity(ModalitiesDTO data) {
         ModalitiesEntity entity = new ModalitiesEntity();
-        entity.setUniversityID(data.getUniversityID());
         entity.setModalityName(data.getModalityName());
+        if(data.getUniversityID() != null){
+            UniversityEntity university = repoUniversity.findById(data.getUniversityID())
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + data.getUniversityID()));
+            entity.setUniversity(university);
+        }
         return entity;
     }
 
     public ModalitiesDTO actualizarDatos(String id, ModalitiesDTO json) {
         ModalitiesEntity existente = repo.findById(id).orElseThrow(() -> new RuntimeException("Registro no encontrado"));
-        existente.setUniversityID(json.getUniversityID());
         existente.setModalityName(json.getModalityName());
+        if(json.getUniversityID() != null){
+            UniversityEntity university = repoUniversity.findById(json.getUniversityID())
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + json.getUniversityID()));
+            existente.setUniversity(university);
+        }else {
+            existente.setUniversity(null);
+        }
         ModalitiesEntity ModalityActualizada = repo.save(existente);
         return convertirModalidadesADTO(ModalityActualizada);
     }
