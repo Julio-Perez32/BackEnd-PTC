@@ -22,9 +22,6 @@ public class EntityTypesEntity {
     @Column(name = "ENTITYTYPEID")
     private String entityTypeID;
 
-    @Column(name = "UNIVERSITYID")
-    private String universityID;
-
     @Column(name = "ENTITYTYPE")
     private String entityType;
 

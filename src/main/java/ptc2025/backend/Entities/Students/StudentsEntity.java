@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.People.PeopleEntity;
 
 @Entity
 @Table(name = "STUDENTS")
@@ -17,8 +18,10 @@ public class StudentsEntity {
     @GeneratedValue(generator = "studentID")
     @Column(name = "STUDENTID")
     private String studentID;
-    @Column(name = "PERSONID")
-    private String personID;
     @Column(name = "STUDENTCODE")
     private String studentCode;
+
+    @OneToOne
+    @JoinColumn(name = "PERSONID", referencedColumnName = "PERSONID")
+    private PeopleEntity people;
 }

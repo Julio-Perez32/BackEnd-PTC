@@ -18,8 +18,6 @@ public class DocumentCategoriesEntity {
     @GeneratedValue(generator = "IDdocumentCategory")
     @Column(name = "DOCUMENTCATEGORYID")
     private String id;
-    @Column(name = "UNIVERSITYID")
-    private String universityID;
     @Column(name = "DOCUMENTCATEGORY")
     private String documentCategory;
 

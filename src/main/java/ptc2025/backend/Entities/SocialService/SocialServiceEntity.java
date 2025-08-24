@@ -19,8 +19,6 @@ public class SocialServiceEntity
     @GeneratedValue (generator = "idSocialService")
     @Column(name = "SOCIALSERVICEPROJECTID")
     private String socialServiceProjectID;
-    @Column(name = "UNIVERSITYID")
-    private String universityID;
     @Column (name = "SOCIALSERVICEPROJECTNAME")
     private String socialServiceProjectName;
     @Column(name = "DESCRIPTION")

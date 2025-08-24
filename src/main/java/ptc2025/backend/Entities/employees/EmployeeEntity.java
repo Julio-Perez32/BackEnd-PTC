@@ -22,9 +22,6 @@ public class EmployeeEntity {
     @GeneratedValue(generator = "idEmployee")
     private String id;
 
-    @Column(name = "PERSONID")
-    private String personID;
-
     @Column(name = "DEPARTMENTID")
     private String deparmentID;
 

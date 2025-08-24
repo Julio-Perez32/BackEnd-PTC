@@ -27,13 +27,12 @@ public class DocumentCategoriesService {
     public DocumentCategoriesDTO ConvertDocumentCategoriesDTO(DocumentCategoriesEntity documentType){
         DocumentCategoriesDTO dto = new DocumentCategoriesDTO();
         dto.setId(documentType.getId());
-        dto.setUniversityID(documentType.getUniversityID());
         dto.setDocumentCategory(documentType.getDocumentCategory());
         return dto;
     }
     private DocumentCategoriesEntity convertirAEntity(DocumentCategoriesDTO data) {
         DocumentCategoriesEntity entity = new DocumentCategoriesEntity();
-        entity.setUniversityID(data.getUniversityID());
+
         entity.setDocumentCategory(data.getDocumentCategory());
         return entity;
     }
@@ -55,7 +54,6 @@ public class DocumentCategoriesService {
 
     public DocumentCategoriesDTO actualizarDocumentCategory(String id, DocumentCategoriesDTO json) {
         DocumentCategoriesEntity existente = repo.findById(id).orElseThrow(() -> new RuntimeException("No se encontro el DocumentCategory"));
-        existente.setUniversityID(json.getUniversityID());
         existente.setDocumentCategory(json.getDocumentCategory());
         DocumentCategoriesEntity documentCategoryActualizada = repo.save(existente);
         return ConvertDocumentCategoriesDTO(documentCategoryActualizada);

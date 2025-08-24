@@ -27,8 +27,6 @@ public class PeopleEntity {
     @GeneratedValue(generator = "personID")
     @Column(name = "PERSONID")
     private String personID;
-    @Column(name = "PERSONTYPEID")
-    private String persoTypeID;
     @Column(name = "FIRSTNAME")
     private String firstName;
     @Column(name = "LASTNAME")

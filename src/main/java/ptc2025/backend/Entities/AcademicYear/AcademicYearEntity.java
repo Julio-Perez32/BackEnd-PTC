@@ -23,8 +23,6 @@ public class AcademicYearEntity {
     @Column(name = "ACADEMICYEARID")
     private String academicYearId;
 
-    @Column(name = "UNIVERSITYID")
-    private String universityId;
 
     @Column(name = "YEAR")
     @DateTimeFormat

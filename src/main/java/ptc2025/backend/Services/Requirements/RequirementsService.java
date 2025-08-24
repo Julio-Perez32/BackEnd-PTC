@@ -26,7 +26,6 @@ public class RequirementsService {
     public RequirementsDTO convertirRequerimientosADTO(RequirementsEntity reque){
         RequirementsDTO dto = new RequirementsDTO();
         dto.setId(reque.getId());
-        dto.setUniversityID(reque.getUniversityID());
         dto.setRequirementName(reque.getRequirementName());
         dto.setDescription(reque.getDescription());
         return dto;
@@ -48,7 +47,6 @@ public class RequirementsService {
 
     private RequirementsEntity converirAEntity(RequirementsDTO data) {
         RequirementsEntity entity = new RequirementsEntity();
-        entity.setUniversityID(data.getUniversityID());
         entity.setRequirementName(data.getRequirementName());
         entity.setDescription(data.getDescription());
         return entity;
@@ -56,7 +54,7 @@ public class RequirementsService {
 
     public RequirementsDTO actualizarRequirements(String id, RequirementsDTO json) {
         RequirementsEntity existente = repo.findById(id).orElseThrow(() -> new RuntimeException("Requirement no encontrado"));
-        existente.setUniversityID(json.getUniversityID());
+
         existente.setRequirementName(json.getRequirementName());
         existente.setDescription(json.getDescription());
         RequirementsEntity RequirementActualizado = repo.save(existente);

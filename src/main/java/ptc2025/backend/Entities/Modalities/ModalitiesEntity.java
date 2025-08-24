@@ -18,8 +18,6 @@ public class ModalitiesEntity {
     @GeneratedValue(generator = "idModalities")
     @Column(name = "MODALITYID")
     private String id;
-    @Column(name = "UNIVERSITYID")
-    private String universityID;
     @Column(name = "MODALITYNAME")
     private String modalityName;
 

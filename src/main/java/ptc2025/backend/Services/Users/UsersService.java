@@ -53,7 +53,7 @@ public class UsersService {
             dto.setUniversityName("Sin Universidad Asignada");
             dto.setUniversityID(null);
         }
-        if(usuario.getPersonId() != null){
+        if(usuario.getPeople() != null){
             dto.setPersonName(usuario.getPeople().getFirstName());
             dto.setPersonLastName(usuario.getPeople().getLastName());
             dto.setPersonId(usuario.getPeople().getPersonID());
@@ -62,7 +62,7 @@ public class UsersService {
             dto.setPersonId(null);
         }
         //para convertir a DTO el rol del sistema del usuario
-        if(usuario.getRoleId() != null){
+        if(usuario.getPeople() != null){
             dto.setRolesName(usuario.getSystemRoles().getRoleName());
             dto.setRoleId(usuario.getSystemRoles().getRoleId());
         }else {

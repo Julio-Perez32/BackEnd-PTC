@@ -28,7 +28,6 @@ public class ModalityService {
     public ModalitiesDTO convertirModalidadesADTO(ModalitiesEntity modalida){
         ModalitiesDTO dto = new ModalitiesDTO();
         dto.setId(modalida.getId());
-        dto.setUniversityID(modalida.getUniversityID());
         dto.setModalityName(modalida.getModalityName());
         return dto;
     }
@@ -49,14 +48,12 @@ public class ModalityService {
 
     private ModalitiesEntity convertirAEntity(ModalitiesDTO data) {
         ModalitiesEntity entity = new ModalitiesEntity();
-        entity.setUniversityID(data.getUniversityID());
         entity.setModalityName(data.getModalityName());
         return entity;
     }
 
     public ModalitiesDTO actualizarDatos(String id, ModalitiesDTO json) {
         ModalitiesEntity existente = repo.findById(id).orElseThrow(() -> new RuntimeException("Registro no encontrado"));
-        existente.setUniversityID(json.getUniversityID());
         existente.setModalityName(json.getModalityName());
         ModalitiesEntity ModalityActualizada = repo.save(existente);
         return convertirModalidadesADTO(ModalityActualizada);
