@@ -22,7 +22,7 @@ public class SubjectDefinitionsController {
     SubjectDefinitionsService service;
 
     @PostMapping("/newSubjectDefinition")
-    public ResponseEntity<?> newDefinition(@Valid @RequestBody SubjectDefinitionsDTO json, HttpServletRequest request){
+    public ResponseEntity<?> newSubjectDefinition(@Valid @RequestBody SubjectDefinitionsDTO json, HttpServletRequest request){
         try{
             SubjectDefinitionsDTO response = service.insertDefintion(json);
             if(response == null){
@@ -45,8 +45,8 @@ public class SubjectDefinitionsController {
         }
     }
 
-    @PutMapping("/updateSubjectDefinition/{ID}")
-    public ResponseEntity<?> updateDefinition(@PathVariable String id, @Valid @RequestBody SubjectDefinitionsDTO json, BindingResult bindingResult){
+    @PutMapping("/updateSubjectDefinition/{id}")
+    public ResponseEntity<?> updateSubjectDefinition(@PathVariable String id, @Valid @RequestBody SubjectDefinitionsDTO json, BindingResult bindingResult){
         if (bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error -> errores.put(error.getField(), error.getDefaultMessage()));
@@ -65,7 +65,7 @@ public class SubjectDefinitionsController {
         }
     }
 
-    @DeleteMapping("/deleteSubjectDefinition/{ID}")
+    @DeleteMapping("/deleteSubjectDefinition/{id}")
     public ResponseEntity<?> deleteSubjectDefinition(@PathVariable String id){
         try{
             if (!service.deleteDefinition(id)){

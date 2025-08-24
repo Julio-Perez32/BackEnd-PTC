@@ -22,7 +22,7 @@ public class RequirementConditionsController {
     RequirementConditionsService service;
 
     @PostMapping("/newRequirementCondition")
-    public ResponseEntity<?> newRequirement(@Valid @RequestBody RequirementConditionsDTO json, HttpServletRequest request){
+    public ResponseEntity<?> newRequirementConditions(@Valid @RequestBody RequirementConditionsDTO json, HttpServletRequest request){
         try{
             RequirementConditionsDTO response = service.insertRequirementCondition(json);
             if(response == null){
@@ -45,8 +45,8 @@ public class RequirementConditionsController {
         }
     }
 
-    @PutMapping("/updateRequirementCondition/{ID}")
-    public ResponseEntity<?> updateRequirement(@PathVariable String id, @Valid @RequestBody RequirementConditionsDTO json, BindingResult bindingResult){
+    @PutMapping("/updateRequirementCondition/{id}")
+    public ResponseEntity<?> updateRequirementCondition(@PathVariable String id, @Valid @RequestBody RequirementConditionsDTO json, BindingResult bindingResult){
         if (bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error -> errores.put(error.getField(), error.getDefaultMessage()));
@@ -65,8 +65,8 @@ public class RequirementConditionsController {
         }
     }
 
-    @DeleteMapping("/deleteRequirementCondition/{ID}")
-    public ResponseEntity<?> deleteRequirement(@PathVariable String id){
+    @DeleteMapping("/deleteRequirementCondition/{id}")
+    public ResponseEntity<?> deleteRequirementCondition(@PathVariable String id){
         try{
             if(!service.deleteRequirementCondition(id)){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).header("Mensaje Error", "Requisito no encontrado").body(Map.of(

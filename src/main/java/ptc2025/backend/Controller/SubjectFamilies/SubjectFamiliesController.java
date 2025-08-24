@@ -23,10 +23,10 @@ public class SubjectFamiliesController {
     SubjectFamiliesService service;
 
     @GetMapping("/getSubjectFamilies")
-    public List<SubjectFamiliesDTO> geSubjecttFamily(){return service.getSubjectFam();}
+    public List<SubjectFamiliesDTO> geSubjectFamilies(){return service.getSubjectFam();}
 
-    @PostMapping("/newSubjectFamilies")
-    public ResponseEntity<?> newSubjectFam(@Valid @RequestBody SubjectFamiliesDTO json, HttpServletRequest request){
+    @PostMapping("/newSubjectFamily")
+    public ResponseEntity<?> newSubjectFamily(@Valid @RequestBody SubjectFamiliesDTO json, HttpServletRequest request){
         try{
             SubjectFamiliesDTO response = service.insertSubjectFam(json);
             if(response == null){
@@ -49,8 +49,8 @@ public class SubjectFamiliesController {
         }
     }
 
-    @PutMapping("/updateSubjectFamilies/{ID}")
-    public ResponseEntity<?> updateFamily(@PathVariable String ID, @Valid @RequestBody SubjectFamiliesDTO json, BindingResult bindingResult){
+    @PutMapping("/updateSubjectFamily/{id}")
+    public ResponseEntity<?> updateSubjectFamily(@PathVariable String ID, @Valid @RequestBody SubjectFamiliesDTO json, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
@@ -69,8 +69,8 @@ public class SubjectFamiliesController {
         }
     }
 
-    @DeleteMapping("/deleteSubjectFamilies/{ID}")
-    public ResponseEntity<?> eliminarUsuario(@PathVariable String ID){
+    @DeleteMapping("/deleteSubjectFamily/{id}")
+    public ResponseEntity<?> deleteSubjectFamily(@PathVariable String ID){
         try{
             if(!service.deleteSubjectFam(ID)){
                 //Error

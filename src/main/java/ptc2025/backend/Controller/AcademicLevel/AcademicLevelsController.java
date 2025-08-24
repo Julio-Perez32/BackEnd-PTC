@@ -25,10 +25,10 @@ public class AcademicLevelsController {
     AcademicLevelService service;
 
     @GetMapping("/getAcademicLevels")
-    public List<AcademicLevelsDTO> getTeachers(){ return service.getAllLevels();}
+    public List<AcademicLevelsDTO> getAcademicLevels(){ return service.getAllLevels();}
 
     @PostMapping("/insertAcademicLevel")
-    public ResponseEntity<?> registrarUsuario(@Valid @RequestBody AcademicLevelsDTO usuario, HttpServletRequest request){
+    public ResponseEntity<?> insertAcademicLevel(@Valid @RequestBody AcademicLevelsDTO usuario, HttpServletRequest request){
         try{
             AcademicLevelsDTO respuesta = service.insertLevel(usuario);
             if (respuesta == null){
@@ -50,8 +50,8 @@ public class AcademicLevelsController {
         }
     }
 
-    @PostMapping("/updateAcademicLevel/{ID}")
-    public ResponseEntity<?> updateCourseTeacher(@PathVariable String id, @Valid @RequestBody AcademicLevelsDTO json, BindingResult bindingResult){
+    @PostMapping("/updateAcademicLevel/{id}")
+    public ResponseEntity<?> updateAcademicLevel(@PathVariable String id, @Valid @RequestBody AcademicLevelsDTO json, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
@@ -71,8 +71,8 @@ public class AcademicLevelsController {
         }
     }
 
-    @DeleteMapping("/deleteAcademicLevel/{ID}")
-    public ResponseEntity<?> deleteCourseTeacher(@PathVariable String ID){
+    @DeleteMapping("/deleteAcademicLevel/{id}")
+    public ResponseEntity<?> deleteAcademicLevel(@PathVariable String ID){
         try{
             if(!service.deleteLevel(ID)){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)

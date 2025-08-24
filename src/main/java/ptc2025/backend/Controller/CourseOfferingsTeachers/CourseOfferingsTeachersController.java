@@ -25,10 +25,10 @@ public class CourseOfferingsTeachersController {
     CourseOfferingsTeachersService service;
 
     @GetMapping("/getAllCourseOfferingsTeachers")
-    public List<CourseOfferingsTeachersDTO> getCourseTeachers(){ return service.getCourseTeachers();}
+    public List<CourseOfferingsTeachersDTO> getCourseOfferingTeachers(){ return service.getCourseTeachers();}
 
-    @PostMapping("/insertCourseOfferingsTeacher")
-    public ResponseEntity<?> insertCourseTeacher(@Valid @RequestBody CourseOfferingsTeachersDTO usuario, HttpServletRequest request){
+    @PostMapping("/insertCourseOfferingTeacher")
+    public ResponseEntity<?> insertCourseOfferingTeacher(@Valid @RequestBody CourseOfferingsTeachersDTO usuario, HttpServletRequest request){
         try{
             CourseOfferingsTeachersDTO respuesta = service.insertOfferingTeacher(usuario);
             if (respuesta == null){
@@ -50,8 +50,8 @@ public class CourseOfferingsTeachersController {
         }
     }
 
-    @PostMapping("/updateCourseTeacher/{ID}")
-    public ResponseEntity<?> updateCourseTeacher(@PathVariable String id, @Valid @RequestBody CourseOfferingsTeachersDTO json, BindingResult bindingResult){
+    @PostMapping("/updateCourseOfferingTeacher/{id}")
+    public ResponseEntity<?> updateCourseOfferingTeacher(@PathVariable String id, @Valid @RequestBody CourseOfferingsTeachersDTO json, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
@@ -71,13 +71,12 @@ public class CourseOfferingsTeachersController {
         }
     }
 
-    @DeleteMapping("/deleteCourseTeacher/{ID}")
-    public ResponseEntity<?> deleteCourseTeacher(@PathVariable String ID){
+    @DeleteMapping("/deleteCourseOfferingTeacher/{id}")
+    public ResponseEntity<?> deleteCourseOfferingTeacher(@PathVariable String ID){
         try{
             if(!service.deleteCourseTeacher(ID)){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .header("Mensaje Error", "Estudiante no encontrado")
-                        .body(Map.of(
+                        .header("Mensaje Error", "Estudiante no encontrado").body(Map.of(
                                 "Error", "Not found",
                                 "Menaje", "El estudiante no ha sido encontrado",
                                 "timestamp", Instant.now().toString()

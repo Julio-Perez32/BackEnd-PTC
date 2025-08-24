@@ -49,7 +49,7 @@ public class StudentsController {
         }
     }
 
-    @PostMapping("/updateStudents/{ID}")
+    @PostMapping("/updateStudents/{id}")
     public ResponseEntity<?> updateStudent(@PathVariable String ID, @Valid @RequestBody StudentsDTO json, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
@@ -70,7 +70,7 @@ public class StudentsController {
         }
     }
 
-    @DeleteMapping("/deleteStudents/{ID}")
+    @DeleteMapping("/deleteStudents/{id}")
     public ResponseEntity<?> deleteStudent(@PathVariable String ID){
         try{
             if(!service.deleteStudent(ID)){

@@ -25,10 +25,10 @@ public class CourseOfferingsController {
     CourseOfferingsService service;
 
     @GetMapping("/getAllCourseOfferings")
-    public List<CourseOfferingsDTO> getCourses(){ return service.getAllCourses();}
+    public List<CourseOfferingsDTO> getCourseOfferings(){ return service.getAllCourses();}
 
     @PostMapping("/insertCourseOffering")
-    public ResponseEntity<?> insertCourse(@Valid @RequestBody CourseOfferingsDTO usuario, HttpServletRequest request){
+    public ResponseEntity<?> insertCourseOffering(@Valid @RequestBody CourseOfferingsDTO usuario, HttpServletRequest request){
         try{
             CourseOfferingsDTO respuesta = service.insertCourse(usuario);
             if (respuesta == null){
@@ -50,8 +50,8 @@ public class CourseOfferingsController {
         }
     }
 
-    @PostMapping("/updateCourseOffering/{ID}")
-    public ResponseEntity<?> updateCourse(@PathVariable String id, @Valid @RequestBody CourseOfferingsDTO json, BindingResult bindingResult){
+    @PostMapping("/updateCourseOffering/{id}")
+    public ResponseEntity<?> updateCourseOffering(@PathVariable String id, @Valid @RequestBody CourseOfferingsDTO json, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
@@ -71,8 +71,8 @@ public class CourseOfferingsController {
         }
     }
 
-    @DeleteMapping("/deleteCourseOffering/{ID}")
-    public ResponseEntity<?> deleteCourse(@PathVariable String ID){
+    @DeleteMapping("/deleteCourseOffering/{id}")
+    public ResponseEntity<?> deleteCourseOffering(@PathVariable String ID){
         try{
             if(!service.deleteCourse(ID)){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
