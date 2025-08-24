@@ -6,6 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.Users.UsersEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "SYSTEMROLES")
@@ -21,4 +25,7 @@ public class SystemRolesEntity {
     private String roleId;
     @Column (name = "ROLENAME")
     private String roleName;
+
+    @OneToMany(mappedBy = "systemRoles", cascade = CascadeType.ALL)
+    private List<UsersEntity> systemRoles = new ArrayList<>();
 }

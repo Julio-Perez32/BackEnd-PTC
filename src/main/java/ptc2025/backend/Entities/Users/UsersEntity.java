@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Entities.systemRoles.SystemRolesEntity;
 
 import java.util.Date;
 
@@ -22,14 +23,18 @@ public class UsersEntity {
     private String id;
     @Column(name = "UNIVERSITYID")
     private String universityID;
+    @Column(name = "PERSONID")
+    private String personid;
+    @Column (name = "ROLEID")
+    private String roleId;
     @Column(name = "EMAIL")
     private String email;
-    @Column(name = "USERNAME")
-    private String usuario;
     @Column(name = "PASSWORD")
     private String contrasena;
-    @Column(name = "CREATEDAT")
-    private Date fechaCreacion;
+
+    @ManyToOne
+    @JoinColumn(name = "ROLEID", referencedColumnName = "ROLEID")
+    private SystemRolesEntity systemRoles;
 
     @ManyToOne
     @JoinColumn(name = "UNIVERSITYID", referencedColumnName = "UNIVERSITYID")

@@ -15,4 +15,5 @@ public class systemRolesDTO {
     @NotBlank(message = "El nombre del rol no puede estar vacio")
     private String roleName;
 
+
 }
