@@ -51,8 +51,12 @@ public class AcademicLevelsController {
         }
     }
 
-    @PostMapping("/updateAcademicLevel/{id}")
-    public ResponseEntity<?> updateAcademicLevel(@PathVariable String id, @Valid @RequestBody AcademicLevelsDTO json, BindingResult bindingResult){
+    @PutMapping("/updateAcademicLevel/{id}")
+    public ResponseEntity<?> updateAcademicLevel(
+            @PathVariable String id,
+            @Valid @RequestBody AcademicLevelsDTO json,
+            BindingResult bindingResult
+    ){
         if(bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
