@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 
 @Entity
 @Table(name = "ACADEMICLEVELS")
@@ -21,4 +22,12 @@ public class AcademicLevelsEntity {
     private String universityID;
     @Column (name = "ACADEMICLEVELNAME")
     private String academicLevelName;
+
+    /**
+     * Aca se define que el atributo university es de tipo UniversityEntity
+     * con JoinColumn(name -> apunta hacia la llave foranea
+     * referencedColumnName -> apunta hacia la llave primaria de la tabla Universities*/
+    @ManyToOne
+    @JoinColumn(name = "UNIVERSITYID", referencedColumnName = "UNIVERSITYID")
+    private UniversityEntity university;
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 
 @Entity
 @Table(name = "SOCIALSERVICEPROJECTS")
@@ -24,13 +25,8 @@ public class SocialServiceEntity
     private String socialServiceProjectName;
     @Column(name = "DESCRIPTION")
     private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "UNIVERSITYID", referencedColumnName = "UNIVERSITYID")
+    private UniversityEntity university;
 }
-/**SOCIALSERVICEPROJECTID
- UNIVERSITYID
- SOCIALSERVICEPROJECTNAME
- DESCRIPTION*/
-/**socialServiceProjectID
- universityID
- socialServiceProjectName
- description
- */

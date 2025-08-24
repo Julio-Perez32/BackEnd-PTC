@@ -14,4 +14,6 @@ public class CycleTypesDTO {
     private String universityID;
     @NotBlank
     private String cycleLabel;
+
+    private String universityName;
 }

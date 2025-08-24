@@ -26,4 +26,6 @@ public class UsersDTO {
     @NotNull @DateTimeFormat
     private Date fechaCreacion;
 
+    private String universityName;
+
 }

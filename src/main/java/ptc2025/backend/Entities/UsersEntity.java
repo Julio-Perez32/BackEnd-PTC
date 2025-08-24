@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 
 import java.util.Date;
 
@@ -29,6 +30,10 @@ public class UsersEntity {
     private String contrasena;
     @Column(name = "CREATEDAT")
     private Date fechaCreacion;
+
+    @ManyToOne
+    @JoinColumn(name = "UNIVERSITYID", referencedColumnName = "UNIVERSITYID")
+    private UniversityEntity university;
 
 
 }

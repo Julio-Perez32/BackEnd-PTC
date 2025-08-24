@@ -12,4 +12,6 @@ public class ModalitiesDTO {
     private String universityID;
     @NotBlank
     private String modalityName;
+
+    private String universityName;
 }

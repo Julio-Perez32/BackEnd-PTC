@@ -22,4 +22,6 @@ public class EntityTypesDTO {
     @Size(max = 60, message = "No debe tener más de 60 caracteres")
     private String entityType;
 
+    private String universityName;
+
 }
