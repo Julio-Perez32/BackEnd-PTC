@@ -49,10 +49,10 @@ public class PeopleEntity {
     @OneToMany(mappedBy = "people", cascade = CascadeType.ALL)
     private List<UsersEntity> users = new ArrayList<>();
 
-    @OneToMany(mappedBy = "people", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<EmployeeEntity> employee = new ArrayList<>();
 
-    @OneToMany(mappedBy = "people", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "students", cascade = CascadeType.ALL)
     private List<StudentsEntity> students = new ArrayList<>();
 
 
