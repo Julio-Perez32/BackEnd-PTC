@@ -1,4 +1,4 @@
-package ptc2025.backend.Controller;
+package ptc2025.backend.Controller.Users;
 
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,8 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ptc2025.backend.Models.DTO.UsersDTO;
-import ptc2025.backend.Services.UsersService;
+import ptc2025.backend.Models.DTO.Users.UsersDTO;
+import ptc2025.backend.Services.Users.UsersService;
 
 import java.time.Instant;
 import java.util.HashMap;

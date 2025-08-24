@@ -15,5 +15,6 @@ public class CycleTypesDTO {
     @NotBlank
     private String cycleLabel;
 
+    //campo para el nombre
     private String universityName;
 }

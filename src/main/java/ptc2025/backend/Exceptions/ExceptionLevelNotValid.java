@@ -1,4 +1,4 @@
-package ptc2025.backend.Execeptions;
+package ptc2025.backend.Exceptions;
 
 public class ExceptionLevelNotValid extends RuntimeException {
     private String LevelNotValid;

@@ -6,7 +6,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.AcademicLevel.AcademicLevelsEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
-import ptc2025.backend.Execeptions.ExceptionLevelNotValid;
+import ptc2025.backend.Exceptions.ExceptionLevelNotValid;
 import ptc2025.backend.Models.DTO.AcademicLevel.AcademicLevelsDTO;
 import ptc2025.backend.Respositories.AcademicLevel.AcademicLevelsRepository;
 import ptc2025.backend.Respositories.Universities.UniversityRespository;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class AcademicLevelService {
+public class AcademicLevelsService {
 
     @Autowired
     AcademicLevelsRepository repo;

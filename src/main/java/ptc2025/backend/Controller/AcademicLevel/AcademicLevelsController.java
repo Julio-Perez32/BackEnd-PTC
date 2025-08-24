@@ -8,9 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ptc2025.backend.Models.DTO.AcademicLevel.AcademicLevelsDTO;
-import ptc2025.backend.Models.DTO.CourseOfferings.CourseOfferingsDTO;
-import ptc2025.backend.Services.AcademicLevel.AcademicLevelService;
-import ptc2025.backend.Services.CourseOfferings.CourseOfferingsService;
+import ptc2025.backend.Services.AcademicLevel.AcademicLevelsService;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -22,7 +20,7 @@ import java.util.Map;
 public class AcademicLevelsController {
 
     @Autowired
-    AcademicLevelService service;
+    AcademicLevelsService service;
 
     @GetMapping("/getAcademicLevels")
     public List<AcademicLevelsDTO> getTeachers(){ return service.getAllLevels();}

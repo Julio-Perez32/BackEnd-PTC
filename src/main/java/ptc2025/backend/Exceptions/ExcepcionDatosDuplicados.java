@@ -1,4 +1,4 @@
-package ptc2025.backend.Execeptions;
+package ptc2025.backend.Exceptions;
 
 import lombok.Getter;
 

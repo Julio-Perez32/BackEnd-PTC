@@ -1,13 +1,13 @@
-package ptc2025.backend.Services;
+package ptc2025.backend.Services.Users;
 
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import ptc2025.backend.Entities.UsersEntity;
-import ptc2025.backend.Models.DTO.UsersDTO;
-import ptc2025.backend.Respositories.UsersRespository;
+import ptc2025.backend.Entities.Users.UsersEntity;
+import ptc2025.backend.Models.DTO.Users.UsersDTO;
+import ptc2025.backend.Respositories.Users.UsersRespository;
 
 import java.util.List;
 import java.util.stream.Collectors;
