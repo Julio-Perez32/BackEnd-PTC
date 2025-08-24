@@ -57,7 +57,6 @@ public class NotificationService {
         existente.setTitle(dto.getTitle());
         existente.setBody(dto.getBody());
         existente.setSentAt(dto.getSentAt());
-        existente.setReadAt(dto.getReadAt());
         NotificationEntity actualizar = repo.save(existente);
         return convertirADTO(actualizar);
 
@@ -86,7 +85,6 @@ public class NotificationService {
         dto.setTitle(entity.getTitle());
         dto.setBody(entity.getBody());
         dto.setSentAt(entity.getSentAt());
-        dto.setReadAt(entity.getReadAt());
         return dto;
     }
     //Convertir a Entity
@@ -96,7 +94,6 @@ public class NotificationService {
         entity.setTitle(dto.getTitle());
         entity.setBody(dto.getBody());
         entity.setSentAt(dto.getSentAt());
-        entity.setReadAt(dto.getReadAt());
         return entity;
     }
 }

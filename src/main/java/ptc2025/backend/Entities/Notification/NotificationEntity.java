@@ -29,8 +29,6 @@ public class NotificationEntity {
     private String body;
     @Column(name = "SENTAT")
     private LocalDate sentAt;
-    @Column(name = "READAT")
-    private LocalDate readAt;
 }
 /**NOTIFICATIONID
  USERID
