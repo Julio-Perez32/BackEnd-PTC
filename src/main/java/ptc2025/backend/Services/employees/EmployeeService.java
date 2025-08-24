@@ -70,7 +70,7 @@ public class EmployeeService {
             throw new IllegalArgumentException("El empleado con ID " + id + " no pudo ser actualizado");
         } catch (Exception e) {
             throw new RuntimeException("No se pudo actualizar el empleado: " + e.getMessage());
-        }
+        } //se le puso un catch para que funcione
     }
 
     // DELETE
