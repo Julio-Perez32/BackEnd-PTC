@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -43,5 +44,9 @@ public class AcademicYearEntity {
 
     @Column(name = "DEFAULTCYCLEDURATION")
     private Integer defaultCycleDuration;
+
+    @ManyToOne
+    @JoinColumn(name = "UNIVERSITYID", referencedColumnName = "UNIVERSITYID")
+    private UniversityEntity university;
 
 }

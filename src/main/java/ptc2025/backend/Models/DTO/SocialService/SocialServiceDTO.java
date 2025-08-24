@@ -17,6 +17,8 @@ public class SocialServiceDTO {
     private String socialServiceProjectName;
     @NotBlank
     private String description;
+
+    private String universityName;
 }
 /**SOCIALSERVICEPROJECTID
  UNIVERSITYID

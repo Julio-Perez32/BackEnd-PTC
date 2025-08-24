@@ -42,4 +42,6 @@ public class AcademicYearDTO {
     @NotNull(message = "El campo no puede ser nulo")
     @NotBlank(message = "El campo no puede ser vacio")
     private Integer defaultInterCycle = 16;
+
+    private String universityName;
 }

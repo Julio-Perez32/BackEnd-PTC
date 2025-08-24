@@ -5,9 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.AcademicLevel.AcademicLevelsEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Execeptions.ExceptionLevelNotValid;
 import ptc2025.backend.Models.DTO.AcademicLevel.AcademicLevelsDTO;
 import ptc2025.backend.Respositories.AcademicLevel.AcademicLevelsRepository;
+import ptc2025.backend.Respositories.Universities.UniversityRespository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +21,9 @@ public class AcademicLevelService {
     @Autowired
     AcademicLevelsRepository repo;
 
+    @Autowired //Se inyecta el repositorio de University
+    UniversityRespository repoUniversity;
+
     public List<AcademicLevelsDTO> getAllLevels(){
         List<AcademicLevelsEntity> levels = repo.findAll();
         return levels.stream()
@@ -29,22 +34,32 @@ public class AcademicLevelService {
     public AcademicLevelsDTO convertToLevelsDTO(AcademicLevelsEntity level){
         AcademicLevelsDTO dto = new AcademicLevelsDTO();
         dto.setAcademicLevelID(level.getAcademicLevelID());
-        dto.setUniversityID(level.getUniversityID());
         dto.setAcademicLevelName(level.getAcademicLevelName());
+        if(level.getUniversity() != null){
+            dto.setUniversityName(level.getUniversity().getUniversityName());
+            dto.setUniversityID(level.getUniversity().getUniversityID());
+        }else {
+            dto.setUniversityName("Si Universidad Asignada");
+            dto.setUniversityID(null);
+        }
         return dto;
     }
 
     public AcademicLevelsEntity convertToLevelEntity (AcademicLevelsDTO dto){
         AcademicLevelsEntity level = new AcademicLevelsEntity();
         level.setAcademicLevelID(dto.getAcademicLevelID());
-        level.setUniversityID(dto.getUniversityID());
         level.setAcademicLevelName(dto.getAcademicLevelName());
+        if(dto.getUniversityID() != null){
+            UniversityEntity university = repoUniversity.findById(dto.getUniversityID())
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + dto.getUniversityID()));
+            level.setUniversity(university);
+        }
         return level;
     }
 
     public AcademicLevelsDTO insertLevel(AcademicLevelsDTO dto){
 
-        if (dto == null || dto.getUniversityID() == null || dto.getUniversityID().isBlank() || dto.getAcademicLevelName() == null || dto.getAcademicLevelName().isBlank()){
+        if (dto.getAcademicLevelName() == null || dto.getAcademicLevelName().isBlank()){
             throw new IllegalArgumentException("Todos los campos deben estar completados.");
         }
         try{
@@ -60,8 +75,15 @@ public class AcademicLevelService {
 
     public AcademicLevelsDTO updateLevel(String id, AcademicLevelsDTO json){
         AcademicLevelsEntity existsLevel = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("El ID no pudo ser encontrado."));
-        existsLevel.setUniversityID(json.getUniversityID());
         existsLevel.setAcademicLevelName(json.getAcademicLevelName());
+
+        if(json.getUniversityID() != null){
+            UniversityEntity university = repoUniversity.findById(json.getUniversityID())
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + json.getUniversityID()));
+            existsLevel.setUniversity(university);
+        }else {
+            existsLevel.setUniversity(null);
+        }
 
         AcademicLevelsEntity levelUpdated = repo.save(existsLevel);
 

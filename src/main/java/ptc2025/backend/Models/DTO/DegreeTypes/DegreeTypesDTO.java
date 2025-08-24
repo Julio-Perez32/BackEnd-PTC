@@ -12,4 +12,6 @@ public class DegreeTypesDTO {
     private String universityID;
     @NotBlank
     private String degreeTypeName;
+
+    private String universityName;
 }

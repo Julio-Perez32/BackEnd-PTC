@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 
 @Entity
 @Table(name = "REQUIREMENTS")
@@ -22,4 +23,9 @@ public class RequirementsEntity {
     private String requirementName;
     @Column(name = "DESCRIPTION")
     private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "UNIVERSITYID", referencedColumnName = "UNIVERSITYID")
+    private UniversityEntity university;
+
 }

@@ -14,4 +14,6 @@ public class AcademicLevelsDTO {
     private String universityID;
     @NotBlank
     private String academicLevelName;
+
+    private  String universityName;
 }

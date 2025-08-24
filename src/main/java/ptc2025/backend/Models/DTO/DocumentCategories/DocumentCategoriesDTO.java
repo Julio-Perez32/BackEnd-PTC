@@ -12,4 +12,6 @@ public class DocumentCategoriesDTO {
     private String universityID;
     @NotBlank
     private String documentCategory;
+
+    private String universityName;
 }

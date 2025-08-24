@@ -14,4 +14,6 @@ public class RequirementsDTO {
     private String requirementName;
     @NotBlank
     private String description;
+
+    private String universityName;
 }

@@ -26,6 +26,8 @@ public class LocalitiesDTO {
     @NotBlank(message = "ingrese un numero de telefono")
     @Size(max = 8, message = "el numero no puede tener mas de 7 numeros")//8 contando el guion
     private String phoneNumber;
+
+    private String universityName;
 }
 /** LOCALITYID
  UNIVERSITYID

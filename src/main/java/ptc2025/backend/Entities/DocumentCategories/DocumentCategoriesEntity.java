@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 
 
 @Entity
@@ -21,5 +22,9 @@ public class DocumentCategoriesEntity {
     private String universityID;
     @Column(name = "DOCUMENTCATEGORY")
     private String documentCategory;
+
+    @ManyToOne
+    @JoinColumn(name = "UNIVERSITYID", referencedColumnName = "UNIVERSITYID")
+    private UniversityEntity university;
 
 }
