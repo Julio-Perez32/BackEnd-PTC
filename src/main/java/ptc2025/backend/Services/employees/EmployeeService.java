@@ -20,7 +20,7 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository repo;
 
-    @Autowired
+    @Autowired//inyectando repositorio
     private PeopleRepository repoPeople;
 
     // GET
