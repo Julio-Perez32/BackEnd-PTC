@@ -5,8 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Localities.LocalitiesEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Models.DTO.Localities.LocalitiesDTO;
 import ptc2025.backend.Respositories.Localities.LocalitiesRespository;
+import ptc2025.backend.Respositories.Universities.UniversityRespository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +18,10 @@ import java.util.stream.Collectors;
 public class LocalitiesService {
     @Autowired
     LocalitiesRespository repo;
+
+    @Autowired //Se inyecta el repositorio de University
+    UniversityRespository repoUniversity;
+
     public List<LocalitiesDTO> getLocalitiesService(){
         List<LocalitiesEntity> localidad = repo.findAll();
         return localidad.stream()
@@ -43,11 +49,18 @@ public class LocalitiesService {
 
     public LocalitiesDTO modificarLocalidad(String id, LocalitiesDTO dto){
         LocalitiesEntity localidadExistente = repo.findById(id).orElseThrow(() -> new RuntimeException("El dato no pudo ser actualizado. Localidad no encontrada"));
-        localidadExistente.setUniversityID(dto.getUniversityID());
+
         localidadExistente.setIsMainLocality(dto.getIsMainLocality());
         localidadExistente.setAddress(dto.getAddress());
         localidadExistente.setPhoneNumber(dto.getPhoneNumber());
         LocalitiesEntity actualizado = repo.save(localidadExistente);
+        if(dto.getLocalityID() != null){
+            UniversityEntity university = repoUniversity.findById(dto.getLocalityID())
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + dto.getLocalityID()));
+            localidadExistente.setUniversity(university);
+        }else {
+            localidadExistente.setUniversity(null);
+        }
         return convertirALocaltityDTO(actualizado);
     }
 
@@ -69,19 +82,34 @@ public class LocalitiesService {
     private LocalitiesDTO convertirALocaltityDTO(LocalitiesEntity localities) {
         LocalitiesDTO dto = new LocalitiesDTO();
         dto.setLocalityID(localities.getLocalityID());
-        dto.setUniversityID(localities.getUniversityID());
+
         dto.setIsMainLocality(localities.getIsMainLocality());
         dto.setAddress(localities.getAddress());
         dto.setPhoneNumber(localities.getPhoneNumber());
+
+        if(localities.getUniversity() != null){
+            dto.setUniversityName(localities.getUniversity().getUniversityName());
+            dto.setUniversityID(localities.getUniversity().getUniversityID());
+        }else {
+            dto.setUniversityName("Sin Universidad Asignada");
+            dto.setUniversityID(null);
+        }
         return dto;
     }
 
     private LocalitiesEntity convertirALocaltityEntity(LocalitiesDTO dto){
         LocalitiesEntity entity = new LocalitiesEntity();
-        entity.setUniversityID(dto.getUniversityID());
+
         entity.setIsMainLocality(dto.getIsMainLocality());
         entity.setAddress(dto.getAddress());
         entity.setPhoneNumber(dto.getPhoneNumber());
+
+        if(dto.getUniversityID() != null){
+            UniversityEntity university = repoUniversity.findById(dto.getLocalityID())
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + dto.getUniversityID()));
+            entity.setUniversity(university);
+        }
+
         return entity;
     }
 }

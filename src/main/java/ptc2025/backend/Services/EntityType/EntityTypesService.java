@@ -6,9 +6,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.EntityType.EntityTypesEntity;
 import ptc2025.backend.Entities.PlanComponents.PlanComponentsEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Models.DTO.EntityType.EntityTypesDTO;
 import ptc2025.backend.Models.DTO.PlanComponents.PlanComponentsDTO;
 import ptc2025.backend.Respositories.EntityType.EntityTypesRepository;
+import ptc2025.backend.Respositories.Universities.UniversityRespository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +20,9 @@ import java.util.stream.Collectors;
 public class EntityTypesService {
     @Autowired
     EntityTypesRepository repo;
+
+    @Autowired //Se inyecta el repositorio de University
+    UniversityRespository repoUniversity;
     //Get
     public List<EntityTypesDTO> getEntityTypes (){
         List<EntityTypesEntity> components = repo.findAll();
@@ -28,7 +33,6 @@ public class EntityTypesService {
     public EntityTypesDTO insertEntityType(EntityTypesDTO dto) {
         // Validaciones
         if (dto == null ||
-                dto.getUniversityID() == null || dto.getUniversityID().isBlank() ||
                 dto.getEntityType() == null || dto.getEntityType().isBlank()) {
             throw new IllegalArgumentException("Todos los campos son obligatorios, no dejarlos vacios");
         }
@@ -48,11 +52,27 @@ public class EntityTypesService {
         }
     }
     public EntityTypesDTO updateEntityType(String id, EntityTypesDTO dto){
-        EntityTypesEntity existente = new EntityTypesEntity();
-        existente.setUniversityID(dto.getUniversityID());
-        existente.setEntityType(dto.getEntityType());
-        EntityTypesEntity actualizar = repo.save(existente);
-        return convertirADTO(actualizar);
+        try{
+            if (repo.existsById(id)){
+                EntityTypesEntity existente = new EntityTypesEntity();
+                existente.setEntityType(dto.getEntityType());
+
+
+                if(dto.getUniversityID() != null){
+                    UniversityEntity university = repoUniversity.findById(dto.getUniversityID())
+                            .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + dto.getUniversityID()));
+                    existente.setUniversity(university);
+                }else {
+                    existente.setUniversity(null);
+                }
+                EntityTypesEntity actualizar = repo.save(existente);
+                return convertirADTO(actualizar);
+            }
+            throw new IllegalArgumentException("El tipo de codigo  con el id " + id + " no pudo ser actualizado");
+        }catch (Exception e){
+            throw new RuntimeException("El tipo de codigo no pudo ser editado: " + e.getMessage() );
+        }
+
     }
     public boolean deleteEntityType(String id){
         try {
@@ -72,14 +92,25 @@ public class EntityTypesService {
     private EntityTypesDTO convertirADTO (EntityTypesEntity entity){
         EntityTypesDTO dto = new EntityTypesDTO();
         dto.setEntityTypeID(entity.getEntityTypeID());
-        dto.setUniversityID(entity.getUniversityID());
         dto.setEntityType(entity.getEntityType());
+        if(entity.getUniversity() != null){
+            dto.setUniversityName(entity.getUniversity().getUniversityName());
+            dto.setUniversityID(entity.getUniversity().getUniversityID());
+        }else {
+            dto.setUniversityName("Sin Universidad Asignada");
+            dto.setEntityTypeID(null);
+        }
         return dto;
     }
     public EntityTypesEntity convertirAEntity(EntityTypesDTO dto) {
         EntityTypesEntity entity = new EntityTypesEntity();
-        entity.setUniversityID(dto.getUniversityID());
         entity.setEntityType(dto.getEntityType());
+
+        if(dto.getUniversityID() != null){
+            UniversityEntity university = repoUniversity.findById(dto.getUniversityID())
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + dto.getUniversityID()));
+            entity.setUniversity(university);
+        }
         return entity;
     }
 }
