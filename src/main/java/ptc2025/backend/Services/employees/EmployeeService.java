@@ -4,8 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.People.PeopleEntity;
 import ptc2025.backend.Entities.employees.EmployeeEntity;
 import ptc2025.backend.Models.DTO.employees.EmployeeDTO;
+import ptc2025.backend.Respositories.People.PeopleRepository;
 import ptc2025.backend.Respositories.employees.EmployeeRepository;
 
 import java.util.List;
@@ -17,6 +19,9 @@ public class EmployeeService {
 
     @Autowired
     private EmployeeRepository repo;
+
+    @Autowired
+    private PeopleRepository repoPeople;
 
     // GET
     public List<EmployeeDTO> getEmployees() {
@@ -34,9 +39,15 @@ public class EmployeeService {
         if (repo.existsById(dto.getId())) {
             throw new IllegalArgumentException("El empleado ya existe");
         }
-        EmployeeEntity entity = convertirAEntity(dto);
-        EmployeeEntity saved = repo.save(entity);
-        return convertirADTO(saved);
+        try{
+            EmployeeEntity entity = convertirAEntity(dto);
+            EmployeeEntity saved = repo.save(entity);
+            return convertirADTO(saved);
+        }catch (Exception e){
+            log.error("Error al registrar al empleado" + e.getMessage());
+            throw new RuntimeException("Error interno a la hora de registrar al empleado");
+        }
+
     }
 
     // PUT
@@ -44,11 +55,15 @@ public class EmployeeService {
         try {
             if (repo.existsById(id)) {
                 EmployeeEntity entity = repo.getById(id);
-                entity.setFullName(dto.getFullName());
-                entity.setEmail(dto.getEmail());
-                entity.setPosition(dto.getPosition());
-                entity.setPhone(dto.getPhone());
-                entity.setIsActive(dto.getIsActive());
+                entity.setEmployeeCode(dto.getEmployeeCode());
+                entity.setEmployeeDetail(dto.getEmployeeDetail());
+                if (dto.getPersonID() != null){
+                    PeopleEntity person = repoPeople.findById(dto.getPersonID())
+                            .orElseThrow(() -> new IllegalArgumentException("Cargo no encontrado con ID proporcionado: " + dto.getPersonID()));
+                    entity.setPeople(person);
+                }else {
+                    entity.setPeople(null);
+                }
                 EmployeeEntity saved = repo.save(entity);
                 return convertirADTO(saved);
             }
@@ -76,22 +91,28 @@ public class EmployeeService {
     private EmployeeDTO convertirADTO(EmployeeEntity entity) {
         EmployeeDTO dto = new EmployeeDTO();
         dto.setId(entity.getId());
-        dto.setFullName(entity.getFullName());
-        dto.setEmail(entity.getEmail());
-        dto.setPosition(entity.getPosition());
-        dto.setPhone(entity.getPhone());
-        dto.setIsActive(entity.getIsActive());
+        dto.setEmployeeCode(entity.getEmployeeCode());
+        dto.setEmployeeDetail(entity.getEmployeeDetail());
+        if(entity.getPersonID() != null){
+            dto.setPersonName(entity.getPeople().getFirstName());
+            dto.setPersonLastName(entity.getPeople().getLastName());
+            dto.setPersonID(entity.getPeople().getPersonID());
+        }else {
+            dto.setPersonName("Sin Persona Asignada");
+            dto.setPersonID(null);
+        }
         return dto;
     }
 
     private EmployeeEntity convertirAEntity(EmployeeDTO dto) {
         EmployeeEntity entity = new EmployeeEntity();
-        entity.setId(dto.getId());
-        entity.setFullName(dto.getFullName());
-        entity.setEmail(dto.getEmail());
-        entity.setPosition(dto.getPosition());
-        entity.setPhone(dto.getPhone());
-        entity.setIsActive(dto.getIsActive());
+        entity.setEmployeeCode(dto.getEmployeeCode());
+        entity.setEmployeeDetail(dto.getEmployeeDetail());
+        if(dto.getPersonID() != null){
+            PeopleEntity people = repoPeople.findById(dto.getPersonID())
+                    .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada con ID: " + dto.getPersonID()));
+            entity.setPeople(people);
+        }
         return entity;
     }
 }

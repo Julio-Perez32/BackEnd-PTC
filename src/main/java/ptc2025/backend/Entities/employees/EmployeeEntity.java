@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.People.PeopleEntity;
 
 @Entity
 @Table(name = "EMPLOYEES")
@@ -16,20 +18,25 @@ public class EmployeeEntity {
 
     @Id
     @Column(name = "EMPLOYEEID")
+    @GenericGenerator(name = "idEmployee", strategy = "guid")
+    @GeneratedValue(generator = "idEmployee")
     private String id;
 
-    @Column(name = "FULLNAME", nullable = false)
-    private String fullName;
+    @Column(name = "PERSONID")
+    private String personID;
 
-    @Column(name = "EMAIL", nullable = false)
-    private String email;
+    @Column(name = "DEPARTMENTID")
+    private String deparmentID;
 
-    @Column(name = "POSITION")
-    private String position;
+    @Column(name = "EMPLOYEECODE")
+    private String employeeCode;
 
-    @Column(name = "PHONE")
-    private String phone;
+    @Column(name = "EMPLOYEEDETAIL")
+    private String EmployeeDetail;
 
-    @Column(name = "ISACTIVE")
-    private Boolean isActive;
+    @OneToOne
+    @JoinColumn(name = "PERSONID", referencedColumnName = "PERSONID")
+    private PeopleEntity people;
+
+
 }

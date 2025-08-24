@@ -55,6 +55,7 @@ public class UsersService {
         }
         if(usuario.getPersonId() != null){
             dto.setPersonName(usuario.getPeople().getFirstName());
+            dto.setPersonLastName(usuario.getPeople().getLastName());
             dto.setPersonId(usuario.getPeople().getPersonID());
         }else {
             dto.setPersonName("Sin Persona Asignada");
@@ -98,7 +99,7 @@ public class UsersService {
         }
         if(data.getPersonId() != null){
             PeopleEntity people = repoPeople.findById(data.getPersonId())
-                    .orElseThrow(() -> new IllegalArgumentException("Rol del sistema no encontrada con ID: " + data.getPersonId()));
+                    .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada con ID: " + data.getPersonId()));
             entity.setPeople(people);
         }
         //para obtener el id rol del sistema

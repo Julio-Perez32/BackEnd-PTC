@@ -14,19 +14,20 @@ public class EmployeeDTO {
 
     private String id;
 
-    @NotNull(message = "El nombre completo no puede ser nulo")
-    @NotBlank(message = "El nombre completo no puede estar vacío")
-    private String fullName;
+    @NotBlank(message = "La persona no puede quedar vacia")
+    private String personID;
 
-    @NotNull(message = "El correo electrónico no puede ser nulo")
-    @NotBlank(message = "El correo electrónico no puede estar vacío")
-    @Email(message = "Correo electrónico inválido")
-    private String email;
+    @NotBlank(message = "El departamente al que pertenece el empleado no puede quedar vacio")
+    private String deparmentID;
 
-    private String position;
+    @NotBlank(message = "El codigo del empleado debe de estar completo")
+    private String employeeCode;
 
-    private String phone;
+    @NotBlank(message = "Ingrese los detalles sobre el empleado")
+    private String EmployeeDetail;
 
-    @NotNull(message = "El estado de actividad es obligatorio")
-    private Boolean isActive = true;
+    //campo para la persona
+    private String personName;
+    private String personLastName;
+
 }
