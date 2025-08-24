@@ -46,41 +46,41 @@ public class UniversityEntity {
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
     private List<AcademicLevelsEntity> academicLevels = new ArrayList<>();
 
-    //1 Universidad -> muchos degreeTypes
+    //1 Universidad -> muchos AcademicYears
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
-    private List<DegreeTypesEntity> degreeTypes = new ArrayList<>();
-
-    //1 Universidad -> muchos Requirements
-    @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
-    private List<RequirementsEntity> requirements = new ArrayList<>();
+    private List<AcademicYearEntity> academicYear = new ArrayList<>();
 
     //1 Universidad -> muchos CycleTypes
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
     private List<CycleTypesEntity> cycleTypes = new ArrayList<>();
 
-    //1 Universidad -> muchos SocialServiceProjects
+    //1 Universidad -> muchos degreeTypes
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
-    private List<SocialServiceEntity> socialService = new ArrayList<>();
+    private List<DegreeTypesEntity> degreeTypes = new ArrayList<>();
 
-    //1 Universidad -> muchos Modalities
+    //1 Univesidad -> muuchos DocumenteCategories
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
-    private List<ModalitiesEntity> modalities = new ArrayList<>();
+    private List<DocumentCategoriesEntity> documentCategories = new ArrayList<>();
+
+    //1 Universidad -> muchos EntityTypes
+    @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
+    private List<EntityTypesEntity> entityTypes = new ArrayList<>();
 
     //1 Universoidad -> muchos Localities
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
     private List<LocalitiesEntity> entities = new ArrayList<>();
 
-    //1 Univesidad -> muuchos DocumenteCategories
+    //1 Universidad -> muchos Modalities
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
-    private List<DocumentCategoriesEntity> documentCategories =new ArrayList<>();
+    private List<ModalitiesEntity> modalities = new ArrayList<>();
 
-    //1 Universidad -> muchos AcademicYears
+    //1 Universidad -> muchos Requirements
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
-    private List<AcademicYearEntity> academicYear = new ArrayList<>();
+    private List<RequirementsEntity> requirements = new ArrayList<>();
 
-    //1 Universidad -> muchos EntityTypes
+    //1 Universidad -> muchos SocialServiceProjects
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
-    private List<EntityTypesEntity> entityTypes = new ArrayList<>();
+    private List<SocialServiceEntity> socialService = new ArrayList<>();
 
     //1 Universidad -> muchos Users
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
