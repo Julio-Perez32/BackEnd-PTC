@@ -5,8 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.AcademicYear.AcademicYearEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Models.DTO.AcademicYear.AcademicYearDTO;
 import ptc2025.backend.Respositories.AcademicYear.AcademicYearRepository;
+import ptc2025.backend.Respositories.Universities.UniversityRespository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +18,9 @@ import java.util.stream.Collectors;
 public class AcademicYearService {
     @Autowired
     private AcademicYearRepository repo;
+
+    @Autowired //Se inyecta el repositorio de University
+    UniversityRespository repoUniversity;
 
     //Get
     public List<AcademicYearDTO> getAcademicYear(){
@@ -29,7 +34,7 @@ public class AcademicYearService {
     //POST
     public AcademicYearDTO insertAcademicYear(AcademicYearDTO dto){
         if(dto == null){
-            throw new IllegalArgumentException("Año academico no puede ser nulo o vacio");
+            throw new IllegalArgumentException("Los campos deben de ir completos");
         }
         try{
             AcademicYearEntity entity = convertirAEntity(dto);
@@ -47,13 +52,20 @@ public class AcademicYearService {
             if(repo.existsById(id)){
                 AcademicYearEntity entity = repo.getById(id);
 
-                entity.setUniversityId(dto.getUniversityId());
                 entity.setYear(dto.getYear());
                 entity.setStartDate(dto.getStartDate());
                 entity.setEndDate(dto.getEndDate());
                 entity.setCycleCount(dto.getCycleCount());
                 entity.setAlowInterCycle(dto.getAllowInterCycle());
                 entity.setDefaultCycleDuration(dto.getDefaultInterCycle());
+
+                if(dto.getUniversityId() != null){
+                    UniversityEntity university = repoUniversity.findById(dto.getUniversityId())
+                            .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + dto.getUniversityId()));
+                    entity.setUniversity(university);
+                }else {
+                    entity.setUniversity(null);
+                }
 
                 AcademicYearEntity save = repo.save(entity);
                 return convertirADTO(save);
@@ -86,26 +98,39 @@ public class AcademicYearService {
     private AcademicYearDTO convertirADTO(AcademicYearEntity entity){
         AcademicYearDTO dto = new AcademicYearDTO();
         dto.setAcademicYearId(entity.getAcademicYearId());
-        dto.setUniversityId(entity.getUniversityId());
         dto.setYear(entity.getYear());
         dto.setStartDate(entity.getStartDate());
         dto.setEndDate(entity.getEndDate());
         dto.setCycleCount(entity.getCycleCount());
         dto.setAllowInterCycle(entity.getAlowInterCycle());
         dto.setDefaultInterCycle(entity.getDefaultCycleDuration());
+
+        if(entity.getUniversity() != null){
+            dto.setUniversityName(entity.getUniversity().getUniversityName());
+            dto.setUniversityId(entity.getUniversity().getUniversityID());
+        }else {
+            dto.setUniversityName("Sin Universidad Asignada");
+            dto.setUniversityId(null);
+        }
         return dto;
     }
 
     private AcademicYearEntity convertirAEntity(AcademicYearDTO dto){
         AcademicYearEntity entity = new AcademicYearEntity();
         entity.setAcademicYearId(dto.getAcademicYearId());
-        entity.setUniversityId(dto.getUniversityId());
         entity.setYear(dto.getYear());
         entity.setStartDate(dto.getStartDate());
         entity.setEndDate(dto.getEndDate());
         entity.setCycleCount(dto.getCycleCount());
         entity.setAlowInterCycle(dto.getAllowInterCycle());
         entity.setDefaultCycleDuration(dto.getDefaultInterCycle());
+
+        if(dto.getUniversityId() != null){
+            UniversityEntity university = repoUniversity.findById(dto.getUniversityId())
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + dto.getUniversityId()));
+            entity.setUniversity(university);
+        }
+
         return entity;
     }
 }

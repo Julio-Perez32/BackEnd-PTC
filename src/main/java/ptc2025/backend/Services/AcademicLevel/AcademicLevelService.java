@@ -39,7 +39,7 @@ public class AcademicLevelService {
             dto.setUniversityName(level.getUniversity().getUniversityName());
             dto.setUniversityID(level.getUniversity().getUniversityID());
         }else {
-            dto.setUniversityName("Si Universidad Asignada");
+            dto.setUniversityName("Sin Universidad Asignada");
             dto.setUniversityID(null);
         }
         return dto;

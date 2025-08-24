@@ -5,6 +5,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.careerCycleAvailability.CareerCycleAvailabilityEntity;
 import ptc2025.backend.Models.DTO.careerCycleAvailability.CareerCycleAvailabilityDTO;
+import ptc2025.backend.Respositories.Universities.UniversityRespository;
 import ptc2025.backend.Respositories.careerCycleAvailability.CareerCycleAvailabilityRepository;
 
 import java.util.List;
