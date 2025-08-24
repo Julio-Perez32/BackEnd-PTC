@@ -5,8 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.People.PeopleEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Entities.personTypes.personTypesEntity;
 import ptc2025.backend.Models.DTO.People.PeopleDTO;
 import ptc2025.backend.Respositories.People.PeopleRepository;
+import ptc2025.backend.Respositories.personTypes.personTypesRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +20,10 @@ public class PeopleService {
 
     @Autowired
     PeopleRepository repo;
+
+    @Autowired
+    personTypesRepository repoTypesPerson;
+
 
     public List<PeopleDTO> getAllPeople(){
         List<PeopleEntity> people = repo.findAll();
@@ -33,6 +40,13 @@ public class PeopleService {
         dto.setBirthDate(people.getBirthDate());
         dto.setContactEmail(people.getContactEmail());
         dto.setPhone(people.getPhone());
+        if(people.getPersonTypes() != null){
+            dto.setPersonType(people.getPersonTypes().getPersonType());
+            dto.setPersonTypesID(people.getPersonTypes().getPersonTypeID());
+        }else {
+            dto.setPersonType("Sin Tipo de Persona Asignado");
+            dto.setPersonTypesID(null);
+        }
         return dto;
     }
 
@@ -44,6 +58,11 @@ public class PeopleService {
         entity.setBirthDate(dto.getBirthDate());
         entity.setContactEmail(dto.getContactEmail());
         entity.setPhone(dto.getPhone());
+        if(dto.getPersonTypesID() != null){
+            personTypesEntity personTypes = repoTypesPerson.findById(dto.getPersonTypesID())
+                    .orElseThrow(() -> new IllegalArgumentException("Tipo de persona no encontrada con ID: " + dto.getPersonTypesID()));
+            entity.setPersonTypes(personTypes);
+        }
         return entity;
     }
 
@@ -69,6 +88,13 @@ public class PeopleService {
         existsPeople.setBirthDate(json.getBirthDate());
         existsPeople.setContactEmail(json.getContactEmail());
         existsPeople.setPhone(json.getPhone());
+        if(json.getPersonTypesID() != null){
+            personTypesEntity personTypes = repoTypesPerson.findById(json.getPersonTypesID())
+                    .orElseThrow(() -> new IllegalArgumentException("Tipo de persona no encontrada con ID: " + json.getPersonTypesID()));
+            existsPeople.setPersonTypes(personTypes);
+        }else {
+            existsPeople.setPersonTypes(null);
+        }
 
         PeopleEntity updatedPeople = repo.save(existsPeople);
 

@@ -15,6 +15,7 @@ import java.util.Date;
 public class PeopleDTO {
 
     private String personID;
+    private String personTypesID;
     @NotBlank
     private String firstName;
     @NotBlank
@@ -25,4 +26,9 @@ public class PeopleDTO {
     @Email
     private String contactEmail;
     private String phone;
+
+    //campo para el nombre del tipo de persona
+    private String personType;
+
+
 }
