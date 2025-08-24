@@ -33,5 +33,6 @@ public class UsersDTO {
     private String universityName;
 
     private String personName;
+    private String personLastName;
 
 }
