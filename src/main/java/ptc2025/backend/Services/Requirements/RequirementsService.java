@@ -18,6 +18,8 @@ public class RequirementsService {
 
     @Autowired
     private RequirementsRepository repo;
+    @Autowired
+    private UniversityRespository repoUniversity;
 
     @Autowired
     private UniversityRespository repoUniversity;

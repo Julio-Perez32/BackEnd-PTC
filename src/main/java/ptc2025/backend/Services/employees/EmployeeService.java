@@ -93,7 +93,7 @@ public class EmployeeService {
         dto.setId(entity.getId());
         dto.setEmployeeCode(entity.getEmployeeCode());
         dto.setEmployeeDetail(entity.getEmployeeDetail());
-        if(entity.getPersonID() != null){
+        if(entity.getPeople() != null){
             dto.setPersonName(entity.getPeople().getFirstName());
             dto.setPersonLastName(entity.getPeople().getLastName());
             dto.setPersonID(entity.getPeople().getPersonID());

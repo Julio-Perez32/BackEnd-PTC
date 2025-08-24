@@ -28,7 +28,6 @@ public class StudentsService {
     public StudentsDTO convertToStudentsDTO(StudentsEntity students) {
         StudentsDTO dto = new StudentsDTO();
         dto.setStudentID(students.getStudentID());
-        dto.setPersonID(students.getPersonID());
         dto.setStudentCode(students.getStudentCode());
         return dto;
     }
@@ -36,7 +35,6 @@ public class StudentsService {
     public StudentsEntity convertToStudentsEntity(StudentsDTO dto) {
         StudentsEntity entity = new StudentsEntity();
         entity.setStudentID(dto.getStudentID());
-        entity.setPersonID(dto.getPersonID());
         entity.setStudentCode(dto.getStudentCode());
         return entity;
     }
@@ -58,7 +56,7 @@ public class StudentsService {
 
     public StudentsDTO updateStudent(String id, StudentsDTO json){
         StudentsEntity existsStudent = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado."));
-        existsStudent.setPersonID(json.getPersonID());
+
         existsStudent.setStudentCode(json.getStudentCode());
 
         StudentsEntity updatedStudent = repo.save(existsStudent);

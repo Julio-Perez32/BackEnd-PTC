@@ -17,8 +17,6 @@ public class CycleTypesEntity {
     @GeneratedValue(generator = "IDCycleTypes")
     @Column(name = "CYCLETYPEID")
     private String id;
-    @Column(name = "UNIVERSITYID")
-    private String universityID;
     @Column(name = "CYCLELABEL")
     private String cycleLabel;
 

@@ -17,8 +17,6 @@ public class DegreeTypesEntity {
     @GeneratedValue(generator = "idDegreeTypes")
     @Column(name = "DEGREETYPEID")
     private String id;
-    @Column(name = "UNIVERSITYID")
-    private String universityID;
     @Column(name = "DEGREETYPENAME")
     private String degreeTypeName;
 

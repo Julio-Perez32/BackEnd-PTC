@@ -18,8 +18,6 @@ public class AcademicLevelsEntity {
     @GeneratedValue(generator = "AcademicLevelID")
     @Column(name = "ACADEMICLEVELID")
     private String academicLevelID;
-    @Column(name = "UNIVERSITYID")
-    private String universityID;
     @Column (name = "ACADEMICLEVELNAME")
     private String academicLevelName;
 

@@ -17,8 +17,6 @@ public class RequirementsEntity {
     @Id
     @Column(name = "REQUIREMENTID")
     private String id;
-    @Column(name = "UNIVERSITYID")
-    private String universityID;
     @Column(name = "REQUIREMENTNAME")
     private String requirementName;
     @Column(name = "DESCRIPTION")

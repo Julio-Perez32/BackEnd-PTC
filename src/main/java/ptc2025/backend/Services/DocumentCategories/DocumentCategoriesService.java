@@ -18,6 +18,8 @@ public class DocumentCategoriesService {
 
     @Autowired
     private DocumentCategoriesRepository repo;
+    @Autowired
+    private UniversityRespository repoUniversity;
 
     @Autowired
     UniversityRespository repoUniversity;

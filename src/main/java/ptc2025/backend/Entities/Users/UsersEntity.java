@@ -20,12 +20,6 @@ public class UsersEntity {
     @GeneratedValue(generator = "IDusers")
     @Column(name = "USERID")
     private String id;
-    @Column(name = "UNIVERSITYID")
-    private String universityID;
-    @Column(name = "PERSONID")
-    private String personId;
-    @Column (name = "ROLEID")
-    private String roleId;
     @Column(name = "EMAIL")
     private String email;
     @Column(name = "PASSWORD")

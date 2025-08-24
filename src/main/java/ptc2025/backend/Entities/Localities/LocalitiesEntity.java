@@ -19,8 +19,6 @@ public class LocalitiesEntity {
     @GeneratedValue (generator = "idLocality")
     @Column(name = "LOCALITYID")
     private String localityID;
-    @Column(name = "UNIVERSITYID")
-    private String universityID;
     @Column(name = "ISMAINLOCALITY")
     private Boolean isMainLocality;
     @Column(name = "ADDRESS")
