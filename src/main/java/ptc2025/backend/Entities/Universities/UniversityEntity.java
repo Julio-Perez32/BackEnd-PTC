@@ -16,7 +16,7 @@ import ptc2025.backend.Entities.Localities.LocalitiesEntity;
 import ptc2025.backend.Entities.Modalities.ModalitiesEntity;
 import ptc2025.backend.Entities.Requirements.RequirementsEntity;
 import ptc2025.backend.Entities.SocialService.SocialServiceEntity;
-import ptc2025.backend.Entities.UsersEntity;
+import ptc2025.backend.Entities.Users.UsersEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class UniversityEntity {
 
     //1 Universidad -> muchos CycleTypes
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
-    private List<CycleTypesEntity> cycleTypes = new ArrayList<>();
+    private List<CycleTypesEntity> cycleTypes = new ArrayList<>();//me quede hasta aca
 
     //1 Universidad -> muchos degreeTypes
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)

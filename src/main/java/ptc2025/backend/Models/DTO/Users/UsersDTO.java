@@ -1,4 +1,4 @@
-package ptc2025.backend.Models.DTO;
+package ptc2025.backend.Models.DTO.Users;
 
 
 import jakarta.validation.constraints.Email;

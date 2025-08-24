@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ptc2025.backend.Execeptions.ExcepcionDatosDuplicados;
+import ptc2025.backend.Exceptions.ExcepcionDatosDuplicados;
 import ptc2025.backend.Models.DTO.SystemPermissions.SystemPermissionsDTO;
 import ptc2025.backend.Services.SystemPermissions.SystemPermissionsService;
 

@@ -1,4 +1,4 @@
-package ptc2025.backend.Entities;
+package ptc2025.backend.Entities.Users;
 
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
