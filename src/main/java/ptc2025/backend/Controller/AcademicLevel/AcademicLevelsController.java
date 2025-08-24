@@ -23,10 +23,13 @@ public class AcademicLevelsController {
     AcademicLevelsService service;
 
     @GetMapping("/getAcademicLevels")
-    public List<AcademicLevelsDTO> getAcademicLevels(){ return service.getAllLevels();}
+    public List<AcademicLevelsDTO> getAcademicLevels(){ return service.getAllLevels(); }
 
     @PostMapping("/insertAcademicLevel")
-    public ResponseEntity<?> insertAcademicLevel(@Valid @RequestBody AcademicLevelsDTO usuario, HttpServletRequest request){
+    public ResponseEntity<?> insertAcademicLevel(
+            @Valid @RequestBody AcademicLevelsDTO usuario,
+            HttpServletRequest request
+    ){
         try{
             AcademicLevelsDTO respuesta = service.insertLevel(usuario);
             if (respuesta == null){
@@ -63,8 +66,8 @@ public class AcademicLevelsController {
             return ResponseEntity.notFound().build();
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
-                    "Error", "Datos duplicados",
-                    "Campo", e.getMessage()
+                    "error", "Datos duplicados",
+                    "detail", e.getMessage()
             ));
         }
     }
@@ -74,21 +77,21 @@ public class AcademicLevelsController {
         try{
             if(!service.deleteLevel(ID)){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .header("Mensaje Error", "Estudiante no encontrado")
+                        .header("Error message", "Nivel académico no encontrado")
                         .body(Map.of(
-                                "Error", "Not found",
-                                "Menaje", "El estudiante no ha sido encontrado",
+                                "error", "Not found",
+                                "message", "El nivel académico no ha sido encontrado",
                                 "timestamp", Instant.now().toString()
                         ));
             }
             return ResponseEntity.ok().body(Map.of(
                     "status", "Proceso completado",
-                    "message", "Estudiante eliminado con exito"
+                    "message", "Nivel académico eliminado con exito"
             ));
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(Map.of(
                     "status", "Error",
-                    "message", "Error al eliminar el estudiante",
+                    "message", "Error al eliminar el nivel académico",
                     "detail", e.getMessage()
             ));
         }
