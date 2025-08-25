@@ -54,7 +54,11 @@ public class UsersController {
     }
 
     @PutMapping("/UpdateUser/{id}")
-    public ResponseEntity<?> modificarUsuario(@PathVariable String id, @Valid @RequestBody UsersDTO json, BindingResult bindingResult){
+    public ResponseEntity<?> modificarUsuario(
+            @PathVariable String id,
+            @Valid @RequestBody UsersDTO json,
+            BindingResult bindingResult
+    ){
         if (bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
