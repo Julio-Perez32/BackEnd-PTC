@@ -1,5 +1,6 @@
 package ptc2025.backend.Services.AcademicLevel;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -57,7 +58,7 @@ public class AcademicLevelsService {
         return level;
     }
 
-    public AcademicLevelsDTO insertLevel(AcademicLevelsDTO dto){
+    public AcademicLevelsDTO insertLevel(@Valid AcademicLevelsDTO dto){
 
         if (dto.getAcademicLevelName() == null || dto.getAcademicLevelName().isBlank()){
             throw new IllegalArgumentException("Todos los campos deben estar completados.");
