@@ -1,4 +1,4 @@
-package ptc2025.backend.Controller.AcademicLevel;
+package ptc2025.backend.Controller.AcademicLevels;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -23,7 +23,15 @@ public class AcademicLevelsController {
     AcademicLevelsService service;
 
     @GetMapping("/getAcademicLevels")
-    public List<AcademicLevelsDTO> getAcademicLevels(){ return service.getAllLevels(); }
+    public ResponseEntity<List<AcademicLevelsDTO>> getAcademicLevels(int page, int size){
+        List<AcademicLevelsDTO> levels = service.getAllAcademicLevels(page, size);
+        if(levels == null){
+            ResponseEntity.badRequest().body(Map.of(
+                    "status","No hay niveles registrados"
+            ));
+        }
+        return ResponseEntity.ok(levels);
+    }
 
     @PostMapping("/insertAcademicLevel")
     public ResponseEntity<?> insertAcademicLevel(
@@ -36,7 +44,7 @@ public class AcademicLevelsController {
                 return ResponseEntity.badRequest().body(Map.of(
                         "status", "Inserción incorrecta",
                         "errorType", "VALIDATION_ERROR",
-                        "message", "Datos del maestro inválidos"
+                        "message", "Datos del nivel academico inválidos"
                 ));
             }
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
@@ -45,7 +53,7 @@ public class AcademicLevelsController {
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "status", "error",
-                    "message", "Error al registrar el maestro",
+                    "message", "Error al registrar el nivel academico",
                     "detail", e.getMessage()
             ));
         }

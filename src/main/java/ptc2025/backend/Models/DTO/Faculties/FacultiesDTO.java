@@ -11,6 +11,7 @@ import lombok.ToString;
 public class FacultiesDTO {
 
     private String facultyID;
+    private String FacultyName;
     @NotBlank
     private String facultyCode;
     @Pattern(regexp = "^\\+503\\s\\d{4}-\\d{4}$", message = "El número debe tener el formato: +503 1234-5678")

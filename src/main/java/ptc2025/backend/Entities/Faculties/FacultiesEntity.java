@@ -28,6 +28,8 @@ public class FacultiesEntity {
     @GeneratedValue(generator = "facultyID")
     @Column(name = "FACULTYID")
     private String facultyID;
+    @Column(name = "FACULTYNAME")
+    private String facultyName;
     @Column(name = "FACULTYCODE")
     private String facultyCode;
     @Column(name = "CONTACTPHONE")
