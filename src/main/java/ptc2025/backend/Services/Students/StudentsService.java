@@ -4,8 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.People.PeopleEntity;
 import ptc2025.backend.Entities.Students.StudentsEntity;
 import ptc2025.backend.Models.DTO.Students.StudentsDTO;
+import ptc2025.backend.Respositories.People.PeopleRepository;
 import ptc2025.backend.Respositories.Students.StudentsRepository;
 
 import java.util.List;
@@ -17,6 +19,8 @@ public class StudentsService {
 
     @Autowired
     StudentsRepository repo;
+    @Autowired
+    private PeopleRepository repoPeople;
 
     public List<StudentsDTO> getAllStudents() {
         List<StudentsEntity> students = repo.findAll();
@@ -29,6 +33,14 @@ public class StudentsService {
         StudentsDTO dto = new StudentsDTO();
         dto.setStudentID(students.getStudentID());
         dto.setStudentCode(students.getStudentCode());
+        if(students.getPeople() != null){
+            dto.setPersonName(students.getPeople().getFirstName());
+            dto.setPersonLastName(students.getPeople().getLastName());
+            dto.setPersonID(students.getPeople().getPersonID());
+        }else {
+            dto.setPersonName("Sin Persona Asignada");
+            dto.setPersonID(null);
+        }
         return dto;
     }
 
@@ -36,6 +48,11 @@ public class StudentsService {
         StudentsEntity entity = new StudentsEntity();
         entity.setStudentID(dto.getStudentID());
         entity.setStudentCode(dto.getStudentCode());
+        if(dto.getPersonID() != null){
+            PeopleEntity people = repoPeople.findById(dto.getPersonID())
+                    .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada con ID: " + dto.getPersonID()));
+            entity.setPeople(people);
+        }
         return entity;
     }
 
@@ -58,7 +75,13 @@ public class StudentsService {
         StudentsEntity existsStudent = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado."));
 
         existsStudent.setStudentCode(json.getStudentCode());
-
+        if (json.getPersonID() != null){
+            PeopleEntity person = repoPeople.findById(json.getPersonID())
+                    .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada con ID proporcionado: " + json.getPersonID()));
+            existsStudent.setPeople(person);
+        }else {
+            existsStudent.setPeople(null);
+        }
         StudentsEntity updatedStudent = repo.save(existsStudent);
 
         return convertToStudentsDTO(updatedStudent);

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.Users.UsersEntity;
+import ptc2025.backend.Entities.systemRoles.SystemRolesEntity;
 
 import java.time.LocalDate;
 
@@ -21,14 +23,16 @@ public class NotificationEntity {
     @GeneratedValue(generator = "notificationID")
     @Column(name = "NOTIFICATIONID")
     private String notificationID;
-    @Column(name = "USERID")
-    private String userID;
     @Column(name = "TITLE")
     private String title;
     @Column(name = "BODY")
     private String body;
     @Column(name = "SENTAT")
     private LocalDate sentAt;
+
+    @ManyToOne
+    @JoinColumn(name = "USERID", referencedColumnName = "USERID")
+    private UsersEntity user;
 }
 /**NOTIFICATIONID
  USERID

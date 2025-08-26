@@ -24,6 +24,8 @@ public class NotificationDTO {
     private String body;
     @NotBlank (message = "Ingrese la fecha de envio")
     private LocalDate sentAt;
+
+    private String UserName;
 }
 /**NOTIFICATIONID
  USERID

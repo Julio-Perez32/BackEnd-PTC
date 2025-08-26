@@ -131,7 +131,7 @@ public class UsersService {
         // Persona asociada
         if (json.getPersonId() != null){
             PeopleEntity person = repoPeople.findById(json.getPersonId())
-                    .orElseThrow(() -> new IllegalArgumentException("Cargo no encontrado con ID proporcionado: " + json.getPersonId()));
+                    .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada con ID proporcionado: " + json.getPersonId()));
             existente.setPeople(person);
         }else {
             existente.setPeople(null);
