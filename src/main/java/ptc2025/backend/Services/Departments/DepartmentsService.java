@@ -5,8 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Departments.DepartmentsEntity;
+import ptc2025.backend.Entities.Faculties.FacultiesEntity;
 import ptc2025.backend.Models.DTO.Departments.DepartmentsDTO;
 import ptc2025.backend.Respositories.Departments.DepartmentsRepository;
+import ptc2025.backend.Respositories.Faculties.FacultiesRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +20,9 @@ public class DepartmentsService {
     @Autowired
     DepartmentsRepository repo;
 
+    @Autowired
+    FacultiesRepository repoFaculties;
+
     public List<DepartmentsDTO> getAllDepartments(){
         List<DepartmentsEntity> departments = repo.findAll();
         return departments.stream()
@@ -28,18 +33,30 @@ public class DepartmentsService {
     private DepartmentsDTO convertToDepartmentsDTO(DepartmentsEntity departments){
         DepartmentsDTO dto = new DepartmentsDTO();
         dto.setDepartmentID(departments.getDepartmentID());
-        dto.setFacultyID(departments.getFacultyID());
         dto.setDepartmentName(departments.getDepartmentName());
         dto.setDepartmentType(departments.getDepartmentType());
+
+        if(departments.getFaculty() != null){
+            dto.setFacultyName(departments.getFaculty().getFacultyName());
+            dto.setFacultyID(departments.getFaculty().getFacultyID());
+        }else{
+            dto.setFacultyName("Sin facultad asignada");
+            dto.setFacultyID(null);
+        }
         return dto;
     }
 
     private DepartmentsEntity convertToDepartmentEntity(DepartmentsDTO dto){
         DepartmentsEntity entity = new DepartmentsEntity();
         entity.setDepartmentID(dto.getDepartmentID());
-        entity.setFacultyID(dto.getFacultyID());
         entity.setDepartmentName(dto.getDepartmentName());
         entity.setDepartmentType(dto.getDepartmentType());
+
+        if(dto.getFacultyID() != null){
+            FacultiesEntity faculties = repoFaculties.findById(dto.getFacultyID()).orElseThrow(
+                    () -> new IllegalArgumentException("Facultad no encontrada con ID" + dto.getFacultyID()));
+            entity.setFaculty(faculties);
+        }
         return entity;
     }
 
