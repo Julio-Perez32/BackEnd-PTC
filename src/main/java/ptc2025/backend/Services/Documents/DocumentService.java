@@ -3,6 +3,9 @@ package ptc2025.backend.Services.Documents;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.DocumentCategories.DocumentCategoriesEntity;
 import ptc2025.backend.Entities.Documents.DocumentEntity;
@@ -30,6 +33,14 @@ public class DocumentService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+    // GET DE PAGINACION
+    public Page<DocumentDTO> getDocumentsPaginated(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return repository.findAll(pageable)
+                .map(this::convertToDTO);
+    }
+
 
     // POST
     public DocumentDTO insertDocument(DocumentDTO dto) {

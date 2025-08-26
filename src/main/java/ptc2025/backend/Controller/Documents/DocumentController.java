@@ -22,11 +22,38 @@ public class DocumentController {
     @Autowired
     private DocumentService service;
 
+    //GET
     @GetMapping("/getDocuments")
     public List<DocumentDTO> getDocuments() {
         return service.getDocuments();
     }
 
+    @GetMapping("/getDocumentsPaginated")
+    public ResponseEntity<Map<String, Object>> getDocumentsPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        try {
+            var documentsPage = service.getDocumentsPaginated(page, size);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("data", documentsPage.getContent());
+            response.put("currentPage", documentsPage.getNumber());
+            response.put("totalItems", documentsPage.getTotalElements());
+            response.put("totalPages", documentsPage.getTotalPages());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "status", "server error",
+                            "message", "Error al obtener documentos paginados",
+                            "detail", e.getMessage()
+                    ));
+        }
+    }
+
+    //INSERT
     @PostMapping("/insertDocument")
     public ResponseEntity<Map<String, Object>> insertDocument(
             @Valid @RequestBody DocumentDTO dto,
