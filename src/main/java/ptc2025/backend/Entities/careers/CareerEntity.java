@@ -9,7 +9,12 @@ import ptc2025.backend.Entities.AcademicLevel.AcademicLevelsEntity;
 import ptc2025.backend.Entities.DegreeTypes.DegreeTypesEntity;
 import ptc2025.backend.Entities.Departments.DepartmentsEntity;
 import ptc2025.backend.Entities.Modalities.ModalitiesEntity;
+import ptc2025.backend.Entities.Pensum.PensumEntity;
 import ptc2025.backend.Entities.YearCycles.YearCyclesEntity;
+import ptc2025.backend.Entities.careerCycleAvailability.CareerCycleAvailabilityEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "CAREERS")
@@ -39,10 +44,6 @@ public class CareerEntity {
     @JoinColumn(name = "DEPARTMENTID", referencedColumnName = "DEPARTMENTID")
     private DepartmentsEntity departments;
 
-    @ManyToOne
-    @JoinColumn(name = "YEARCYCLEID", referencedColumnName = "YEARCYCLEID")
-    private YearCyclesEntity yearCycles;
-
     @Column(name = "CAREERNAME", nullable = false)
     private String name;
 
@@ -63,4 +64,10 @@ public class CareerEntity {
 
     @Column(name = "TOTALVALUEUNITS")
     private Integer totalValueUnits;
+
+    @OneToMany(mappedBy = "career", cascade = CascadeType.ALL)
+    private List<CareerCycleAvailabilityEntity> careerCycleAvailability = new ArrayList<>();
+
+    @OneToMany(mappedBy = "carrer", cascade = CascadeType.ALL)
+    private  List<PensumEntity> pensum = new ArrayList<>();
 }
