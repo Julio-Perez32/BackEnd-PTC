@@ -6,6 +6,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.Faculties.FacultiesEntity;
+import ptc2025.backend.Entities.Requirements.RequirementsEntity;
+import ptc2025.backend.Entities.SubjectDefinitions.SubjectDefinitionsEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "REQUIREMENTCONDITIONS")
@@ -21,4 +27,14 @@ public class RequirementConditionsEntity {
     private String RequirementID;
     @Column(name = "SUBJECTID")
     private String SubjectID;
+
+    //Faculties le da la llave a SubjectTeachers
+    @ManyToOne
+    @JoinColumn(name = "SUBJECTID", referencedColumnName = "SUBJECTID")
+    private SubjectDefinitionsEntity subjectDefinitions;
+
+    //Faculties le da la llave a SubjectTeachers
+    @ManyToOne
+    @JoinColumn(name = "REQUIREMENTID", referencedColumnName = "REQUIREMENTID")
+    private RequirementsEntity requirements;
 }

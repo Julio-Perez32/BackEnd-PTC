@@ -23,8 +23,18 @@ public class RequirementConditionsService {
     public RequirementConditionsDTO convertToRequirementDTO(RequirementConditionsEntity entity){
         RequirementConditionsDTO dto = new RequirementConditionsDTO();
         dto.setConditionID(entity.getConditionID());
-        dto.setRequirementID(entity.getRequirementID());
-        dto.setSubjectID(entity.getSubjectID());
+
+        if(entity.getRequirements() != null){
+            dto.setRequirementID(entity.getRequirements().getId());
+        }else {
+            dto.setRequirementID(null);
+        }
+
+        if(entity.getSubjectDefinitions() != null){
+            dto.setConditionID(entity.getSubjectDefinitions().getSubjectID());
+        }else {
+            dto.setSubjectID(null);
+        }
         return dto;
     }
 

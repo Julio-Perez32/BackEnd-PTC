@@ -6,9 +6,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Pensum.PensumEntity;
 import ptc2025.backend.Entities.SubjectDefinitions.SubjectDefinitionsEntity;
+import ptc2025.backend.Entities.SubjectFamilies.SubjectFamiliesEntity;
 import ptc2025.backend.Models.DTO.Pensum.PensumDTO;
 import ptc2025.backend.Models.DTO.SubjectDefinitions.SubjectDefinitionsDTO;
 import ptc2025.backend.Respositories.SubjectDefinitions.SubjectDefinitionsRepository;
+import ptc2025.backend.Respositories.SubjectFamilies.SubjectFamiliesRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,21 +22,35 @@ public class SubjectDefinitionsService {
     @Autowired
     SubjectDefinitionsRepository repo;
 
+    @Autowired
+    SubjectFamiliesRepository repoSubjectFamilies;
+
     public SubjectDefinitionsDTO convertToDefinitionDTO(SubjectDefinitionsEntity entity){
         SubjectDefinitionsDTO dto = new SubjectDefinitionsDTO();
         dto.setSubjectID(entity.getSubjectID());
-        dto.setSubjectFamilyID(entity.getSubjectFamilyID());
         dto.setSubjectName(entity.getSubjectName());
         dto.setSubjectCode(entity.getSubjectCode());
+
+        if(entity.getSubjectFamilies() != null){
+            dto.setSubjectFamilyID(entity.getSubjectFamilies().getSubjectFamilyID());
+        }else {
+            dto.setSubjectFamilyID(null);
+        }
         return dto;
     }
 
     public SubjectDefinitionsEntity convertToDefinitionEntity(SubjectDefinitionsDTO dto){
         SubjectDefinitionsEntity entity = new SubjectDefinitionsEntity();
         entity.setSubjectID(dto.getSubjectID());
-        entity.setSubjectFamilyID(dto.getSubjectFamilyID());
         entity.setSubjectName(dto.getSubjectName());
         entity.setSubjectCode(dto.getSubjectCode());
+
+        if(dto.getSubjectFamilyID() != null){
+            SubjectFamiliesEntity families = repoSubjectFamilies.findById(dto.getSubjectFamilyID()).orElseThrow(
+                    () -> new IllegalArgumentException("Materias no encontradas con ID" + dto.getSubjectFamilyID()));
+            entity.setSubjectFamilies(families);
+        }
+
         return entity;
     }
 

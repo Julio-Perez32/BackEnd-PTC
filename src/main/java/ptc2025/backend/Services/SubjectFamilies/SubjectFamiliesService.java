@@ -6,6 +6,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.SubjectFamilies.SubjectFamiliesEntity;
 import ptc2025.backend.Models.DTO.SubjectFamilies.SubjectFamiliesDTO;
+import ptc2025.backend.Respositories.Faculties.FacultiesRepository;
 import ptc2025.backend.Respositories.SubjectFamilies.SubjectFamiliesRepository;
 
 import java.util.List;
@@ -18,6 +19,9 @@ public class SubjectFamiliesService {
     @Autowired
     SubjectFamiliesRepository repo;
 
+    @Autowired
+    FacultiesRepository repoFaculties;
+
     public List<SubjectFamiliesDTO> getSubjectFam(){
         List<SubjectFamiliesEntity> families = repo.findAll();
         return families.stream()
@@ -28,11 +32,18 @@ public class SubjectFamiliesService {
     private SubjectFamiliesDTO convertToSubjectFamDTO(SubjectFamiliesEntity families) {
         SubjectFamiliesDTO dto = new SubjectFamiliesDTO();
         dto.setSubjectFamilyID(families.getSubjectFamilyID());
-        dto.setFacultyID(families.getFacultyID());
         dto.setSubjectPrefix(families.getSubjectPrefix());
         dto.setReservedSlots(families.getReservedSlots());
         dto.setStartingNumber(families.getStartingNumber());
         dto.setLastAssignedNumber(families.getLastAssignedNumber());
+
+        if(families.getFaculty() != null){
+            dto.setFacultyName(families.getFaculty().getFacultyName());
+            dto.setFacultyID(families.getFaculty().getFacultyID());
+        }else{
+            dto.setFacultyName("Sin facultad asignada");
+            dto.setFacultyID(null);
+        }
         return dto;
     }
 

@@ -21,8 +21,19 @@ public class SubjectTeachersService {
     public SubjectTeachersDTO convertToSubjectTeachersDTO(SubjectTeachersEntity entity){
         SubjectTeachersDTO dto = new SubjectTeachersDTO();
         dto.setSubjectTeacherID(entity.getSubjectTeacherID());
-        dto.setSubjectID(entity.getSubjectID());
-        dto.setEmployeeID(entity.getEmployeeID());
+
+        if(entity.getEmployee() != null){
+            dto.setEmployeeID(entity.getEmployee().getId());
+        }else{
+            dto.setEmployeeID(null);
+        }
+
+        if(entity.getSubjectDefinitions() != null){
+            dto.setSubjectID(entity.getSubjectDefinitions().getSubjectID());
+        }else{
+            dto.setSubjectID(null);
+        }
+
         return dto;
     }
 
