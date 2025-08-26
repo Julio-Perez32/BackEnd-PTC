@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import ptc2025.backend.Entities.AcademicYear.AcademicYearEntity;
 import ptc2025.backend.Entities.CycleTypes.CycleTypesEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@CrossOrigin
 public class YearCyclesService {
 
     @Autowired
