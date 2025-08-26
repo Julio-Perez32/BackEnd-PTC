@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import ptc2025.backend.Entities.AcademicYear.AcademicYearEntity;
 import ptc2025.backend.Entities.CycleTypes.CycleTypesEntity;
 import ptc2025.backend.Entities.StudentEvaluations.StudentEvaluationsEntity;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@CrossOrigin
 public class StudentEvaluationsService {
 
     @Autowired
