@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.CodeGenerators.CodeGeneratorsEntity;
+import ptc2025.backend.Entities.EntityType.EntityTypesEntity;
+import ptc2025.backend.Entities.facultyCorrelatives.facultyCorrelativesEntity;
 import ptc2025.backend.Exceptions.ExceptionLevelNotValid;
 import ptc2025.backend.Models.DTO.AcademicLevel.AcademicLevelsDTO;
 import ptc2025.backend.Models.DTO.CodeGenerators.CodeGeneratorsDTO;
@@ -56,6 +58,22 @@ public class CodeGeneratorsService {
         exist.setSuffixLength(dto.getSuffixLength());
         exist.setLastAssignedNumber(dto.getSuffixLength());
 
+        if(dto.getEntityTypeID() != null){
+            EntityTypesEntity entityTypes = repoEntityType.findById(dto.getEntityTypeID())
+                    .orElseThrow(() -> new IllegalArgumentException("Tipo de entidad no encontrada con ID: " + dto.getEntityTypeID()));
+            exist.setEntityType(entityTypes);
+        }else {
+            exist.setEntityType(null);
+        }
+
+        if(dto.getCorrelativeID() != null){
+            facultyCorrelativesEntity correlatives = repoCorrelatives.findById(dto.getCorrelativeID())
+                    .orElseThrow(() -> new IllegalArgumentException("Correlativo de la universidad no encontrada con ID: " + dto.getCorrelativeID()));
+            exist.setFacultyCorrelative(correlatives);
+        }else {
+            exist.setFacultyCorrelative(null);
+        }
+
         CodeGeneratorsEntity update = repo.save(exist);
         return convertToDTO(update);
     }
@@ -75,18 +93,40 @@ public class CodeGeneratorsService {
     }
     public CodeGeneratorsEntity convertToEntity (CodeGeneratorsDTO dto){
         CodeGeneratorsEntity entity = new CodeGeneratorsEntity();
-        dto.setGeneratorID(entity.getGeneratorID());
         dto.setPrefix(entity.getPrefix());
         dto.setSuffixLength(entity.getSuffixLength());
         dto.setLastAssignedNumber(entity.getLastAssignedNumber());
+        if(dto.getEntityTypeID() != null){
+            EntityTypesEntity entityTypes = repoEntityType.findById(dto.getEntityTypeID())
+                    .orElseThrow(() -> new IllegalArgumentException("Tipo de entidad no encontrada con ID: " + dto.getEntityTypeID()));
+            entity.setEntityType(entityTypes);
+        }
+        if(dto.getEntityTypeID() != null){
+            EntityTypesEntity entityTypes = repoEntityType.findById(dto.getEntityTypeID())
+                    .orElseThrow(() -> new IllegalArgumentException("Correlativo de la universidad no encontrada con ID: " + dto.getEntityTypeID()));
+            entity.setEntityType(entityTypes);
+        }
         return entity;
     }
 
     public CodeGeneratorsDTO convertToDTO(CodeGeneratorsEntity entity){
         CodeGeneratorsDTO dto = new CodeGeneratorsDTO();
+        dto.setGeneratorID(entity.getGeneratorID());
         entity.setPrefix(dto.getPrefix());
         entity.setSuffixLength(dto.getSuffixLength());
         entity.setLastAssignedNumber(dto.getLastAssignedNumber());
+        if(entity.getEntityType() != null){
+            dto.setEntityTypeName(entity.getEntityType().getEntityType());
+            dto.setEntityTypeID(entity.getEntityType().getEntityTypeID());
+        }
+        if (entity.getFacultyCorrelative() != null) {
+            dto.setFacultyCorrelativesID(entity.getFacultyCorrelative().getCorrelativeID());
+            //para evitar el conflicto de convirtio con el .valueOf el Intenger a String
+            dto.setFacultyCorrelativesName(
+                    String.valueOf(entity.getFacultyCorrelative().getCorrelativeNumber())
+            );
+        }
+
         return dto;
     }
 

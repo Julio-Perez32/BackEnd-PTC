@@ -25,7 +25,9 @@ public class CodeGeneratorsDTO {
     private Integer lastAssignedNumber;
 
     private String entityTypeName;
+
     private String facultyCorrelativesName;
+    private String facultyCorrelativesID;
 }
 /**
  * generatorID
