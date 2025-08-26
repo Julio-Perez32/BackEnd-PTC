@@ -17,7 +17,8 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping("/api/University") //los endPoint se anteceden de la palabra api
+@RequestMapping("/api/University")
+@CrossOrigin //los endPoint se anteceden de la palabra api
 public class UniversityController {
     @Autowired
     private UniversityServices services;

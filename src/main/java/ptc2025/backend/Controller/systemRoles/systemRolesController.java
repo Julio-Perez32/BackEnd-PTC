@@ -18,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/SystemRol")
+@CrossOrigin
 public class systemRolesController {
     @Autowired
     private systemRolesService services;

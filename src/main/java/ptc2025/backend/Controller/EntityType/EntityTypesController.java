@@ -20,6 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping ("/api/EntityType")
+@CrossOrigin
 public class EntityTypesController{
 
     @Autowired

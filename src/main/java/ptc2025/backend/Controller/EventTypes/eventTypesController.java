@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/EventTypes")
+@CrossOrigin
 public class eventTypesController {
     @Autowired
     eventTypesService service;

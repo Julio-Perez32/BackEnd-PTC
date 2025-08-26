@@ -3,6 +3,7 @@ package ptc2025.backend.Controller.AcademicLevels;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -17,14 +18,15 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/AcademicLevels")
+@CrossOrigin
 public class AcademicLevelsController {
 
     @Autowired
     AcademicLevelsService service;
 
     @GetMapping("/getAcademicLevels")
-    public ResponseEntity<List<AcademicLevelsDTO>> getAcademicLevels(int page, int size){
-        List<AcademicLevelsDTO> levels = service.getAllAcademicLevels(page, size);
+    public ResponseEntity<Page<AcademicLevelsDTO>> getAcademicLevels(int page, int size){
+        Page<AcademicLevelsDTO> levels = service.getAllAcademicLevels(page, size);
         if(levels == null){
             ResponseEntity.badRequest().body(Map.of(
                     "status","No hay niveles registrados"

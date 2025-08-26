@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/PermissionCategories")
+@CrossOrigin
 public class PermissionCategoriesControllers {
 
     @Autowired

@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/DegreeTypes")
+@CrossOrigin
 public class DegreeTypesController {
     @Autowired
     private DegreeTypesService service;

@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/courseOfferingSchedules")
+@CrossOrigin
 public class CourseOfferingSchedulesController {
     @Autowired
     private CourseOfferingSchedulesService service;

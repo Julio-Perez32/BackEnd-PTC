@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/SocialService")
+@CrossOrigin
 public class SocialServiceController {
     @Autowired
     private SocialServiceServices services;

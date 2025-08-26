@@ -20,6 +20,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/api/FacultyDeans")
+@CrossOrigin
 public class FacultyDeansController {
 
     @Autowired

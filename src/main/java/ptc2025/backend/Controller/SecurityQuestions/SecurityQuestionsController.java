@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/SecurityQuestions")
+@CrossOrigin
 public class SecurityQuestionsController {
 
     @Autowired

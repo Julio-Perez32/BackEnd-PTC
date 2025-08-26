@@ -19,6 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/StudentsDocuements")
+@CrossOrigin
 public class StudentDocumentsController {
     @Autowired
     StudentDocumentsService service;

@@ -18,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/FacultyCorrelative")
+@CrossOrigin
 public class facultyCorrelativesController {
     @Autowired
     private facultyCorrelativesService services;

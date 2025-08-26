@@ -18,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/Modalities")
+@CrossOrigin
 public class ModalitiesController {
     @Autowired
     private ModalityService service;

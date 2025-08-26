@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/InstrumentType")
+@CrossOrigin
 public class InstrumentTypeController {
     @Autowired
     InstrumentTypeService service;

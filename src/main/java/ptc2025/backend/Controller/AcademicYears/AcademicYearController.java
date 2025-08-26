@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/AcademicYear")
+@CrossOrigin
 public class AcademicYearController {
     @Autowired
     private AcademicYearService service;
