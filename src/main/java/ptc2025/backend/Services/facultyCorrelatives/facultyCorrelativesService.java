@@ -4,8 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.Faculties.FacultiesEntity;
 import ptc2025.backend.Entities.facultyCorrelatives.facultyCorrelativesEntity;
 import ptc2025.backend.Models.DTO.facultyCorrelatives.facultyCorrelativesDTO;
+import ptc2025.backend.Respositories.Faculties.FacultiesRepository;
 import ptc2025.backend.Respositories.facultyCorrelatives.facultyCorrelativesRespository;
 
 import java.util.List;
@@ -16,6 +18,9 @@ import java.util.stream.Collectors;
 public class facultyCorrelativesService {
     @Autowired
     facultyCorrelativesRespository repo;
+
+    @Autowired
+    private FacultiesRepository repoFaculties;
 
     public List<facultyCorrelativesDTO> getFacultyCorrelatives(){
         List<facultyCorrelativesEntity> universidad = repo.findAll();
@@ -47,8 +52,13 @@ public class facultyCorrelativesService {
     public facultyCorrelativesDTO updateFacultyCorrelatives(String id, facultyCorrelativesDTO dto){
         facultyCorrelativesEntity correlativo = repo.findById(id).orElseThrow(() -> new RuntimeException("El dato no pudo ser actualizado. Correlativo no encontrada"));
         //Actualizacion de los datos
-        correlativo.setFacultyID(dto.getFacultyID());
         correlativo.setCorrelativeNumber(dto.getCorrelativeNumber());
+        if(dto.getCorrelativeID() != null){
+            FacultiesEntity faculties = repoFaculties.findById(dto.getCorrelativeID())
+                    .orElseThrow(()-> new IllegalArgumentException("Facultad no encontrada"));
+        }else {
+            correlativo.setFaculties(null);
+        }
 
         facultyCorrelativesEntity actulizado = repo.save(correlativo);
         return convertirADTO(actulizado);
@@ -74,14 +84,23 @@ public class facultyCorrelativesService {
     private facultyCorrelativesDTO convertirADTO (facultyCorrelativesEntity entity){
         facultyCorrelativesDTO dto = new facultyCorrelativesDTO();
         dto.setCorrelativeID(entity.getCorrelativeID());
-        dto.setFacultyID(entity.getFacultyID());
         dto.setCorrelativeNumber(entity.getCorrelativeNumber());
+        if(entity.getFaculties() != null){
+            dto.setFacultyName(entity.getFaculties().getFacultyName());
+            dto.setFacultyName(entity.getFaculties().getFacultyID());
+        }else {
+            dto.setFacultyName("Sin Facultad aisgnada");
+            dto.setFacultyID(null);
+        }
         return dto;
     }
     private facultyCorrelativesEntity convertirAEntity(facultyCorrelativesDTO dto){
         facultyCorrelativesEntity entity = new facultyCorrelativesEntity();
-        entity.setFacultyID(dto.getFacultyID());
         entity.setCorrelativeNumber(dto.getCorrelativeNumber());
+        if(dto.getCorrelativeID() != null){
+            FacultiesEntity faculties = repoFaculties.findById(dto.getCorrelativeID())
+                    .orElseThrow(()-> new IllegalArgumentException("Facultad no encontrada"));
+        }
         return entity;
 
 
