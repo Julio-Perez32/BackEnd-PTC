@@ -18,4 +18,6 @@ public class CourseOfferingSchedulesDTO {
     private String endTime;
     @NotBlank
     private String classroom;
+
+    private String courseoffering;
 }

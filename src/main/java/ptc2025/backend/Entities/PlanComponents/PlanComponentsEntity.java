@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.EvaluationPlans.EvaluationPlansEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 
 @Entity
 @Table(name = "EVALUATIONPLANCOMPONENTS")
@@ -20,12 +22,6 @@ public class PlanComponentsEntity {
     @Column(name = "COMPONENTID")
     private String componentID;
 
-    @Column(name = "INSTRUMENTID")
-    private String instrumentID;
-
-    @Column(name = "EVALUATIONPLANID")
-    private String evaluationPlanID;
-
     @Column(name = "RUBRIC")
     private String rubric;
 
@@ -37,4 +33,8 @@ public class PlanComponentsEntity {
 
     @Column(name = "ORDERINDEX")
     private Integer orderIndex = 1;
+
+    @ManyToOne
+    @JoinColumn(name = "EVALUATIONPLANID", referencedColumnName = "EVALUATIONPLANID")
+    private EvaluationPlansEntity evaluationPlans;
 }

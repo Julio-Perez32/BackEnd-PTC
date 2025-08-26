@@ -4,8 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
 import ptc2025.backend.Entities.EvaluationPlans.EvaluationPlansEntity;
 import ptc2025.backend.Models.DTO.EvaluationPlans.EvaluationPlansDTO;
+import ptc2025.backend.Respositories.CourseOfferings.CourseOfferingsRepository;
 import ptc2025.backend.Respositories.EvaluationPlans.EvaluationPlansRepository;
 
 import java.util.List;
@@ -16,6 +18,8 @@ import java.util.stream.Collectors;
 public class EvaluationPlansService {
     @Autowired
     EvaluationPlansRepository repo;
+    @Autowired
+    CourseOfferingsRepository courseOfferingsRepo;
 
     //Get
     public List<EvaluationPlansDTO> getEvaluationPlans(){
@@ -47,7 +51,7 @@ public class EvaluationPlansService {
             if(repo.existsById(id)){
                 EvaluationPlansEntity entity = repo.getById(id);
 
-                entity.setCourseOfferingID(dto.getCourseOfferingID());
+               // entity.setCourseOfferingID(dto.getCourseOfferingID());
                 entity.setPlanName(dto.getPlanName());
                 entity.setDescription(dto.getDescription());
                 entity.setCreatedAt(dto.getCreatedAt());
@@ -83,7 +87,7 @@ public class EvaluationPlansService {
     private EvaluationPlansDTO convertirADTO(EvaluationPlansEntity entity){
         EvaluationPlansDTO dto = new EvaluationPlansDTO();
         dto.setEvaluationPlanID(entity.getEvaluationPlanID());
-        dto.setCourseOfferingID(entity.getCourseOfferingID());
+       // dto.setCourseOfferingID(entity.getCourseOfferingID());
         dto.setPlanName(entity.getPlanName());
         dto.setDescription(entity.getDescription());
         dto.setCreatedAt(entity.getCreatedAt());
@@ -93,7 +97,7 @@ public class EvaluationPlansService {
     private EvaluationPlansEntity convertirAEntity(EvaluationPlansDTO dto){
         EvaluationPlansEntity entity = new EvaluationPlansEntity();
         entity.setEvaluationPlanID(dto.getEvaluationPlanID());
-        entity.setCourseOfferingID(dto.getCourseOfferingID());
+       // entity.setCourseOfferingID(dto.getCourseOfferingID());
         entity.setPlanName(dto.getPlanName());
         entity.setDescription(dto.getDescription());
         entity.setCreatedAt(dto.getCreatedAt());

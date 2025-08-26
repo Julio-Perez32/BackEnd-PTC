@@ -13,8 +13,6 @@ import lombok.ToString;
 public class PlanComponentsDTO {
     private String componentID;
 
-    @NotNull
-    private String instrumentID;
 
     @NotNull
     private String evaluationPlanID;
@@ -32,5 +30,7 @@ public class PlanComponentsDTO {
     private Double weightPercentage;
 
     private Integer orderIndex = 1;
+
+    private String evaluationplans;
 
 }

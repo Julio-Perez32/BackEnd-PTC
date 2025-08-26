@@ -14,4 +14,7 @@ public class CourseOfferingsDTO {
     private String SubjectID;
     @NotBlank
     private String YearCycleID;
+
+    private String subject;
+    private String yearcycle;
 }

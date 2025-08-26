@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import ptc2025.backend.Entities.PlanComponents.PlanComponentsEntity;
 import ptc2025.backend.Models.DTO.PlanComponents.PlanComponentsDTO;
+import ptc2025.backend.Respositories.EvaluationPlans.EvaluationPlansRepository;
 import ptc2025.backend.Respositories.PlanComponents.PlanComponentsRespository;
 
 import java.util.List;
@@ -17,6 +18,9 @@ import java.util.stream.Collectors;
 public class PlanComponentsService {
     @Autowired
     PlanComponentsRespository repo;
+
+    @Autowired
+    EvaluationPlansRepository evaluationPlansRepo;
     //Get
     public List<PlanComponentsDTO> getPlanComponent (){
         List<PlanComponentsEntity> components = repo.findAll();
@@ -28,7 +32,6 @@ public class PlanComponentsService {
     public PlanComponentsDTO insertPlanComponents (@RequestBody PlanComponentsDTO dto){
         //Validacion
         if (dto == null ||
-                dto.getInstrumentID() == null || dto.getInstrumentID().isBlank() ||
                 dto.getEvaluationPlanID() == null || dto.getEvaluationPlanID().isBlank() ||
                 dto.getComponentName() == null || dto.getComponentName().isBlank() ||
                 dto.getWeightPercentage() == null ||
@@ -49,8 +52,7 @@ public class PlanComponentsService {
     //Put
     public PlanComponentsDTO updatePlanComponents (String id, PlanComponentsDTO dto){
         PlanComponentsEntity existente = new PlanComponentsEntity();
-        existente.setInstrumentID(dto.getInstrumentID());
-        existente.setEvaluationPlanID(dto.getEvaluationPlanID());
+       // existente.setEvaluationPlanID(dto.getEvaluationPlanID());
         existente.setRubric(dto.getRubric());
         existente.setComponentName(dto.getComponentName());
         existente.setWeightPercentage(dto.getWeightPercentage());
@@ -77,9 +79,8 @@ public class PlanComponentsService {
     //Convertir a DTO
     private PlanComponentsDTO convertirADTO (PlanComponentsEntity entity){
         PlanComponentsDTO dto = new PlanComponentsDTO();
-        dto.setComponentID(entity.getComponentID());
-        dto.setInstrumentID(entity.getInstrumentID());
-        dto.setEvaluationPlanID(entity.getEvaluationPlanID());
+        dto.setComponentID(entity.getComponentID());;
+       // dto.setEvaluationPlanID(entity.getEvaluationPlanID());
         dto.setRubric(entity.getRubric());
         dto.setComponentName(entity.getComponentName());
         dto.setWeightPercentage(entity.getWeightPercentage());
@@ -90,8 +91,7 @@ public class PlanComponentsService {
     public PlanComponentsEntity convertirAEntity(PlanComponentsDTO dto) {
         PlanComponentsEntity entity = new PlanComponentsEntity();
 
-        entity.setInstrumentID(dto.getInstrumentID());
-        entity.setEvaluationPlanID(dto.getEvaluationPlanID());
+       // entity.setEvaluationPlanID(dto.getEvaluationPlanID());
         entity.setRubric(dto.getRubric());
         entity.setComponentName(dto.getComponentName().trim());
         entity.setWeightPercentage(dto.getWeightPercentage());

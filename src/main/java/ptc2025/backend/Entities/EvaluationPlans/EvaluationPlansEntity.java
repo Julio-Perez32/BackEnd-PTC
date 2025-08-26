@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 
 import java.time.LocalDate;
 
@@ -21,14 +23,19 @@ public class EvaluationPlansEntity {
     @GeneratedValue(generator = "evaluationPlanID")
     @Column(name = "EVALUATIONPLANID")
     private String evaluationPlanID;
-    @Column(name = "COURSEOFFERINGID")
-    private String courseOfferingID;
     @Column(name = "PLANNAME")
     private String planName;
     @Column(name ="DESCRIPTION" )
     private String description;
     @Column(name = "CREATEDAT")
     private LocalDate createdAt;
+
+
+
+    @ManyToOne
+    @JoinColumn(name = "COURSEOFFERINGID", referencedColumnName = "COURSEOFFERINGID")
+    private CourseOfferingsEntity courseOfferings;
+
 }
 /**EVALUATIONPLANID
  COURSEOFFERINGID
