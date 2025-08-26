@@ -18,4 +18,6 @@ public class facultyCorrelativesDTO {
 
     @NotBlank(message = "El correlativo no puede estar vacio")
     private Integer correlativeNumber;
+
+    private String facultyName;
 }

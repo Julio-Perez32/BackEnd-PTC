@@ -6,6 +6,17 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.AcademicLevel.AcademicLevelsEntity;
+import ptc2025.backend.Entities.AcademicYear.AcademicYearEntity;
+import ptc2025.backend.Entities.CycleTypes.CycleTypesEntity;
+import ptc2025.backend.Entities.DegreeTypes.DegreeTypesEntity;
+import ptc2025.backend.Entities.Departments.DepartmentsEntity;
+import ptc2025.backend.Entities.DocumentCategories.DocumentCategoriesEntity;
+import ptc2025.backend.Entities.SubjectFamilies.SubjectFamiliesEntity;
+import ptc2025.backend.Entities.facultyCorrelatives.facultyCorrelativesEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "FACULTIES")
@@ -23,4 +34,19 @@ public class FacultiesEntity {
     private String contactPhone;
     @Column(name = "CORRELATIVECODE")
     private String correlativeCode;
+
+    @OneToMany(mappedBy = "faculties", cascade = CascadeType.ALL)
+    private List<facultyCorrelativesEntity> academicLevels = new ArrayList<>();
+
+    @OneToMany(mappedBy = "faculties", cascade = CascadeType.ALL)
+    private List<SubjectFamiliesEntity> academicYear = new ArrayList<>();
+
+    //@OneToMany(mappedBy = "faculties", cascade = CascadeType.ALL)
+    //private List<FacultyDeans> cycleTypes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "faculties", cascade = CascadeType.ALL)
+    private List<DepartmentsEntity> degreeTypes = new ArrayList<>();
+
+    //@OneToMany(mappedBy = "faculties", cascade = CascadeType.ALL)
+    //private List<DocumentCategoriesEntity> documentCategories = new ArrayList<>();
 }
