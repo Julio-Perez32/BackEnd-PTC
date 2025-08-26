@@ -17,6 +17,6 @@ public class DepartmentsDTO {
     @NotBlank
     private String departmentType;
 
-    private String facultyName;
+    private String faculty;
 
 }

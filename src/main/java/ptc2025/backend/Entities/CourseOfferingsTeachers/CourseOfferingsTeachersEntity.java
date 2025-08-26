@@ -6,6 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
+import ptc2025.backend.Entities.SubjectDefinitions.SubjectDefinitionsEntity;
+import ptc2025.backend.Entities.YearCycles.YearCyclesEntity;
+import ptc2025.backend.Entities.employees.EmployeeEntity;
 
 @Entity
 @Table(name = "COURSEOFFERINGTEACHERS")
@@ -17,8 +21,12 @@ public class CourseOfferingsTeachersEntity {
     @GeneratedValue(generator = "CourseOfferingTeacherID")
     @Column(name = "COURSEOFFERINGTEACHERID")
     private String CourseOfferingTeacherID;
-    @Column(name = "COURSEOFFERINGID")
-    private String CourseOfferingID;
-    @Column(name = "EMPLOYEEID")
-    private String EmployeeID;
+
+    @ManyToOne
+    @JoinColumn(name = "COURSEOFFERINGID", referencedColumnName = "COURSEOFFERINGID")
+    private CourseOfferingsEntity courseOfferings;
+
+    @ManyToOne
+    @JoinColumn(name = "EMPLOYEEID", referencedColumnName = "EMPLOYEEID")
+    private EmployeeEntity employee;
 }

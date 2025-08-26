@@ -5,8 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Pensum.PensumEntity;
+import ptc2025.backend.Entities.careers.CareerEntity;
 import ptc2025.backend.Models.DTO.Pensum.PensumDTO;
 import ptc2025.backend.Respositories.Pensum.PensumRepository;
+import ptc2025.backend.Respositories.careers.CareerRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +20,9 @@ public class PensumService {
     @Autowired
     PensumRepository repo;
 
+    @Autowired
+    CareerRepository repoCareer;
+
     public List<PensumDTO> getPensa(){
         List<PensumEntity> pensa = repo.findAll();
         return pensa.stream()
@@ -28,18 +33,31 @@ public class PensumService {
     private PensumDTO convertToPensumDTO(PensumEntity entity){
         PensumDTO dto = new PensumDTO();
         dto.setPensumID(entity.getPensumID());
-        dto.setCareerID(entity.getCareerID());
         dto.setVersion(entity.getVersion());
         dto.setEffectiveYear(entity.getEffectiveYear());
+
+        if(entity.getCareer() != null){
+            dto.setCareerID(entity.getCareer().getId());
+        }else {
+            dto.setCareerID(null);
+        }
+
         return dto;
     }
 
     private PensumEntity convertToPensumEntity(PensumDTO dto){
         PensumEntity entity = new PensumEntity();
         entity.setPensumID(dto.getPensumID());
-        entity.setCareerID(dto.getCareerID());
         entity.setVersion(dto.getVersion());
         entity.setEffectiveYear(dto.getEffectiveYear());
+
+        if(dto.getCareerID() != null){
+            CareerEntity career = repoCareer.findById(dto.getCareerID()).orElseThrow(
+                    () -> new IllegalArgumentException("Carrera no encontrada con ID " + dto.getCareerID()));
+            entity.setCareer(career);
+        }else {
+            entity.setCareer(null);
+        }
         return entity;
     }
 
@@ -60,9 +78,16 @@ public class PensumService {
 
     public PensumDTO updatePensum(String Id, PensumDTO dto){
         PensumEntity existsPensum = repo.findById(Id).orElseThrow(() -> new IllegalArgumentException("Pensum no encontrado."));
-        existsPensum.setCareerID(dto.getCareerID());
         existsPensum.setVersion(dto.getVersion());
         existsPensum.setEffectiveYear(dto.getEffectiveYear());
+
+        if(dto.getCareerID() != null){
+            CareerEntity career = repoCareer.findById(dto.getCareerID()).orElseThrow(
+                    () -> new IllegalArgumentException("Carrera no encontrada con ID " + dto.getCareerID()));
+            existsPensum.setCareer(career);
+        }else{
+            existsPensum.setCareer(null);
+        }
 
         PensumEntity updatedPensum = repo.save(existsPensum);
 

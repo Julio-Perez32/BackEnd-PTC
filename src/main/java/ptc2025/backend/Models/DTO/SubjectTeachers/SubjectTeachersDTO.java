@@ -12,4 +12,7 @@ public class SubjectTeachersDTO {
     private String SubjectTeacherID;
     private String SubjectID;
     private String EmployeeID;
+
+    private String subject;
+    private String employee;
 }

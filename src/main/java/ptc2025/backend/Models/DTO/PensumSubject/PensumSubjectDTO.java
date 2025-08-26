@@ -19,4 +19,7 @@ public class PensumSubjectDTO {
     @NotNull
     private Long ValueUnits;
     private Character IsRequired;
+
+    private String pensum;
+    private String subject;
 }

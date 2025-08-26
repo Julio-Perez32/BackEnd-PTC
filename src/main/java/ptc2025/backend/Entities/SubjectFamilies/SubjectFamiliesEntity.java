@@ -23,8 +23,6 @@ public class SubjectFamiliesEntity {
     @GeneratedValue(generator = "subjectID")
     @Column(name = "SUBJECTFAMILYID")
     private String subjectFamilyID;
-    @Column(name = "FACULTYID")
-    private String facultyID;
     @Column(name = "SUBJECTPREFIX")
     private String subjectPrefix;
     @Column(name = "RESERVEDSLOTS")

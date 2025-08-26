@@ -4,10 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
 import ptc2025.backend.Entities.CourseOfferingsTeachers.CourseOfferingsTeachersEntity;
+import ptc2025.backend.Entities.employees.EmployeeEntity;
 import ptc2025.backend.Models.DTO.CourseOfferingsTeachers.CourseOfferingsTeachersDTO;
 import ptc2025.backend.Respositories.CourseOfferings.CourseOfferingsRepository;
 import ptc2025.backend.Respositories.CourseOfferingsTeachers.CourseOfferingsTeachersRepository;
+import ptc2025.backend.Respositories.employees.EmployeeRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +22,12 @@ public class CourseOfferingsTeachersService {
     @Autowired
     CourseOfferingsTeachersRepository repo;
 
+    @Autowired
+    EmployeeRepository repoEmployee;
+
+    @Autowired
+    CourseOfferingsRepository repoCourseOfferings;
+
     public List<CourseOfferingsTeachersDTO> getCourseTeachers(){
         List<CourseOfferingsTeachersEntity> teachers = repo.findAll();
         return teachers.stream()
@@ -28,15 +37,31 @@ public class CourseOfferingsTeachersService {
 
     private CourseOfferingsTeachersDTO convertToOfferingsTeachersDTO(CourseOfferingsTeachersEntity entity){
         CourseOfferingsTeachersDTO dto = new CourseOfferingsTeachersDTO();
-        dto.setCourseOfferingID(entity.getCourseOfferingID());
-        dto.setEmployeeID(entity.getEmployeeID());
+
+        if(entity.getCourseOfferings() != null){
+            dto.setCoureOffering(entity.getCourseOfferings().getCourseOfferingID());
+        }else{
+            dto.setCoureOffering("Sin curso asignado");
+            dto.setCourseOfferingID(null);
+        }
+
+        if(entity.getEmployee() != null){
+            dto.setEmployeeID(entity.getEmployee().getId());
+        }else {
+            dto.setEmployeeID("Sin empleado asignado");
+            dto.setEmployeeID(null);
+        }
         return dto;
     }
 
     private CourseOfferingsTeachersEntity convertToOfferingsTeachersEntity(CourseOfferingsTeachersDTO dto){
         CourseOfferingsTeachersEntity entity = new CourseOfferingsTeachersEntity();
-        entity.setCourseOfferingID(dto.getCourseOfferingID());
-        entity.setEmployeeID(dto.getEmployeeID());
+
+        if(dto.getEmployeeID() != null){
+            EmployeeEntity employee = repoEmployee.findById(dto.getEmployeeID()).orElseThrow(
+                    () -> new IllegalArgumentException("Empleado no encontrado con ID " + dto.getEmployeeID()));
+            entity.setEmployee(employee);
+        }
         return entity;
     }
 
@@ -57,8 +82,20 @@ public class CourseOfferingsTeachersService {
 
     public CourseOfferingsTeachersDTO updateCourseTeacher(String ID, CourseOfferingsTeachersDTO json){
         CourseOfferingsTeachersEntity existsCourseTeacher = repo.findById(ID).orElseThrow(() -> new IllegalArgumentException("Docente no encontrado"));
-        existsCourseTeacher.setCourseOfferingID(json.getCourseOfferingID());
-        existsCourseTeacher.setEmployeeID(json.getEmployeeID());
+
+        if(json.getCourseOfferingID() != null){
+            CourseOfferingsEntity courseOfferings = repoCourseOfferings.findById(json.getCourseOfferingID()).orElseThrow(
+                    () -> new IllegalArgumentException("Curso no encontrado con ID " + json.getCourseOfferingID()));
+            existsCourseTeacher.setCourseOfferings(courseOfferings);
+        }
+
+        if(json.getEmployeeID() != null){
+            EmployeeEntity employee = repoEmployee.findById(json.getEmployeeID()).orElseThrow(
+                    () -> new IllegalArgumentException("Empleado no encontrado con ID " + json.getEmployeeID()));
+            existsCourseTeacher.setEmployee(employee);
+        }else {
+            existsCourseTeacher.setEmployee(null);
+        }
 
         CourseOfferingsTeachersEntity savedCourseTeacher = repo.save(existsCourseTeacher);
 

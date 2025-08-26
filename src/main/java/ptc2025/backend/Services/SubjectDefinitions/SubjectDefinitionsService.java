@@ -34,6 +34,7 @@ public class SubjectDefinitionsService {
         if(entity.getSubjectFamilies() != null){
             dto.setSubjectFamilyID(entity.getSubjectFamilies().getSubjectFamilyID());
         }else {
+            dto.setSubjectName("Sin Materia asignada");
             dto.setSubjectFamilyID(null);
         }
         return dto;
@@ -81,6 +82,11 @@ public class SubjectDefinitionsService {
         exists.setSubjectFamilyID(json.getSubjectFamilyID());
         exists.setSubjectName(json.getSubjectName());
         exists.setSubjectCode(json.getSubjectCode());
+
+        if (json.getSubjectID() != null) {
+            SubjectFamiliesEntity subjectFamilies = repoSubjectFamilies.findById(json.getSubjectFamilyID()).orElseThrow(
+                    () -> new IllegalArgumentException("Materia no encontrada con ID " + json.getSubjectFamilyID()));
+        }
 
         SubjectDefinitionsEntity updated = repo.save(exists);
 

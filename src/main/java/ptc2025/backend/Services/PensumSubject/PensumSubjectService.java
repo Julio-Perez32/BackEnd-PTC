@@ -8,7 +8,9 @@ import ptc2025.backend.Entities.Pensum.PensumEntity;
 import ptc2025.backend.Entities.PensumSubject.PensumSubjectEntity;
 import ptc2025.backend.Models.DTO.Pensum.PensumDTO;
 import ptc2025.backend.Models.DTO.PensumSubject.PensumSubjectDTO;
+import ptc2025.backend.Respositories.Pensum.PensumRepository;
 import ptc2025.backend.Respositories.PensumSubject.PensumSubjectRepository;
+import ptc2025.backend.Respositories.SubjectDefinitions.SubjectDefinitionsRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,23 +22,44 @@ public class PensumSubjectService {
     @Autowired
     PensumSubjectRepository repo;
 
+    @Autowired
+    PensumRepository repoPensum;
+
+    @Autowired
+    SubjectDefinitionsRepository repoSubjectDefinitions;
+
     public PensumSubjectDTO convertToPensumSubjectDTO(PensumSubjectEntity entity){
         PensumSubjectDTO dto = new PensumSubjectDTO();
         dto.setPensumSubjectID(entity.getPensumSubjectID());
-        dto.setPensumID(entity.getPensumID());
-        dto.setSubjectID(entity.getSubjectID());
         dto.setValueUnits(entity.getValueUnits());
         dto.setIsRequired(entity.getIsRequired());
+
+        if(entity.getPensum() != null){
+            dto.setPensumID(entity.getPensum().getPensumID());
+        }else {
+            dto.setPensumID(null);
+        }
+
+        if(entity.getSubjectDefinitions() != null){
+            dto.setSubjectID(entity.getSubjectDefinitions().getSubjectID());
+        }else{
+            dto.setSubjectID(null);
+        }
+
         return dto;
     }
 
     public PensumSubjectEntity convertToPensumSubjectEntity(PensumSubjectDTO dto){
         PensumSubjectEntity entity = new PensumSubjectEntity();
         entity.setPensumSubjectID(dto.getPensumSubjectID());
-        entity.setPensumID(dto.getPensumID());
-        entity.setSubjectID(dto.getSubjectID());
         entity.setValueUnits(dto.getValueUnits());
         entity.setIsRequired(dto.getIsRequired());
+
+        if(dto.getPensumID() != null){
+            PensumEntity pensum = repoPensum.findById(dto.getPensumID()).orElseThrow(
+                    () -> new IllegalArgumentException("Pensum no encontrado con ID " + dto.getPensumID()));
+            entity.setPensum(pensum);
+        }
         return entity;
     }
 
@@ -64,10 +87,16 @@ public class PensumSubjectService {
 
     public PensumSubjectDTO updatePensumSubject(String id, PensumSubjectDTO json){
         PensumSubjectEntity exists = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Materia de pensum no encontrada."));
-        exists.setPensumID(json.getPensumID());
-        exists.setSubjectID(json.getSubjectID());
         exists.setValueUnits(json.getValueUnits());
         exists.setIsRequired(json.getIsRequired());
+
+        if(json.getPensumID() != null){
+            PensumEntity pensum = repoPensum.findById(json.getPensumID()).orElseThrow(
+                    () -> new IllegalArgumentException("Pensum no encontrado con ID " + json.getPensumID()));
+            exists.setPensum(pensum);
+        }else {
+            exists.setPensum(null);
+        }
 
         PensumSubjectEntity updatedPensumSubject = repo.save(exists);
 

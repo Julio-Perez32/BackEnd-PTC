@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.Faculties.FacultiesEntity;
 import ptc2025.backend.Entities.SubjectFamilies.SubjectFamiliesEntity;
 import ptc2025.backend.Models.DTO.SubjectFamilies.SubjectFamiliesDTO;
 import ptc2025.backend.Respositories.Faculties.FacultiesRepository;
@@ -38,10 +39,8 @@ public class SubjectFamiliesService {
         dto.setLastAssignedNumber(families.getLastAssignedNumber());
 
         if(families.getFaculty() != null){
-            dto.setFacultyName(families.getFaculty().getFacultyName());
             dto.setFacultyID(families.getFaculty().getFacultyID());
         }else{
-            dto.setFacultyName("Sin facultad asignada");
             dto.setFacultyID(null);
         }
         return dto;
@@ -50,11 +49,16 @@ public class SubjectFamiliesService {
     private SubjectFamiliesEntity convertToSubjectFamEntity(SubjectFamiliesDTO dto){
         SubjectFamiliesEntity entity = new SubjectFamiliesEntity();
         entity.setSubjectFamilyID(dto.getSubjectFamilyID());
-        entity.setFacultyID(dto.getFacultyID());
         entity.setSubjectPrefix(dto.getSubjectPrefix());
         entity.setReservedSlots(dto.getReservedSlots());
         entity.setStartingNumber(dto.getStartingNumber());
         entity.setLastAssignedNumber(dto.getLastAssignedNumber());
+
+        if(dto.getFacultyID() != null){
+            FacultiesEntity faculties = repoFaculties.findById(dto.getFacultyID()).orElseThrow(
+                    () -> new IllegalArgumentException("Facultad no encontrada con ID " + dto.getFacultyID()));
+            entity.setFaculty(faculties);
+        }
         return entity;
     }
 
@@ -76,10 +80,17 @@ public class SubjectFamiliesService {
 
     public SubjectFamiliesDTO updateSubjectFam(String ID, SubjectFamiliesDTO json){
         SubjectFamiliesEntity existsSubjectFam = repo.findById(ID).orElseThrow(() -> new IllegalArgumentException("Familia de Materias no encontrada."));
-        existsSubjectFam.setFacultyID(json.getFacultyID());
         existsSubjectFam.setSubjectPrefix(json.getSubjectPrefix());
         existsSubjectFam.setReservedSlots(json.getReservedSlots());
         existsSubjectFam.setLastAssignedNumber(json.getLastAssignedNumber());
+
+        if(json.getFacultyID() != null){
+            FacultiesEntity faculties = repoFaculties.findById(json.getFacultyID()).orElseThrow(
+                    () -> new IllegalArgumentException("Facultad no encontrada con ID " + json.getFacultyID()));
+            existsSubjectFam.setFaculty(faculties);
+        }else {
+            existsSubjectFam.setFaculty(null);
+        }
 
         SubjectFamiliesEntity updatedSubjectFam = repo.save(existsSubjectFam);
 

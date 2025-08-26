@@ -37,10 +37,8 @@ public class DepartmentsService {
         dto.setDepartmentType(departments.getDepartmentType());
 
         if(departments.getFaculty() != null){
-            dto.setFacultyName(departments.getFaculty().getFacultyName());
             dto.setFacultyID(departments.getFaculty().getFacultyID());
         }else{
-            dto.setFacultyName("Sin facultad asignada");
             dto.setFacultyID(null);
         }
         return dto;
@@ -77,9 +75,16 @@ public class DepartmentsService {
 
     public DepartmentsDTO updateDepartment(String id, DepartmentsDTO json){
         DepartmentsEntity existsDepartment = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Departamento no encontrado."));
-        existsDepartment.setFacultyID(json.getFacultyID());
         existsDepartment.setDepartmentName(json.getDepartmentName());
         existsDepartment.setDepartmentType(json.getDepartmentType());
+
+        if(json.getFacultyID() != null){
+            FacultiesEntity faculties = repoFaculties.findById(json.getFacultyID()).orElseThrow(
+                    () -> new IllegalArgumentException("Facultad no encontrada con ID " + json.getFacultyID()));
+            existsDepartment.setFaculty(faculties);
+        }else {
+            existsDepartment.setFaculty(null);
+        }
 
         DepartmentsEntity departmentUpdated = repo.save(existsDepartment);
 
