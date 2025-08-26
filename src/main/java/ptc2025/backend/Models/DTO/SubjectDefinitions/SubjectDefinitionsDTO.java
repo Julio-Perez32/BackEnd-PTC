@@ -16,4 +16,6 @@ public class SubjectDefinitionsDTO {
     private String SubjectName;
     @Size(max = 10)
     private String SubjectCode;
+
+    private String subjectFamily;
 }

@@ -24,10 +24,6 @@ public class SubjectTeachersEntity {
     @GeneratedValue(generator = "SUBJECTTEACHERID")
     @Column(name = "SUBJECTTEACHERID")
     private String SubjectTeacherID;
-    @Column(name = "SUBJECTID")
-    private String SubjectID;
-    @Column(name = "EMPLOYEEID")
-    private String EmployeeID;
 
     @ManyToOne
     @JoinColumn(name = "EMPLOYEEID", referencedColumnName = "EMPLOYEEID")

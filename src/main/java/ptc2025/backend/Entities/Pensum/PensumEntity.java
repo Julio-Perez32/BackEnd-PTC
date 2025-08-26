@@ -6,6 +6,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.PensumSubject.PensumSubjectEntity;
+import ptc2025.backend.Entities.careers.CareerEntity;
+import ptc2025.backend.Entities.employees.EmployeeEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "PENSA")
@@ -17,10 +23,15 @@ public class PensumEntity {
     @GeneratedValue(generator = "PensumID")
     @Column(name = "PENSUMID")
     private String PensumID;
-    @Column(name = "CAREERID")
-    private String CareerID;
     @Column(name = "VERSION")
     private String Version;
     @Column(name = "EFFECTIVEYEAR")
     private Long EffectiveYear;
+
+    @OneToMany(mappedBy = "PENSA", cascade = CascadeType.ALL)
+    private List<PensumSubjectEntity> PensumSubject = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "CAREERID", referencedColumnName = "CAREER")
+    private CareerEntity career;
 }

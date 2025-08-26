@@ -21,6 +21,5 @@ public class SubjectFamiliesDTO {
     @Size(max = 5)
     private Long lastAssignedNumber;
 
-
-    private String facultyName;
+    private String faculty;
 }

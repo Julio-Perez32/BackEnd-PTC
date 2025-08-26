@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 import ptc2025.backend.Entities.Faculties.FacultiesEntity;
+import ptc2025.backend.Entities.PensumSubject.PensumSubjectEntity;
 import ptc2025.backend.Entities.SubjectFamilies.SubjectFamiliesEntity;
 import ptc2025.backend.Entities.SubjectTeachers.SubjectTeachersEntity;
 import ptc2025.backend.Entities.personTypes.personTypesEntity;
@@ -34,6 +35,9 @@ public class SubjectDefinitionsEntity {
     //SubjectDefinitions le da la llave a
     @OneToMany(mappedBy = "SUBJECTDEFINITIONS", cascade = CascadeType.ALL)
     private List<SubjectTeachersEntity> SubjectTeachers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "SUBJECTDEFINITIONS", cascade = CascadeType.ALL)
+    private List<PensumSubjectEntity> pensumSubject = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "SUBJECTFAMILYID", referencedColumnName = "SUBJECTFAMILYID")

@@ -14,4 +14,7 @@ public class CourseOfferingsTeachersDTO {
     private String CourseOfferingID;
     @NotBlank
     private String EmployeeID;
+
+    private String coureOffering;
+    private String employee;
 }

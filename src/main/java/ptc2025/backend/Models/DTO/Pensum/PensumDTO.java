@@ -17,4 +17,6 @@ public class PensumDTO {
     private String Version;
     @NotBlank @Size(max = 4)
     private Long EffectiveYear;
+
+    private String career;
 }

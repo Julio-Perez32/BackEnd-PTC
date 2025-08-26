@@ -4,9 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.SubjectDefinitions.SubjectDefinitionsEntity;
 import ptc2025.backend.Entities.SubjectTeachers.SubjectTeachersEntity;
+import ptc2025.backend.Entities.employees.EmployeeEntity;
 import ptc2025.backend.Models.DTO.SubjectTeachers.SubjectTeachersDTO;
+import ptc2025.backend.Respositories.SubjectDefinitions.SubjectDefinitionsRepository;
 import ptc2025.backend.Respositories.SubjectTeachers.SubjectTeachersRepository;
+import ptc2025.backend.Respositories.employees.EmployeeRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +21,12 @@ public class SubjectTeachersService {
 
     @Autowired
     SubjectTeachersRepository repo;
+
+    @Autowired
+    SubjectDefinitionsRepository repoSubjectDefinitions;
+
+    @Autowired
+    EmployeeRepository repoEmployee;
 
     public SubjectTeachersDTO convertToSubjectTeachersDTO(SubjectTeachersEntity entity){
         SubjectTeachersDTO dto = new SubjectTeachersDTO();
@@ -40,8 +50,18 @@ public class SubjectTeachersService {
     public SubjectTeachersEntity convertToSubjectEntity(SubjectTeachersDTO dto){
         SubjectTeachersEntity entity = new SubjectTeachersEntity();
         entity.setSubjectTeacherID(dto.getSubjectTeacherID());
-        entity.setSubjectID(dto.getSubjectID());
-        entity.setEmployeeID(dto.getEmployeeID());
+
+        if(dto.getSubjectID() != null){
+            SubjectDefinitionsEntity subjectDefinitions = repoSubjectDefinitions.findById(dto.getSubjectID()).orElseThrow(
+                    () -> new IllegalArgumentException("Materia no encontrada on ID " + dto.getSubjectID()));
+            entity.setSubjectDefinitions(subjectDefinitions);
+        }
+
+        if(dto.getEmployeeID() != null){
+            EmployeeEntity employee = repoEmployee.findById(dto.getSubjectID()).orElseThrow(
+                    () -> new IllegalArgumentException("Empleado no encontrado con ID " + dto.getEmployeeID()));
+            entity.setEmployee(employee);
+        }
         return entity;
     }
 
@@ -69,8 +89,22 @@ public class SubjectTeachersService {
 
     public SubjectTeachersDTO updateSubjectTeacher(String id, SubjectTeachersDTO json){
         SubjectTeachersEntity exists = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Maestro no encontrado"));
-        exists.setSubjectID(json.getSubjectID());
-        exists.setEmployeeID(json.getEmployeeID());
+
+        if(json.getSubjectID() != null){
+            SubjectDefinitionsEntity subjectDefinitions = repoSubjectDefinitions.findById(json.getSubjectID()).orElseThrow(
+                    () -> new IllegalArgumentException("Materia no encontrada con ID " + json.getSubjectID()));
+            exists.setSubjectDefinitions(subjectDefinitions);
+        }else {
+            exists.setSubjectDefinitions(null);
+        }
+
+        if (json.getEmployeeID() != null) {
+            EmployeeEntity employee = repoEmployee.findById(json.getEmployeeID()).orElseThrow(
+                    () -> new IllegalArgumentException("Empleado no encontrado con ID" + json.getEmployeeID()));
+            exists.setEmployee(employee);
+        }else {
+            exists.setEmployee(null);
+        }
 
         SubjectTeachersEntity updateSubTeacher = repo.save(exists);
 
