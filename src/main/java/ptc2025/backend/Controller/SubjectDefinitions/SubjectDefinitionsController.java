@@ -16,6 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/SubjectDefinitions")
+@CrossOrigin
 public class SubjectDefinitionsController {
 
     @Autowired

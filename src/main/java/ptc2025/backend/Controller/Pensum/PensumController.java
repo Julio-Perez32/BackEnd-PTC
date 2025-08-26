@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/Pensum")
+@CrossOrigin
 public class PensumController {
 
     @Autowired

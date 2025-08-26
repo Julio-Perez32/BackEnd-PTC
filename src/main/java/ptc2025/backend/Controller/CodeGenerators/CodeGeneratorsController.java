@@ -18,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/CodeGenerators")
+@CrossOrigin
 public class CodeGeneratorsController {
     @Autowired
     CodeGeneratorsService service;

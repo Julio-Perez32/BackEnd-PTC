@@ -21,6 +21,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/api/YearCycles")
+@CrossOrigin
 public class YearCyclesController {
 
     @Autowired

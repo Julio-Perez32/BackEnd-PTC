@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/StudentCareerEnrollments")
+@CrossOrigin
 public class StudentCareerEnrollmentsController {
 
     @Autowired

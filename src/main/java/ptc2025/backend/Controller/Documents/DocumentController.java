@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/Documents")
+@CrossOrigin
 public class DocumentController {
 
     @Autowired

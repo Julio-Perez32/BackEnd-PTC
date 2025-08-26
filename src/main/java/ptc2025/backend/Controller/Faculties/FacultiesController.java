@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/Faculties")
+@CrossOrigin
 public class FacultiesController {
 
     @Autowired

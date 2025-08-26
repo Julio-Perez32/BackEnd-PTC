@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/SubjectFamilies")
+@CrossOrigin
 public class SubjectFamiliesController {
 
     @Autowired

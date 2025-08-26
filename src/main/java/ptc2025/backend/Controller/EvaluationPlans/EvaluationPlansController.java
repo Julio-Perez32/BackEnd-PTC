@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/EvaluationPlans")
+@CrossOrigin
 public class EvaluationPlansController {
     @Autowired
     private EvaluationPlansService service;

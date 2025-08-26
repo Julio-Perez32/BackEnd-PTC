@@ -18,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/EvaluationInstrument")
+@CrossOrigin
 public class EvaluationInstrumentsController {
 
     @Autowired

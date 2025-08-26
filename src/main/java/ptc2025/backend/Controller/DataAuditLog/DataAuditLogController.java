@@ -18,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/DataAuditLog")
+@CrossOrigin
 public class DataAuditLogController {
     @Autowired
     private DataAuditLogService service;

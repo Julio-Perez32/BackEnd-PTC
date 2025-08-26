@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/CycleTypes")
+@CrossOrigin
 public class CycleTypesController {
 
     @Autowired

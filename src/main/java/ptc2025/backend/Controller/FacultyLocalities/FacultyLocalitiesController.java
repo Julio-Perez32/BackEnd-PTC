@@ -21,6 +21,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/api/FacultyLocalities")
+@CrossOrigin
 public class FacultyLocalitiesController {
     @Autowired
     FacultyLocalitiesService service;

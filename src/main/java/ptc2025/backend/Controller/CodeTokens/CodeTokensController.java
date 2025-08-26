@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/CodeToken")
+@CrossOrigin
 public class CodeTokensController {
     @Autowired
     CodeTokensService service;

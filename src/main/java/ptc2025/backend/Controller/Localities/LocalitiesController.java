@@ -17,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/Locality")
+@CrossOrigin
 public class LocalitiesController {
     @Autowired
     LocalitiesService service;
