@@ -22,4 +22,5 @@ public class FacultyDeansDTO {
     private LocalDate endDate;
 
     private String faculties;
+    private String employees;
 }
