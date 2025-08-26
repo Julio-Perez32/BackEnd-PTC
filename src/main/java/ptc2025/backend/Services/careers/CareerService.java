@@ -3,6 +3,9 @@ package ptc2025.backend.Services.careers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.careers.CareerEntity;
 import ptc2025.backend.Models.DTO.careers.CareerDTO;
@@ -44,6 +47,13 @@ public class CareerService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+    // GET DE PAGINACION
+    public Page<CareerDTO> getCareersPaginated(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return repo.findAll(pageable).map(this::convertToDTO);
+    }
+
 
     // POST
     public CareerDTO insertCareer(CareerDTO dto) {

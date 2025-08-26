@@ -27,6 +27,32 @@ public class CareerController {
         return service.getCareers();
     }
 
+    @GetMapping("/getCareersPaginated")
+    public ResponseEntity<Map<String, Object>> getCareersPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        try {
+            var careersPage = service.getCareersPaginated(page, size);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("data", careersPage.getContent());
+            response.put("currentPage", careersPage.getNumber());
+            response.put("totalItems", careersPage.getTotalElements());
+            response.put("totalPages", careersPage.getTotalPages());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "status", "server error",
+                            "message", "Error al obtener carreras paginadas",
+                            "detail", e.getMessage()
+                    ));
+        }
+    }
+
+
     // POST
     @PostMapping("/insertCareer")
     public ResponseEntity<Map<String, Object>> insertCareer(@Valid @RequestBody CareerDTO dto, BindingResult binding) {
