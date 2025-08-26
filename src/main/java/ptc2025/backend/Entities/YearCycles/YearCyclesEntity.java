@@ -6,8 +6,17 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.AcademicLevel.AcademicLevelsEntity;
+import ptc2025.backend.Entities.AcademicYear.AcademicYearEntity;
+import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
+import ptc2025.backend.Entities.CycleTypes.CycleTypesEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Entities.careerCycleAvailability.CareerCycleAvailabilityEntity;
+import ptc2025.backend.Entities.studentCycleEnrollments.StudentCycleEnrollmentEntity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "YEARCYCLES")
@@ -19,12 +28,27 @@ public class YearCyclesEntity {
     @GeneratedValue(generator = "YEARCYCLEID")
     @Column(name = "YEARCYCLEID")
     private String id;
-    @Column(name = "ACADEMICYEARID")
-    private String academicYearID;
-    @Column(name = "CYCCLETYPEID")
-    private String cycleTypeID;
     @Column(name = "STARTDATE")
     private LocalDate startDate;
     @Column(name = "ENDDATE")
     private LocalDate endDate;
+
+
+    @OneToMany(mappedBy = "yearcycle", cascade = CascadeType.ALL)
+    private List<CareerCycleAvailabilityEntity> careerCycleAvailability = new ArrayList<>();
+
+    @OneToMany(mappedBy = "yearcycle", cascade = CascadeType.ALL)
+    private List<StudentCycleEnrollmentEntity> studentCycleEnrollment = new ArrayList<>();
+
+    @OneToMany(mappedBy = "yearcycle", cascade = CascadeType.ALL)
+    private List<CourseOfferingsEntity> courseOfferings = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "CYCLETYPEID", referencedColumnName = "CYCLETYPEID")
+    private CycleTypesEntity cycleTypes;
+
+    @ManyToOne
+    @JoinColumn(name = "ACADEMICYEAR", referencedColumnName = "ACADEMICYEAR")
+    private AcademicYearEntity academicYear;
+
 }

@@ -103,4 +103,16 @@ public class YearCyclesController {
         }
     }
 
+   /**
+    @GetMapping("/GetDataYearCycles")
+    private ResponseEntity<List<YearCyclesDTO>> getData(){
+        List<YearCyclesDTO> categories = service.getAllCategories();
+        if (categories == null){
+            ResponseEntity.badRequest().body(Map.of(
+                    "status", "No hay YearCycles registrados"
+            ));
+        }
+        return ResponseEntity.ok(categories);
+    }
+**/
 }

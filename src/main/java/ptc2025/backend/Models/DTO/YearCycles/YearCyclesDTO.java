@@ -17,4 +17,7 @@ public class YearCyclesDTO {
     private LocalDate startDate;
     @NotBlank
     private LocalDate endDate;
+
+    private String academicyear;
+    private String cycletype;
 }

@@ -5,8 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
+import ptc2025.backend.Entities.SubjectDefinitions.SubjectDefinitionsEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Entities.YearCycles.YearCyclesEntity;
 import ptc2025.backend.Models.DTO.CourseOfferings.CourseOfferingsDTO;
 import ptc2025.backend.Respositories.CourseOfferings.CourseOfferingsRepository;
+import ptc2025.backend.Respositories.SubjectDefinitions.SubjectDefinitionsRepository;
+import ptc2025.backend.Respositories.YearCycles.YearCyclesRepository;
 import ptc2025.backend.Respositories.courseEnrollments.CourseEnrollmentRepository;
 
 import java.util.List;
@@ -19,6 +24,14 @@ public class CourseOfferingsService {
     @Autowired
     CourseOfferingsRepository repo;
 
+    @Autowired
+    SubjectDefinitionsRepository subjectDefinitionsRepo;
+
+
+    @Autowired
+    YearCyclesRepository yearCyclesRepo;
+
+
     public List<CourseOfferingsDTO> getAllCourses(){
         List<CourseOfferingsEntity> courses = repo.findAll();
         return courses.stream()
@@ -29,16 +42,39 @@ public class CourseOfferingsService {
     private CourseOfferingsDTO convertToCoursesDTO(CourseOfferingsEntity entity) {
         CourseOfferingsDTO dto = new CourseOfferingsDTO();
         dto.setCourseOfferingID(entity.getCourseOfferingID());
-        dto.setSubjectID(entity.getSubjectID());
-        dto.setYearCycleID(entity.getYearCycleID());
+
+        if(entity.getSubjectDefinitions() != null){
+            dto.setSubject(entity.getSubjectDefinitions().getSubjectName());
+            dto.setSubject(entity.getSubjectDefinitions().getSubjectID());
+        }else {
+            dto.setSubject("Sin Materia Asignada");
+            dto.setSubjectID(null);
+        }
+
+        if(entity.getYearCycles() != null){
+            dto.setYearcycle(entity.getYearCycles().getId());
+        }else {
+            dto.setYearcycle("Sin Año Asignado");
+            dto.setYearcycle(null);
+        }
         return dto;
     }
 
     public CourseOfferingsEntity convertToCoursesEntity(CourseOfferingsDTO dto){
         CourseOfferingsEntity entity = new CourseOfferingsEntity();
         entity.setCourseOfferingID(dto.getCourseOfferingID());
-        entity.setSubjectID(dto.getSubjectID());
-        entity.setYearCycleID(dto.getYearCycleID());
+
+        if(dto.getSubjectID() != null){
+            SubjectDefinitionsEntity subjectDefinitions = subjectDefinitionsRepo.findById(dto.getSubjectID())
+                    .orElseThrow(() -> new IllegalArgumentException("Materia no encontrada con ID: " + dto.getSubjectID()));
+            entity.setSubjectDefinitions(subjectDefinitions);
+        }
+
+        if(dto.getYearCycleID() != null){
+            YearCyclesEntity yearCycles = yearCyclesRepo.findById(dto.getYearCycleID())
+                    .orElseThrow(() -> new IllegalArgumentException("Año no encontrado con ID: " + dto.getYearCycleID()));
+            entity.setYearCycles(yearCycles);
+        }
         return entity;
     }
 
@@ -59,8 +95,22 @@ public class CourseOfferingsService {
 
     public CourseOfferingsDTO updateCourse(String id, CourseOfferingsDTO json){
         CourseOfferingsEntity exists = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Curso no encontrado"));
-        exists.setSubjectID(json.getSubjectID());
-        exists.setYearCycleID(json.getYearCycleID());
+
+        if(json.getSubjectID() != null){
+            SubjectDefinitionsEntity subjectDefinitions = subjectDefinitionsRepo.findById(json.getSubjectID())
+                    .orElseThrow(() -> new IllegalArgumentException("Materia no encontrada con ID: " + json.getSubjectID()));
+            exists.setSubjectDefinitions(subjectDefinitions);
+        }else {
+            exists.setSubjectDefinitions(null);
+        }
+
+        if(json.getYearCycleID() != null){
+            YearCyclesEntity yearCycles = yearCyclesRepo.findById(json.getYearCycleID())
+                    .orElseThrow(() -> new IllegalArgumentException("año no encontrado con ID: " + json.getYearCycleID()));
+            exists.setYearCycles(yearCycles);
+        }else {
+            exists.setYearCycles(null);
+        }
 
         CourseOfferingsEntity updatedCourse = repo.save(exists);
         return convertToCoursesDTO(updatedCourse);

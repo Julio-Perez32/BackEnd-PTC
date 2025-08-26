@@ -30,6 +30,8 @@ public class EvaluationPlansDTO {
     private String description;
 
     private LocalDate createdAt;
+
+    private String courseoffering;
 }
 /**evaluationPlanID
  courseOfferingID

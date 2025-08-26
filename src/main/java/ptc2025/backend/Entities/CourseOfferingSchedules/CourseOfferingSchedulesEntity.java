@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
+import ptc2025.backend.Entities.YearCycles.YearCyclesEntity;
 
 @Entity
 @Table(name = "COURSEOFFERINGSCHEDULES")
@@ -16,8 +18,6 @@ public class CourseOfferingSchedulesEntity {
     @GeneratedValue(generator = "IDcourseOfferingSchedules")
     @Column(name = "COURSEOFFERINGSCHEDULEID")
     private String id;
-    @Column(name = "COURSEOFFERINGID")
-    private String courseOfferingID;
     @Column(name = "WEEKDAY")
     private String weekday;
     @Column(name = "STARTTIME")
@@ -27,4 +27,7 @@ public class CourseOfferingSchedulesEntity {
     @Column(name = "CLASSROOM")
     private String classroom;
 
+    @ManyToOne
+    @JoinColumn(name = "COURSEOFFERINGID", referencedColumnName = "COURSEOFFERINGID")
+    private CourseOfferingsEntity courseOfferings;
 }
