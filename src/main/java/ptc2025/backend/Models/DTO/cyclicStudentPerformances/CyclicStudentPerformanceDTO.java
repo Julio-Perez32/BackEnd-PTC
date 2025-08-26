@@ -1,23 +1,32 @@
 package ptc2025.backend.Models.DTO.cyclicStudentPerformances;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
+@EqualsAndHashCode
+@ToString
 public class CyclicStudentPerformanceDTO {
 
-    private String id;
+    private String performanceID;
 
-    @NotBlank(message = "El ID del estudiante es obligatorio")
-    private String studentId;
+    @NotBlank(message = "El studentCycleEnrollmentID es obligatorio")
+    private String studentCycleEnrollmentID;
 
-    @NotBlank(message = "El código del ciclo es obligatorio")
-    private String cycleCode;
+    private Integer totalValueUnits;
+    private Integer totalMeritUnit;
+    private Double meritUnitCoefficient;
+    private LocalDate computedAt;
 
-    private String academicYearId;
-    private Double averageGrade;
-    private Boolean passed;
-    private Boolean isActive = true;
+    // Derivados
+    private String studentID;
+    private String studentName;
+    private String careerID;
+    private String careerName;
 }
