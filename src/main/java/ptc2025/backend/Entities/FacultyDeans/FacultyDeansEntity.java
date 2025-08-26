@@ -8,6 +8,8 @@ import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.Faculties.FacultiesEntity;
+import ptc2025.backend.Entities.employees.EmployeeEntity;
 
 import java.time.LocalDate;
 
@@ -20,12 +22,16 @@ public class FacultyDeansEntity {
     @GeneratedValue(generator = "idfacultydeans")
     @Column(name = "FACULTYDEANID")
     private String id;
-    @Column(name = "FACULTYID")
-    private String facultyID;
-    @Column(name = "EMPLOYEEID")
-    private String employeeID;
     @Column(name = "STARTDATE")
     private LocalDate startDate;
     @Column(name = "ENDDATE")
     private LocalDate endDate;
+
+    @ManyToOne
+    @JoinColumn(name = "FACULTYID", referencedColumnName = "FACULTYID")
+    private FacultiesEntity faculty;
+
+    @ManyToOne
+    @JoinColumn(name = "EMPLOYEEID", referencedColumnName = "EMPLOYEEID")
+    private EmployeeEntity employee;
 }

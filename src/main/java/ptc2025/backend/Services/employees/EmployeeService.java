@@ -4,9 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.Departments.DepartmentsEntity;
 import ptc2025.backend.Entities.People.PeopleEntity;
 import ptc2025.backend.Entities.employees.EmployeeEntity;
 import ptc2025.backend.Models.DTO.employees.EmployeeDTO;
+import ptc2025.backend.Respositories.Departments.DepartmentsRepository;
 import ptc2025.backend.Respositories.People.PeopleRepository;
 import ptc2025.backend.Respositories.employees.EmployeeRepository;
 
@@ -22,6 +24,9 @@ public class EmployeeService {
 
     @Autowired//inyectando repositorio
     private PeopleRepository repoPeople;
+
+    @Autowired
+    private DepartmentsRepository departmentsRepo;
 
     // GET
     public List<EmployeeDTO> getEmployees() {
@@ -64,6 +69,13 @@ public class EmployeeService {
                 }else {
                     entity.setPeople(null);
                 }
+                if (dto.getDeparmentID() != null){
+                    DepartmentsEntity departments = departmentsRepo.findById(dto.getDeparmentID())
+                            .orElseThrow(() -> new IllegalArgumentException("Departamento no encontrado con ID proporcionado: " + dto.getDeparmentID()));
+                    entity.setDepartments(departments);
+                }else {
+                    entity.setPeople(null);
+                }
                 EmployeeEntity saved = repo.save(entity);
                 return convertirADTO(saved);
             }
@@ -71,6 +83,8 @@ public class EmployeeService {
         } catch (Exception e) {
             throw new RuntimeException("No se pudo actualizar el empleado: " + e.getMessage());
         } //se le puso un catch para que funcione
+
+
     }
 
     // DELETE
@@ -101,6 +115,14 @@ public class EmployeeService {
             dto.setPersonName("Sin Persona Asignada");
             dto.setPersonID(null);
         }
+        if(entity.getDepartments() != null){
+            dto.setDeparmentID(entity.getDepartments().getDepartmentName());
+            dto.setDeparmentID(entity.getDepartments().getDepartmentType());
+            dto.setDeparmentID(entity.getDepartments().getDepartmentID());
+        }else {
+            dto.setPersonName("Sin departamento Asignado");
+            dto.setPersonID(null);
+        }
         return dto;
     }
 
@@ -112,6 +134,11 @@ public class EmployeeService {
             PeopleEntity people = repoPeople.findById(dto.getPersonID())
                     .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada con ID: " + dto.getPersonID()));
             entity.setPeople(people);
+        }
+        if(dto.getDeparmentID() != null){
+            DepartmentsEntity departments = departmentsRepo.findById(dto.getDeparmentID())
+                    .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada con ID: " + dto.getDeparmentID()));
+            entity.setDepartments(departments);
         }
         return entity;
     }

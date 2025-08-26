@@ -9,8 +9,11 @@ import lombok.ToString;
 @Getter @Setter @EqualsAndHashCode @ToString
 public class FacultyLocalitiesDTO {
     private String id;
-    @NotBlank
+
     private String facultyID;
-    @NotBlank
+
     private String localityID;
+
+    private String faculties;
+    private String localities;
 }

@@ -6,7 +6,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.AcademicLevel.AcademicLevelsEntity;
+import ptc2025.backend.Entities.FacultyLocalities.FacultyLocalitiesEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "LOCALITIES")
@@ -29,5 +34,8 @@ public class LocalitiesEntity {
     @ManyToOne
     @JoinColumn(name = "UNIVERSITYID", referencedColumnName = "UNIVERSITYID")
     private UniversityEntity university;
+
+    @OneToMany(mappedBy = "localities", cascade = CascadeType.ALL)
+    private List<FacultyLocalitiesEntity> facultyLocalities = new ArrayList<>();
 
 }

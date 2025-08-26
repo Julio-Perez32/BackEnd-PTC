@@ -5,9 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.Faculties.FacultiesEntity;
 import ptc2025.backend.Entities.FacultyDeans.FacultyDeansEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Entities.employees.EmployeeEntity;
 import ptc2025.backend.Models.DTO.FacultyDeans.FacultyDeansDTO;
+import ptc2025.backend.Respositories.Faculties.FacultiesRepository;
 import ptc2025.backend.Respositories.FacultyDeans.FacultyDeansRepository;
+import ptc2025.backend.Respositories.employees.EmployeeRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +23,12 @@ public class FacultyDeansService {
 
     @Autowired
     private FacultyDeansRepository repo;
+
+    @Autowired
+    private FacultiesRepository facultiesRepo;
+
+    @Autowired
+    private EmployeeRepository employeeRepo;
 
 
     public List<FacultyDeansDTO> obtenerDatos() {
@@ -30,10 +41,23 @@ public class FacultyDeansService {
     private FacultyDeansDTO convertirADTO(FacultyDeansEntity facultyDeansEntity) {
         FacultyDeansDTO dto = new FacultyDeansDTO();
         dto.setId(facultyDeansEntity.getId());
-        dto.setFacultyID(facultyDeansEntity.getFacultyID());
-        dto.setEmployeeID(facultyDeansEntity.getEmployeeID());
         dto.setStartDate(facultyDeansEntity.getStartDate());
         dto.setEndDate(facultyDeansEntity.getEndDate());
+        if(facultyDeansEntity.getFaculty() != null){
+            dto.setFaculties(facultyDeansEntity.getFaculty().getFacultyName());
+            dto.setFaculties(facultyDeansEntity.getFaculty().getFacultyID());
+        }else {
+            dto.setFaculties("Sin Facultad Asignada");
+            dto.setFaculties(null);
+        }
+
+        if(facultyDeansEntity.getEmployee() != null){
+            dto.setEmployees(facultyDeansEntity.getEmployee().getEmployeeDetail());
+            dto.setEmployees(facultyDeansEntity.getEmployee().getId());
+        }else {
+            dto.setEmployees("Sin Empleado Asignado");
+            dto.setEmployees(null);
+        }
         return dto;
     }
 
@@ -53,19 +77,41 @@ public class FacultyDeansService {
 
     private FacultyDeansEntity convertirAEntity(FacultyDeansDTO data) {
         FacultyDeansEntity entity = new FacultyDeansEntity();
-        entity.setFacultyID(data.getFacultyID());
-        entity.setEmployeeID(data.getEmployeeID());
         entity.setStartDate(data.getStartDate());
         entity.setEndDate(data.getEndDate());
+        if(data.getFaculties() != null){
+            FacultiesEntity Faculty = facultiesRepo.findById(data.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("facultad no encontrada con ID: " + data.getId()));
+            entity.setFaculty(Faculty);
+        }
+
+        if(data.getEmployees() != null){
+            EmployeeEntity employee = employeeRepo.findById(data.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("empleado no encontrado con ID: " + data.getId()));
+            entity.setEmployee(employee);
+        }
         return entity;
     }
 
     public FacultyDeansDTO actualizarDatos(String id, FacultyDeansDTO json) {
         FacultyDeansEntity existente = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Registro no encontrado"));
-        existente.setFacultyID(json.getFacultyID());
-        existente.setEmployeeID(json.getEmployeeID());
         existente.setStartDate(json.getStartDate());
         existente.setEndDate(json.getEndDate());
+        if(json.getFacultyID() != null){
+            FacultiesEntity faculties = facultiesRepo.findById(json.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("facultad no encontrada con ID: " + json.getFaculties()));
+            existente.setFaculty(faculties);
+        }else {
+            existente.setFaculty(null);
+        }
+
+        if(json.getEmployees() != null){
+            EmployeeEntity employee = employeeRepo.findById(json.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado con ID: " + json.getEmployeeID()));
+            existente.setEmployee(employee);
+        }else {
+            existente.setFaculty(null);
+        }
         FacultyDeansEntity RegistroActualizado = repo.save(existente);
         return convertirADTO(RegistroActualizado);
     }
