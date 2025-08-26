@@ -6,7 +6,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.CodeGenerators.CodeGeneratorsEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Entities.Users.UsersEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -28,5 +33,8 @@ public class EntityTypesEntity {
     @ManyToOne
     @JoinColumn(name = "UNIVERSITYID", referencedColumnName = "UNIVERSITYID")
     private UniversityEntity university;
+
+    @OneToMany(mappedBy = "entityType", cascade = CascadeType.ALL)
+    private List<CodeGeneratorsEntity> codeGenerators = new ArrayList<>();
 
 }

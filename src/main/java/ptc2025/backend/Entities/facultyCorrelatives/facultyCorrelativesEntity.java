@@ -6,6 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.CodeGenerators.CodeGeneratorsEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "FACULTYCORRELATIVES")
@@ -25,4 +29,7 @@ public class facultyCorrelativesEntity {
 
     @Column(name = "CORRELATIVENUMBER")
     private Integer correlativeNumber;
+
+    @OneToMany(mappedBy = "facultyCorrelative", cascade = CascadeType.ALL)
+    private List<CodeGeneratorsEntity> codeGenerators = new ArrayList<>();
 }
