@@ -12,6 +12,7 @@ import ptc2025.backend.Entities.CycleTypes.CycleTypesEntity;
 import ptc2025.backend.Entities.DegreeTypes.DegreeTypesEntity;
 import ptc2025.backend.Entities.Departments.DepartmentsEntity;
 import ptc2025.backend.Entities.DocumentCategories.DocumentCategoriesEntity;
+import ptc2025.backend.Entities.FacultyDeans.FacultyDeansEntity;
 import ptc2025.backend.Entities.SubjectFamilies.SubjectFamiliesEntity;
 import ptc2025.backend.Entities.facultyCorrelatives.facultyCorrelativesEntity;
 
@@ -43,12 +44,12 @@ public class FacultiesEntity {
     @OneToMany(mappedBy = "faculties", cascade = CascadeType.ALL)
     private List<SubjectFamiliesEntity> academicYear = new ArrayList<>();
 
-    //@OneToMany(mappedBy = "faculties", cascade = CascadeType.ALL)
-    //private List<FacultyDeans> cycleTypes = new ArrayList<>();
+    @OneToMany(mappedBy = "faculties", cascade = CascadeType.ALL)
+    private List<FacultyDeansEntity> cycleTypes = new ArrayList<>();
 
     @OneToMany(mappedBy = "faculties", cascade = CascadeType.ALL)
     private List<DepartmentsEntity> degreeTypes = new ArrayList<>();
 
-    //@OneToMany(mappedBy = "faculties", cascade = CascadeType.ALL)
-    //private List<DocumentCategoriesEntity> documentCategories = new ArrayList<>();
+    @OneToMany(mappedBy = "faculties", cascade = CascadeType.ALL)
+    private List<DocumentCategoriesEntity> documentCategories = new ArrayList<>();
 }
