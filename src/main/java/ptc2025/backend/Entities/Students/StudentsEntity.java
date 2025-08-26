@@ -18,6 +18,8 @@ public class StudentsEntity {
     @GeneratedValue(generator = "studentID")
     @Column(name = "STUDENTID")
     private String studentID;
+    @Column(name = "STUDENTNAME")
+    private String studentName;
     @Column(name = "STUDENTCODE")
     private String studentCode;
 

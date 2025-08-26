@@ -1,33 +1,34 @@
 package ptc2025.backend.Models.DTO.courseEnrollments;
 
 import jakarta.validation.constraints.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+
 import java.time.LocalDate;
 
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CourseEnrollmentDTO {
 
-    private String enrollmentId;
+    private String id;
 
-    @NotBlank(message = "El estudiante es obligatorio")
-    private String studentId;
+    @NotBlank(message = "El ID de la oferta del curso es obligatorio")
+    private String courseOfferingId;
 
-    @NotBlank(message = "La oferta del curso es obligatoria")
-    private String offeringId;
+    @NotBlank(message = "El ID de la inscripción en la carrera es obligatorio")
+    private String studentCareerEnrollmentId;
+
+    @NotBlank(message = "El estado de la inscripción es obligatorio")
+    private String enrollmentStatus;
+
+    @DecimalMin(value = "0.0", inclusive = true, message = "La calificación mínima es 0")
+    @DecimalMax(value = "100.0", inclusive = true, message = "La calificación máxima es 100")
+    private Double finalGrade;
 
     @NotNull(message = "La fecha de inscripción no puede ser nula")
     private LocalDate enrollmentDate;
 
-    @DecimalMin(value = "0.0", inclusive = true, message = "La calificación mínima es 0")
-    @DecimalMax(value = "100.0", inclusive = true, message = "La calificación máxima es 100")
-    private Double grade;
-
-    @NotNull(message = "El estado activo es obligatorio")
-    private Boolean isActive = true;
+    private Double meritUnit;
 }

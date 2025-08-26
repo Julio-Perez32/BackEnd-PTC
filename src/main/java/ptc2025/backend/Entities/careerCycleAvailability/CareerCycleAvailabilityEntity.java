@@ -1,11 +1,9 @@
 package ptc2025.backend.Entities.careerCycleAvailability;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import ptc2025.backend.Entities.careers.CareerEntity;
 
 @Entity
 @Table(name = "CAREERCYCLEAVAILABILITY")
@@ -14,21 +12,13 @@ import lombok.Setter;
 public class CareerCycleAvailabilityEntity {
 
     @Id
-    @Column(name = "AVAILABILITYID")
+    @Column(name = "CAREERCYCLEAVAILABILITYID")
     private String id;
 
-    @Column(name = "CAREERID", nullable = false)
-    private String careerId;
+    @Column(name = "YEARCYCLEID", nullable = false)
+    private String yearCycleId;
 
-    @Column(name = "ACADEMICYEARID", nullable = false)
-    private String academicYearId;
-
-    @Column(name = "CYCLECODE", nullable = false)
-    private String cycleCode;
-
-    @Column(name = "MAXCAPACITY")
-    private Integer maxCapacity;
-
-    @Column(name = "ISACTIVE")
-    private Boolean isActive;
+    @ManyToOne
+    @JoinColumn(name = "CAREERID", nullable = false)
+    private CareerEntity career;
 }

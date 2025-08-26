@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import ptc2025.backend.Entities.courseEnrollments.CourseEnrollmentEntity;
 
 @Repository
-public interface CourseEnrollmentRepository extends JpaRepository<CourseEnrollmentEntity, String> { }
-
+public interface CourseEnrollmentRepository extends JpaRepository<CourseEnrollmentEntity, String> {
+}

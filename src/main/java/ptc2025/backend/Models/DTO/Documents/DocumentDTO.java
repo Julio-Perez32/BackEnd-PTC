@@ -1,4 +1,4 @@
-package ptc2025.backend.Models.DTO.documents;
+package ptc2025.backend.Models.DTO.Documents;
 
 import jakarta.validation.constraints.*;
 import lombok.EqualsAndHashCode;
@@ -27,4 +27,7 @@ public class DocumentDTO {
     private String ownerId;
 
     private Boolean isActive = true;
+
+    @NotBlank(message = "La categoría es obligatoria")
+    private String categoriesId;
 }

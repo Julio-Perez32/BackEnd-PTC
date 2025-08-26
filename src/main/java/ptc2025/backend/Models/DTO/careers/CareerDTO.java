@@ -15,16 +15,25 @@ public class CareerDTO {
 
     private String id;
 
-    @NotNull(message = "El nombre de la carrera no puede ser nulo")
+    @NotNull(message = "El nivel académico es obligatorio")
+    private String academicLevelId;
+
+    @NotNull(message = "El tipo de grado es obligatorio")
+    private String degreeTypeId;
+
+    @NotNull(message = "La modalidad es obligatoria")
+    private String modalityId;
+
+    @NotNull(message = "El departamento es obligatorio")
+    private String departmentId;
+
     @NotBlank(message = "El nombre de la carrera no puede estar vacío")
     private String name;
 
+    private String careerCode;
     private String description;
-
-    @NotNull(message = "La facultad asociada no puede ser nula")
-    @NotBlank(message = "La facultad asociada no puede estar vacía")
-    private String facultyId;
-
-    @NotNull(message = "El estado de actividad es obligatorio")
-    private Boolean isActive = true;
+    private Integer minPassingScore;
+    private Integer minMUC;
+    private Integer compulsorySubjects;
+    private Integer totalValueUnits;
 }

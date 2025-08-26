@@ -7,4 +7,3 @@ import ptc2025.backend.Entities.careerCycleAvailability.CareerCycleAvailabilityE
 @Repository
 public interface CareerCycleAvailabilityRepository extends JpaRepository<CareerCycleAvailabilityEntity, String> {
 }
-

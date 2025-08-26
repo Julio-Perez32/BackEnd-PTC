@@ -22,16 +22,18 @@ public class CourseEnrollmentController {
     @Autowired
     private CourseEnrollmentService service;
 
+    // GET
     @GetMapping("/getEnrollments")
     public List<CourseEnrollmentDTO> getEnrollments() {
         return service.getEnrollments();
     }
 
+    // POST
     @PostMapping("/insertEnrollment")
     public ResponseEntity<Map<String, Object>> insertEnrollment(@Valid @RequestBody CourseEnrollmentDTO dto, HttpServletRequest request) {
         try {
             CourseEnrollmentDTO answer = service.insertEnrollment(dto);
-            if(answer == null) {
+            if (answer == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of(
                                 "status", "error",
@@ -54,9 +56,10 @@ public class CourseEnrollmentController {
         }
     }
 
+    // PUT
     @PutMapping("/updateEnrollment/{id}")
     public ResponseEntity<?> updateEnrollment(@PathVariable String id, @Valid @RequestBody CourseEnrollmentDTO dto, BindingResult binding) {
-        if(binding.hasErrors()) {
+        if (binding.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             binding.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
             return ResponseEntity.badRequest().body(errors);
@@ -64,20 +67,18 @@ public class CourseEnrollmentController {
 
         try {
             CourseEnrollmentDTO answer = service.updateEnrollment(id, dto);
-            if(answer == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of(
-                                "status", "error",
-                                "error type", "VALIDATION_ERROR",
-                                "message", "Error al actualizar inscripción"
-                        ));
-            }
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body(Map.of(
                             "status", "success",
                             "data", answer
                     ));
-        } catch(Exception e) {
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of(
+                            "status", "error",
+                            "message", e.getMessage()
+                    ));
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of(
                             "status", "server error",
@@ -87,10 +88,11 @@ public class CourseEnrollmentController {
         }
     }
 
+    // DELETE
     @DeleteMapping("/deleteEnrollment/{id}")
     public ResponseEntity<Map<String, Object>> deleteEnrollment(@PathVariable String id) {
         try {
-            if(!service.deleteEnrollment(id)) {
+            if (!service.deleteEnrollment(id)) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of(
                                 "error", "not found",
@@ -103,7 +105,7 @@ public class CourseEnrollmentController {
                             "status", "process completed",
                             "message", "Inscripción eliminada con éxito"
                     ));
-        } catch(Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of(
                             "status", "server error",

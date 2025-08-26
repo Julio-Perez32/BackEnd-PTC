@@ -7,8 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ptc2025.backend.Models.DTO.documents.DocumentDTO;
-import ptc2025.backend.Services.documents.DocumentService;
+import ptc2025.backend.Models.DTO.Documents.DocumentDTO;
+import ptc2025.backend.Services.Documents.DocumentService;
 
 import java.time.Instant;
 import java.util.HashMap;

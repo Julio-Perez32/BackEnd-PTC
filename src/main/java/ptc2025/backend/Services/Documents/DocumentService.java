@@ -1,12 +1,14 @@
-package ptc2025.backend.Services.documents;
+package ptc2025.backend.Services.Documents;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import ptc2025.backend.Entities.documents.DocumentEntity;
-import ptc2025.backend.Models.DTO.documents.DocumentDTO;
-import ptc2025.backend.Respositories.documents.DocumentRepository;
+import ptc2025.backend.Entities.DocumentCategories.DocumentCategoriesEntity;
+import ptc2025.backend.Entities.Documents.DocumentEntity;
+import ptc2025.backend.Models.DTO.Documents.DocumentDTO;
+import ptc2025.backend.Respositories.DocumentCategories.DocumentCategoriesRepository;
+import ptc2025.backend.Respositories.Documents.DocumentRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,10 +20,13 @@ public class DocumentService {
     @Autowired
     private DocumentRepository repository;
 
+    @Autowired
+    private DocumentCategoriesRepository categoriesRepository;
+
     // GET
     public List<DocumentDTO> getDocuments() {
-        List<DocumentEntity> docs = repository.findAll();
-        return docs.stream()
+        return repository.findAll()
+                .stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -31,36 +36,36 @@ public class DocumentService {
         if (dto == null) {
             throw new IllegalArgumentException("Documento no puede ser nulo o vacío");
         }
-        try {
-            if(repository.existsById(dto.getId())){
-                throw new IllegalArgumentException("El documento con ID " + dto.getId() + " ya existe");
-            }
-            DocumentEntity entity = convertToEntity(dto);
-            DocumentEntity saved = repository.save(entity);
-            return convertToDTO(saved);
-        } catch (Exception e) {
-            throw new RuntimeException("No se pudo crear documento: " + e.getMessage());
+
+        if (repository.existsById(dto.getId())) {
+            throw new IllegalArgumentException("El documento con ID " + dto.getId() + " ya existe");
         }
+
+        DocumentCategoriesEntity category = categoriesRepository.findById(dto.getCategoriesId())
+                .orElseThrow(() -> new IllegalArgumentException("Categoría con ID " + dto.getCategoriesId() + " no existe"));
+
+        DocumentEntity entity = convertToEntity(dto);
+        entity.setCategories(category);
+
+        DocumentEntity saved = repository.save(entity);
+        return convertToDTO(saved);
     }
 
     // PUT
     public DocumentDTO updateDocument(String id, DocumentDTO dto) {
-        try {
-            if (repository.existsById(id)) {
-                DocumentEntity entity = repository.getById(id);
-                entity.setName(dto.getName());
-                entity.setType(dto.getType());
-                entity.setUploadDate(dto.getUploadDate());
-                entity.setOwnerId(dto.getOwnerId());
-                entity.setIsActive(dto.getIsActive());
+        return repository.findById(id).map(entity -> {
+            entity.setName(dto.getName());
+            entity.setType(dto.getType());
+            entity.setUploadDate(dto.getUploadDate());
+            entity.setOwnerId(dto.getOwnerId());
+            entity.setIsActive(dto.getIsActive());
 
-                DocumentEntity saved = repository.save(entity);
-                return convertToDTO(saved);
-            }
-            throw new IllegalArgumentException("El documento con ID " + id + " no existe");
-        } catch (Exception e) {
-            throw new RuntimeException("No se pudo actualizar documento: " + e.getMessage());
-        }
+            DocumentCategoriesEntity category = categoriesRepository.findById(dto.getCategoriesId())
+                    .orElseThrow(() -> new IllegalArgumentException("Categoría con ID " + dto.getCategoriesId() + " no existe"));
+            entity.setCategories(category);
+
+            return convertToDTO(repository.save(entity));
+        }).orElseThrow(() -> new IllegalArgumentException("El documento con ID " + id + " no existe"));
     }
 
     // DELETE
@@ -85,6 +90,7 @@ public class DocumentService {
         dto.setUploadDate(entity.getUploadDate());
         dto.setOwnerId(entity.getOwnerId());
         dto.setIsActive(entity.getIsActive());
+        dto.setCategoriesId(entity.getCategories().getId());
         return dto;
     }
 

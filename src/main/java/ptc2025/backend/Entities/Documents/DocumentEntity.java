@@ -1,17 +1,18 @@
-package ptc2025.backend.Entities.documents;
+package ptc2025.backend.Entities.Documents;
 
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import ptc2025.backend.Entities.DocumentCategories.DocumentCategoriesEntity;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "DOCUMENTS")
 @Getter @Setter
-@ToString @EqualsAndHashCode
+@ToString(exclude = "CATEGORIES") @EqualsAndHashCode
 public class DocumentEntity {
 
     @Id
@@ -32,4 +33,8 @@ public class DocumentEntity {
 
     @Column(name = "ISACTIVE")
     private Boolean isActive;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "DOCUMENTCATEGORYID", referencedColumnName = "DOCUMENTCATEGORYID")
+    private DocumentCategoriesEntity categories;
 }

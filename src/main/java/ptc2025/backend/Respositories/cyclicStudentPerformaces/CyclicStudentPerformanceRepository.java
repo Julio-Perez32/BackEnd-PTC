@@ -5,5 +5,7 @@ import org.springframework.stereotype.Repository;
 import ptc2025.backend.Entities.cyclicStudentPerformances.CyclicStudentPerformanceEntity;
 
 @Repository
-public interface CyclicStudentPerformanceRepository extends JpaRepository<CyclicStudentPerformanceEntity, String> { }
+public interface CyclicStudentPerformanceRepository extends JpaRepository<CyclicStudentPerformanceEntity, String> {
+
+}
 

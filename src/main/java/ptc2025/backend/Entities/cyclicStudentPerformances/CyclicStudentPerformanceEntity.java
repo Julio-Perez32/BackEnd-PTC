@@ -1,11 +1,11 @@
 package ptc2025.backend.Entities.cyclicStudentPerformances;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import ptc2025.backend.Entities.studentCycleEnrollments.StudentCycleEnrollmentEntity;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "CYCLICSTUDENTPERFORMANCES")
@@ -15,23 +15,21 @@ public class CyclicStudentPerformanceEntity {
 
     @Id
     @Column(name = "PERFORMANCEID")
-    private String id;
+    private String performanceID;
 
-    @Column(name = "STUDENTID", nullable = false)
-    private String studentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "STUDENTCYCLEENROLLMENTID", nullable = false)
+    private StudentCycleEnrollmentEntity studentCycleEnrollment;
 
-    @Column(name = "CYCLECODE", nullable = false)
-    private String cycleCode;
+    @Column(name = "TOTALVALUEUNITS")
+    private Integer totalValueUnits;
 
-    @Column(name = "ACADEMICYEARID")
-    private String academicYearId;
+    @Column(name = "TOTALMERITUNIT")
+    private Integer totalMeritUnit;
 
-    @Column(name = "AVERAGEGRADE")
-    private Double averageGrade;
+    @Column(name = "MERITUNITCOEFFICIENT")
+    private Double meritUnitCoefficient;
 
-    @Column(name = "PASSED")
-    private Boolean passed;
-
-    @Column(name = "ISACTIVE")
-    private Boolean isActive;
+    @Column(name = "COMPUTEDAT")
+    private LocalDate computedAt;
 }

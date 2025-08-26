@@ -4,8 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.StudentCareerEnrollments.StudentCareerEnrollmentsEntity;
 import ptc2025.backend.Entities.studentCycleEnrollments.StudentCycleEnrollmentEntity;
 import ptc2025.backend.Models.DTO.studentCycleEnrollments.StudentCycleEnrollmentDTO;
+import ptc2025.backend.Respositories.StudentCareerEnrollments.StudentCareerEnrollmentsRepository;
 import ptc2025.backend.Respositories.studentCycleEnrollments.StudentCycleEnrollmentRepository;
 
 import java.util.List;
@@ -18,39 +20,38 @@ public class StudentCycleEnrollmentService {
     @Autowired
     private StudentCycleEnrollmentRepository repo;
 
+    @Autowired
+    private StudentCareerEnrollmentsRepository studentCareerEnrollmentsRepository;
+
     // GET
     public List<StudentCycleEnrollmentDTO> getEnrollments() {
         return repo.findAll().stream()
-                .map(this::convertirADTO)
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     // POST
     public StudentCycleEnrollmentDTO insertEnrollment(StudentCycleEnrollmentDTO dto) {
         if (dto == null) throw new IllegalArgumentException("Inscripción no puede ser nula");
-        if (repo.existsById(dto.getId())) throw new IllegalArgumentException("Ya existe una inscripción con ese ID");
-        StudentCycleEnrollmentEntity entity = convertirAEntity(dto);
+
+        StudentCycleEnrollmentEntity entity = convertToEntity(dto);
         StudentCycleEnrollmentEntity saved = repo.save(entity);
-        return convertirADTO(saved);
+        return convertToDTO(saved);
     }
 
     // PUT
     public StudentCycleEnrollmentDTO updateEnrollment(String id, StudentCycleEnrollmentDTO dto) {
-        try {
-            if (repo.existsById(id)) {
-                StudentCycleEnrollmentEntity entity = repo.getById(id);
-                entity.setStudentId(dto.getStudentId());
-                entity.setCycleId(dto.getCycleId());
-                entity.setEnrollmentDate(dto.getEnrollmentDate());
-                entity.setStatus(dto.getStatus());
-                entity.setIsActive(dto.getIsActive());
-                StudentCycleEnrollmentEntity saved = repo.save(entity);
-                return convertirADTO(saved);
-            }
-            throw new IllegalArgumentException("No se encontró inscripción con ID: " + id);
-        } catch (Exception e) {
-            throw new RuntimeException("No se pudo actualizar la inscripción: " + e.getMessage());
-        }
+        return repo.findById(id).map(existing -> {
+            existing.setStatus(dto.getStatus());
+            existing.setRegisteredAt(dto.getRegisteredAt());
+            existing.setCompletedAt(dto.getCompletedAt());
+
+            StudentCareerEnrollmentsEntity sce = studentCareerEnrollmentsRepository.findById(dto.getStudentCareerEnrollmentId())
+                    .orElseThrow(() -> new IllegalArgumentException("No se encontró StudentCareerEnrollment con ID: " + dto.getStudentCareerEnrollmentId()));
+            existing.setStudentCareerEnrollment(sce);
+
+            return convertToDTO(repo.save(existing));
+        }).orElseThrow(() -> new IllegalArgumentException("No se encontró inscripción con ID: " + id));
     }
 
     // DELETE
@@ -68,25 +69,26 @@ public class StudentCycleEnrollmentService {
     }
 
     // CONVERSIONES
-    private StudentCycleEnrollmentDTO convertirADTO(StudentCycleEnrollmentEntity entity) {
-        StudentCycleEnrollmentDTO dto = new StudentCycleEnrollmentDTO();
-        dto.setId(entity.getId());
-        dto.setStudentId(entity.getStudentId());
-        dto.setCycleId(entity.getCycleId());
-        dto.setEnrollmentDate(entity.getEnrollmentDate());
-        dto.setStatus(entity.getStatus());
-        dto.setIsActive(entity.getIsActive());
-        return dto;
+    private StudentCycleEnrollmentDTO convertToDTO(StudentCycleEnrollmentEntity entity) {
+        return StudentCycleEnrollmentDTO.builder()
+                .id(entity.getId())
+                .studentCareerEnrollmentId(entity.getStudentCareerEnrollment().getStudentCareerEnrollmentID())
+                .status(entity.getStatus())
+                .registeredAt(entity.getRegisteredAt())
+                .completedAt(entity.getCompletedAt())
+                .build();
     }
 
-    private StudentCycleEnrollmentEntity convertirAEntity(StudentCycleEnrollmentDTO dto) {
-        StudentCycleEnrollmentEntity entity = new StudentCycleEnrollmentEntity();
-        entity.setId(dto.getId());
-        entity.setStudentId(dto.getStudentId());
-        entity.setCycleId(dto.getCycleId());
-        entity.setEnrollmentDate(dto.getEnrollmentDate());
-        entity.setStatus(dto.getStatus());
-        entity.setIsActive(dto.getIsActive());
-        return entity;
+    private StudentCycleEnrollmentEntity convertToEntity(StudentCycleEnrollmentDTO dto) {
+        StudentCareerEnrollmentsEntity sce = studentCareerEnrollmentsRepository.findById(dto.getStudentCareerEnrollmentId())
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró StudentCareerEnrollment con ID: " + dto.getStudentCareerEnrollmentId()));
+
+        return StudentCycleEnrollmentEntity.builder()
+                .id(dto.getId())
+                .studentCareerEnrollment(sce)
+                .status(dto.getStatus())
+                .registeredAt(dto.getRegisteredAt())
+                .completedAt(dto.getCompletedAt())
+                .build();
     }
 }
