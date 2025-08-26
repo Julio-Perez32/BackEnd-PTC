@@ -9,6 +9,7 @@ import ptc2025.backend.Entities.AcademicLevel.AcademicLevelsEntity;
 import ptc2025.backend.Entities.DegreeTypes.DegreeTypesEntity;
 import ptc2025.backend.Entities.Departments.DepartmentsEntity;
 import ptc2025.backend.Entities.Modalities.ModalitiesEntity;
+import ptc2025.backend.Entities.YearCycles.YearCyclesEntity;
 
 @Entity
 @Table(name = "CAREERS")
@@ -37,6 +38,10 @@ public class CareerEntity {
     @ManyToOne
     @JoinColumn(name = "DEPARTMENTID", referencedColumnName = "DEPARTMENTID")
     private DepartmentsEntity departments;
+
+    @ManyToOne
+    @JoinColumn(name = "YEARCYCLEID", referencedColumnName = "YEARCYCLEID")
+    private YearCyclesEntity yearCycles;
 
     @Column(name = "CAREERNAME", nullable = false)
     private String name;

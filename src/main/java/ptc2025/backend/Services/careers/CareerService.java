@@ -10,6 +10,7 @@ import ptc2025.backend.Respositories.AcademicLevel.AcademicLevelsRepository;
 import ptc2025.backend.Respositories.DegreeTypes.DegreeTypesRepository;
 import ptc2025.backend.Respositories.Departments.DepartmentsRepository;
 import ptc2025.backend.Respositories.Modalities.ModalityRepository;
+import ptc2025.backend.Respositories.YearCycles.YearCyclesRepository;
 import ptc2025.backend.Respositories.careers.CareerRepository;
 
 import java.util.List;
@@ -19,11 +20,23 @@ import java.util.stream.Collectors;
 @Service
 public class CareerService {
 
-    @Autowired private CareerRepository repo;
-    @Autowired private AcademicLevelsRepository academicRepo;
-    @Autowired private DegreeTypesRepository degreeRepo;
-    @Autowired private ModalityRepository modalityRepo;
-    @Autowired private DepartmentsRepository departmentRepo;
+    @Autowired
+    private CareerRepository repo;
+
+    @Autowired
+    private AcademicLevelsRepository academicRepo;
+
+    @Autowired
+    private DegreeTypesRepository degreeRepo;
+
+    @Autowired
+    private ModalityRepository modalityRepo;
+
+    @Autowired
+    private DepartmentsRepository departmentRepo;
+
+    @Autowired
+    private YearCyclesRepository yearCycleRepo;
 
     // GET
     public List<CareerDTO> getCareers() {
@@ -74,6 +87,7 @@ public class CareerService {
         dto.setDegreeTypeId(entity.getDegreeTypes().getId());
         dto.setModalityId(entity.getModalities().getId());
         dto.setDepartmentId(entity.getDepartments().getDepartmentID());
+        dto.setYearCycleId(entity.getYearCycles().getId()); // 👈 agregado
         dto.setName(entity.getName());
         dto.setCareerCode(entity.getCareerCode());
         dto.setDescription(entity.getDescription());
@@ -95,6 +109,8 @@ public class CareerService {
                 .orElseThrow(() -> new IllegalArgumentException("Modalidad no encontrada")));
         entity.setDepartments(departmentRepo.findById(dto.getDepartmentId())
                 .orElseThrow(() -> new IllegalArgumentException("Departamento no encontrado")));
+        entity.setYearCycles(yearCycleRepo.findById(dto.getYearCycleId()) // 👈 agregado
+                .orElseThrow(() -> new IllegalArgumentException("Ciclo lectivo no encontrado")));
         entity.setName(dto.getName());
         entity.setCareerCode(dto.getCareerCode());
         entity.setDescription(dto.getDescription());
