@@ -20,4 +20,7 @@ public class SubjectFamiliesDTO {
     private Long startingNumber;
     @Size(max = 5)
     private Long lastAssignedNumber;
+
+
+    private String facultyName;
 }
