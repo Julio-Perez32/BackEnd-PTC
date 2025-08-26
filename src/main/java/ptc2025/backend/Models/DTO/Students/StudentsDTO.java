@@ -15,4 +15,7 @@ public class StudentsDTO {
     private String personID;
     @NotBlank
     private String studentCode;
+
+    private String personName;
+    private String personLastName;
 }

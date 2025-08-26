@@ -7,9 +7,13 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import ptc2025.backend.Entities.Notification.NotificationEntity;
+import ptc2025.backend.Entities.People.PeopleEntity;
 import ptc2025.backend.Entities.PlanComponents.PlanComponentsEntity;
+import ptc2025.backend.Entities.Users.UsersEntity;
 import ptc2025.backend.Models.DTO.Notification.NotificationDTO;
 import ptc2025.backend.Respositories.Notification.NotificationRespository;
+import ptc2025.backend.Respositories.Users.UsersRespository;
+
 import java.util.List;
 import java.util.stream.Collectors;
 @Slf4j
@@ -17,6 +21,9 @@ import java.util.stream.Collectors;
 public class NotificationService {
     @Autowired
     NotificationRespository repo;
+
+    @Autowired
+    private UsersRespository repoUsers;
     //Get
     public List<NotificationDTO> getNotification(){
         List<NotificationEntity> notification = repo.findAll();
@@ -51,16 +58,31 @@ public class NotificationService {
         }
     }
     //Put
-    public NotificationDTO updateNotification (String id, NotificationDTO dto){
-        NotificationEntity existente = new NotificationEntity();
-        existente.setUserID(dto.getUserID());
+    public NotificationDTO updateNotification(String id, NotificationDTO dto) {
+        // 1. Buscar la notificación existente
+        NotificationEntity existente = repo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Notificación no encontrada con ID: " + id));
+
+        // 2. Actualizar los campos
         existente.setTitle(dto.getTitle());
         existente.setBody(dto.getBody());
         existente.setSentAt(dto.getSentAt());
-        NotificationEntity actualizar = repo.save(existente);
-        return convertirADTO(actualizar);
 
+        if (dto.getUserID() != null) {
+            UsersEntity users = repoUsers.findById(dto.getUserID())
+                    .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con el ID: " + dto.getUserID()));
+            existente.setUser(users);
+        } else {
+            existente.setUser(null);
+        }
+
+        // 3. Guardar cambios
+        NotificationEntity actualizado = repo.save(existente);
+
+        // 4. Convertir a DTO (ya con nombre de la persona del usuario)
+        return convertirADTO(actualizado);
     }
+
     //Delete
     public boolean deleteNotification(String id){
         try {
@@ -78,22 +100,41 @@ public class NotificationService {
         }
     }
     //Convertir a DTO
-    private NotificationDTO convertirADTO (NotificationEntity entity){
+    private NotificationDTO convertirADTO(NotificationEntity entity) {
         NotificationDTO dto = new NotificationDTO();
         dto.setNotificationID(entity.getNotificationID());
-        dto.setUserID(entity.getUserID());
         dto.setTitle(entity.getTitle());
         dto.setBody(entity.getBody());
         dto.setSentAt(entity.getSentAt());
+
+        if (entity.getUser() != null) {
+            dto.setUserID(entity.getUser().getId()); // id del usuario
+
+            if (entity.getUser().getPeople() != null) {
+                PeopleEntity persona = entity.getUser().getPeople();
+
+                // Evitar null en nombres
+                String nombre = (persona.getFirstName() != null ? persona.getFirstName() : "");
+                String apellido = (persona.getLastName() != null ? persona.getLastName() : "");
+
+                dto.setUserName((nombre + " " + apellido).trim());
+            }
+        }
+
         return dto;
     }
+
     //Convertir a Entity
     private NotificationEntity convertirAEntity (NotificationDTO dto){
         NotificationEntity entity = new NotificationEntity();
-        entity.setUserID(dto.getUserID());
         entity.setTitle(dto.getTitle());
         entity.setBody(dto.getBody());
         entity.setSentAt(dto.getSentAt());
+        if(dto.getUserID() != null ){
+            UsersEntity users = repoUsers.findById(dto.getUserID())
+                    .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con el ID"+ dto.getUserID()));
+            entity.setUser(users);
+        }
         return entity;
     }
 }

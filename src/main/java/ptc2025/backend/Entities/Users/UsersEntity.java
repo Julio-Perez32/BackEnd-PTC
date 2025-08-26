@@ -6,9 +6,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.DocumentCategories.DocumentCategoriesEntity;
+import ptc2025.backend.Entities.Notification.NotificationEntity;
 import ptc2025.backend.Entities.People.PeopleEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Entities.systemRoles.SystemRolesEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "USERS")
@@ -37,6 +42,9 @@ public class UsersEntity {
     @ManyToOne
     @JoinColumn(name = "ROLEID", referencedColumnName = "ROLEID")
     private SystemRolesEntity systemRoles;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<NotificationEntity> notification = new ArrayList<>();
 
 
 
