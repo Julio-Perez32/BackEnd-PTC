@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import ptc2025.backend.Entities.EvaluationPlans.EvaluationPlansEntity;
 import ptc2025.backend.Entities.PlanComponents.PlanComponentsEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Models.DTO.PlanComponents.PlanComponentsDTO;
 import ptc2025.backend.Respositories.EvaluationPlans.EvaluationPlansRepository;
 import ptc2025.backend.Respositories.PlanComponents.PlanComponentsRespository;
@@ -52,11 +54,18 @@ public class PlanComponentsService {
     //Put
     public PlanComponentsDTO updatePlanComponents (String id, PlanComponentsDTO dto){
         PlanComponentsEntity existente = new PlanComponentsEntity();
-       // existente.setEvaluationPlanID(dto.getEvaluationPlanID());
         existente.setRubric(dto.getRubric());
         existente.setComponentName(dto.getComponentName());
         existente.setWeightPercentage(dto.getWeightPercentage());
         existente.setOrderIndex(dto.getOrderIndex());
+        if(dto.getEvaluationPlanID() != null){
+            EvaluationPlansEntity evaluationPlans = evaluationPlansRepo.findById(dto.getEvaluationPlanID())
+                    .orElseThrow(() -> new IllegalArgumentException("plan de evaluacion no encontrado con ID: " + dto.getEvaluationPlanID()));
+            existente.setEvaluationPlans(evaluationPlans);
+        }else {
+            existente.setEvaluationPlans(null);
+        }
+
         PlanComponentsEntity actualizar = repo.save(existente);
         return convertirADTO(actualizar);
     }
@@ -80,24 +89,33 @@ public class PlanComponentsService {
     private PlanComponentsDTO convertirADTO (PlanComponentsEntity entity){
         PlanComponentsDTO dto = new PlanComponentsDTO();
         dto.setComponentID(entity.getComponentID());;
-       // dto.setEvaluationPlanID(entity.getEvaluationPlanID());
         dto.setRubric(entity.getRubric());
         dto.setComponentName(entity.getComponentName());
         dto.setWeightPercentage(entity.getWeightPercentage());
         dto.setOrderIndex(entity.getOrderIndex() != null ? entity.getOrderIndex() : 1);
+        if(entity.getEvaluationPlans() != null){
+            dto.setEvaluationplans(entity.getEvaluationPlans().getPlanName());
+            dto.setEvaluationPlanID(entity.getEvaluationPlans().getEvaluationPlanID());
+        }else {
+            dto.setEvaluationplans("Sin plan de evaluacion Asignada");
+            dto.setEvaluationPlanID(null);
+        }
         return dto;
     }
     //Convertir a Entity
     public PlanComponentsEntity convertirAEntity(PlanComponentsDTO dto) {
         PlanComponentsEntity entity = new PlanComponentsEntity();
-
-       // entity.setEvaluationPlanID(dto.getEvaluationPlanID());
         entity.setRubric(dto.getRubric());
         entity.setComponentName(dto.getComponentName().trim());
         entity.setWeightPercentage(dto.getWeightPercentage());
 
         // Si no se envía orderIndex, se usa 1 por defecto
         entity.setOrderIndex(dto.getOrderIndex() != null ? dto.getOrderIndex() : 1);
+        if(dto.getEvaluationPlanID() != null){
+            EvaluationPlansEntity evaluationPlans = evaluationPlansRepo.findById(dto.getEvaluationPlanID())
+                    .orElseThrow(() -> new IllegalArgumentException("Plan de evaluacion no encontrado con ID: " + dto.getEvaluationPlanID()));
+            entity.setEvaluationPlans(evaluationPlans);
+        }
 
         return entity;
     }
