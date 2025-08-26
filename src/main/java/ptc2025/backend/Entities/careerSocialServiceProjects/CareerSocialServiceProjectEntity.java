@@ -7,8 +7,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Entity
 @Table(name = "CAREERSOCIALSERVICEPROJECTS")
 @Getter
@@ -16,24 +14,12 @@ import java.time.LocalDate;
 public class CareerSocialServiceProjectEntity {
 
     @Id
-    @Column(name = "PROJECTID")
+    @Column(name = "CAREERPROJECTID")
     private String id;
 
     @Column(name = "CAREERID", nullable = false)
     private String careerId;
 
-    @Column(name = "PROJECTNAME", nullable = false)
-    private String projectName;
-
-    @Column(name = "SUPERVISORNAME")
-    private String supervisorName;
-
-    @Column(name = "STARTDATE")
-    private LocalDate startDate;
-
-    @Column(name = "ENDDATE")
-    private LocalDate endDate;
-
-    @Column(name = "ISACTIVE")
-    private Boolean isActive;
+    @Column(name = "SOCIALSERVICEPROJECTID", nullable = false)
+    private String socialServiceProjectId;
 }

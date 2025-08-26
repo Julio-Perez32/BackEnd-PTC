@@ -4,8 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Getter
 @Setter
 public class CareerSocialServiceProjectDTO {
@@ -15,11 +13,6 @@ public class CareerSocialServiceProjectDTO {
     @NotBlank(message = "La carrera es obligatoria")
     private String careerId;
 
-    @NotBlank(message = "El nombre del proyecto es obligatorio")
-    private String projectName;
-
-    private String supervisorName;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private Boolean isActive = true;
+    @NotBlank(message = "El proyecto de servicio social es obligatorio")
+    private String socialServiceProjectId;
 }

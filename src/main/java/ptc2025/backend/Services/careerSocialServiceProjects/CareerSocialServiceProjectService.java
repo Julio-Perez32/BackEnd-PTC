@@ -33,11 +33,7 @@ public class CareerSocialServiceProjectService {
         if(!repo.existsById(id)) throw new IllegalArgumentException("No se encontró proyecto con ID: " + id);
         CareerSocialServiceProjectEntity entity = repo.getById(id);
         entity.setCareerId(dto.getCareerId());
-        entity.setProjectName(dto.getProjectName());
-        entity.setSupervisorName(dto.getSupervisorName());
-        entity.setStartDate(dto.getStartDate());
-        entity.setEndDate(dto.getEndDate());
-        entity.setIsActive(dto.getIsActive());
+        entity.setSocialServiceProjectId(dto.getSocialServiceProjectId());
         return convertToDTO(repo.save(entity));
     }
 
@@ -57,11 +53,7 @@ public class CareerSocialServiceProjectService {
         CareerSocialServiceProjectDTO dto = new CareerSocialServiceProjectDTO();
         dto.setId(entity.getId());
         dto.setCareerId(entity.getCareerId());
-        dto.setProjectName(entity.getProjectName());
-        dto.setSupervisorName(entity.getSupervisorName());
-        dto.setStartDate(entity.getStartDate());
-        dto.setEndDate(entity.getEndDate());
-        dto.setIsActive(entity.getIsActive());
+        dto.setSocialServiceProjectId(entity.getSocialServiceProjectId());
         return dto;
     }
 
@@ -69,11 +61,7 @@ public class CareerSocialServiceProjectService {
         CareerSocialServiceProjectEntity entity = new CareerSocialServiceProjectEntity();
         entity.setId(dto.getId());
         entity.setCareerId(dto.getCareerId());
-        entity.setProjectName(dto.getProjectName());
-        entity.setSupervisorName(dto.getSupervisorName());
-        entity.setStartDate(dto.getStartDate());
-        entity.setEndDate(dto.getEndDate());
-        entity.setIsActive(dto.getIsActive());
+        entity.setSocialServiceProjectId(dto.getSocialServiceProjectId());
         return entity;
     }
 }
