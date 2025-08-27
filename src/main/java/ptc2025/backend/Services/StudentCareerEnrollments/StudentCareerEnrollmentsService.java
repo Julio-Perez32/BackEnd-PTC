@@ -9,6 +9,8 @@ import ptc2025.backend.Entities.Students.StudentsEntity;
 import ptc2025.backend.Models.DTO.StudentCareerEnrollments.StudentCareerEnrollmentsDTO;
 import ptc2025.backend.Respositories.StudentCareerEnrollments.StudentCareerEnrollmentsRepository;
 import ptc2025.backend.Respositories.Students.StudentsRepository;
+import ptc2025.backend.Respositories.careerSocialServiceProjects.CareerSocialServiceProjectRepository;
+import ptc2025.backend.Respositories.careers.CareerRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,13 +23,13 @@ public class StudentCareerEnrollmentsService {
     private StudentCareerEnrollmentsRepository repo;
 
     @Autowired
-    private ptc2025.backend.Respositories.careers.CareerRepository careerRepo;
+    private CareerRepository careerRepo;
 
     @Autowired
     private StudentsRepository studentsRepository;
 
     @Autowired
-    private ptc2025.backend.Respositories.careerSocialServiceProjects.CareerSocialServiceProjectRepository careerSocialRepo;
+    private CareerSocialServiceProjectRepository careerSocialRepo;
 
     // GET
     public List<StudentCareerEnrollmentsDTO> getAllEnrollments(){
@@ -113,7 +115,6 @@ public class StudentCareerEnrollmentsService {
         }
         if(entity.getCareerSocialServiceProject() != null){
             dto.setCareerSocialServiceProjectID(entity.getCareerSocialServiceProject().getCareerId());
-            dto.setCareerSocialServiceProjectName(entity.getCareerSocialServiceProject().getProjectName());
         }
         return dto;
     }

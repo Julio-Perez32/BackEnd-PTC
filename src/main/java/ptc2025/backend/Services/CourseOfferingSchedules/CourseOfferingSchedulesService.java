@@ -38,12 +38,16 @@ public class CourseOfferingSchedulesService {
         dto.setStartTime(courseOfferingSchedules.getStartTime());
         dto.setEndTime(courseOfferingSchedules.getEndTime());
         dto.setClassroom(courseOfferingSchedules.getClassroom());
-        if(courseOfferingSchedules.getCourseOfferings() != null){
+        if (courseOfferingSchedules.getCourseOfferings() != null) {
+            dto.setCourseoffering(
+                    courseOfferingSchedules.getCourseOfferings().getSubjectDefinitions().getSubjectName()
+            );
             dto.setCourseOfferingID(courseOfferingSchedules.getCourseOfferings().getCourseOfferingID());
-        }else {
+        } else {
             dto.setCourseoffering("Sin courseOffering Asignada");
-            dto.setCourseoffering(null);
+            dto.setCourseOfferingID(null);
         }
+
         return dto;
     }
 
