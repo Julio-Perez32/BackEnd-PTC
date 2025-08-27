@@ -19,4 +19,7 @@ public class StudentEvaluationsDTO {
     private String feedback;
     @NotBlank
     private LocalDate submittedAt;
+
+    private String component;
+    private String courseEnrollment;
 }

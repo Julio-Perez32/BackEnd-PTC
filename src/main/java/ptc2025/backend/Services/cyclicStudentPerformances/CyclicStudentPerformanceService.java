@@ -3,6 +3,8 @@ package ptc2025.backend.Services.cyclicStudentPerformances;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.AcademicLevel.AcademicLevelsEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Entities.cyclicStudentPerformances.CyclicStudentPerformanceEntity;
 import ptc2025.backend.Entities.studentCycleEnrollments.StudentCycleEnrollmentEntity;
 import ptc2025.backend.Models.DTO.cyclicStudentPerformances.CyclicStudentPerformanceDTO;
@@ -38,14 +40,22 @@ public class CyclicStudentPerformanceService {
     }
 
     public CyclicStudentPerformanceDTO updatePerformance(String id, CyclicStudentPerformanceDTO dto){
-        if(!repo.existsById(id)) throw new IllegalArgumentException("No se encontró rendimiento con ID: " + id);
+        CyclicStudentPerformanceEntity existente = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("El ID no pudo ser encontrado."));
+        existente.setTotalValueUnits(dto.getTotalValueUnits());
+        existente.setTotalMeritUnit(dto.getTotalMeritUnit());
+        existente.setMeritUnitCoefficient(dto.getMeritUnitCoefficient());
+        existente.setComputedAt(dto.getComputedAt());
+        if(dto.getStudentCycleEnrollmentID() != null){
+            StudentCycleEnrollmentEntity studentCycleEnrollment = studentCycleRepo.findById(dto.getStudentCycleEnrollmentID())
+                    .orElseThrow(() -> new IllegalArgumentException("StudentcycleEnrollment no encontrada con ID: " + dto.getStudentCycleEnrollmentID()));
+            existente.setStudentCycleEnrollment(studentCycleEnrollment);
+        }else {
+            existente.setStudentCycleEnrollment(null);
+        }
 
-        StudentCycleEnrollmentEntity enrollment = studentCycleRepo.findById(dto.getStudentCycleEnrollmentID())
-                .orElseThrow(() -> new IllegalArgumentException("No existe StudentCycleEnrollment con ID: " + dto.getStudentCycleEnrollmentID()));
+        CyclicStudentPerformanceEntity levelUpdated = repo.save(existente);
 
-        CyclicStudentPerformanceEntity entity = convertToEntity(dto, enrollment);
-        entity.setPerformanceID(id);
-        return convertToDTO(repo.save(entity));
+        return convertToDTO(levelUpdated);
     }
 
     public boolean deletePerformance(String id){
@@ -63,29 +73,31 @@ public class CyclicStudentPerformanceService {
     private CyclicStudentPerformanceDTO convertToDTO(CyclicStudentPerformanceEntity entity){
         CyclicStudentPerformanceDTO dto = new CyclicStudentPerformanceDTO();
         dto.setPerformanceID(entity.getPerformanceID());
-        dto.setStudentCycleEnrollmentID(entity.getStudentCycleEnrollment().getId());
         dto.setTotalValueUnits(entity.getTotalValueUnits());
         dto.setTotalMeritUnit(entity.getTotalMeritUnit());
         dto.setMeritUnitCoefficient(entity.getMeritUnitCoefficient());
         dto.setComputedAt(entity.getComputedAt());
-
-        // ⚡ Derivados (supone getters en StudentCycleEnrollmentEntity)
-        dto.setStudentID(entity.getStudentCycleEnrollment().getStudentCareerEnrollment().getStudentCareerEnrollmentID());
-        dto.setStudentName(entity.getStudentCycleEnrollment().getStudentCareerEnrollment().getStudentCareerEnrollmentID());
-        dto.setCareerID(entity.getStudentCycleEnrollment().getStudentCareerEnrollment().getStudentCareerEnrollmentID());
-        dto.setCareerName(entity.getStudentCycleEnrollment().getStudentCareerEnrollment().getStudentCareerEnrollmentID());
+        if(entity.getStudentCycleEnrollment() != null){
+            dto.setStudentCycleEnrollmentID(entity.getStudentCycleEnrollment().getId());
+        }else {
+            dto.setStudentCycleEnrollmentID("Sin Universidad Asignada");
+            dto.setStudentCycleEnrollment(null);
+        }
 
         return dto;
     }
 
     private CyclicStudentPerformanceEntity convertToEntity(CyclicStudentPerformanceDTO dto, StudentCycleEnrollmentEntity enrollment){
         CyclicStudentPerformanceEntity entity = new CyclicStudentPerformanceEntity();
-        entity.setPerformanceID(dto.getPerformanceID());
-        entity.setStudentCycleEnrollment(enrollment);
         entity.setTotalValueUnits(dto.getTotalValueUnits());
         entity.setTotalMeritUnit(dto.getTotalMeritUnit());
         entity.setMeritUnitCoefficient(dto.getMeritUnitCoefficient());
         entity.setComputedAt(dto.getComputedAt());
+        if(dto.getStudentCycleEnrollmentID() != null){
+            StudentCycleEnrollmentEntity studentCycleEnrollment = studentCycleRepo.findById(dto.getStudentCycleEnrollmentID())
+                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + dto.getStudentCycleEnrollmentID()));
+            entity.setStudentCycleEnrollment(studentCycleEnrollment);
+        }
         return entity;
     }
 }

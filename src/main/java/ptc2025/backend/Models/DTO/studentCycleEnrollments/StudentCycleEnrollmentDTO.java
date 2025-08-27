@@ -15,12 +15,17 @@ public class StudentCycleEnrollmentDTO {
 
     private String id;
 
-    @NotNull(message = "El ID de la inscripción en la carrera es obligatorio")
     private String studentCareerEnrollmentId;
+
+    private String yearCycleID;
 
     @NotBlank(message = "El estado es obligatorio")
     private String status;
 
     private LocalDate registeredAt;
     private LocalDate completedAt;
+
+    private String studentcareerenrollment;
+    private String yearcycle;
+
 }
