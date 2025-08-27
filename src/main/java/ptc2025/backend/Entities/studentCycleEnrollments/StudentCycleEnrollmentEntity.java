@@ -3,11 +3,12 @@ package ptc2025.backend.Entities.studentCycleEnrollments;
 import jakarta.persistence.*;
 import lombok.*;
 import ptc2025.backend.Entities.StudentCareerEnrollments.StudentCareerEnrollmentsEntity;
+import ptc2025.backend.Entities.YearCycles.YearCyclesEntity;
 
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "studentCycleEnrollments")
+@Table(name = "STUDENTCYCLEENROLLMENTS")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,19 +18,23 @@ public class StudentCycleEnrollmentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "studentCycleEnrollmentID")
+    @Column(name = "STUDENTCYCLEENROLLMENTID")
     private String id;
 
     @ManyToOne
-    @JoinColumn(name = "studentCareerEnrollmentID", referencedColumnName = "studentCareerEnrollmentID")
+    @JoinColumn(name = "STUDENTCAREERENROLLMENTID", referencedColumnName = "STUDENTCAREERENROLLMENTID")
     private StudentCareerEnrollmentsEntity studentCareerEnrollment;
 
-    @Column(name = "status", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "YEARCYCLEID", referencedColumnName = "YEARCYCLEID")
+    private YearCyclesEntity yearCycles;
+
+    @Column(name = "STATUS", nullable = false)
     private String status;
 
-    @Column(name = "registeredAt")
+    @Column(name = "REGISTEREDAT")
     private LocalDate registeredAt;
 
-    @Column(name = "completedAt")
+    @Column(name = "COMPLETEDAT")
     private LocalDate completedAt;
 }

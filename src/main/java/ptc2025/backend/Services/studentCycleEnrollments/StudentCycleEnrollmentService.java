@@ -5,9 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.StudentCareerEnrollments.StudentCareerEnrollmentsEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Entities.YearCycles.YearCyclesEntity;
 import ptc2025.backend.Entities.studentCycleEnrollments.StudentCycleEnrollmentEntity;
 import ptc2025.backend.Models.DTO.studentCycleEnrollments.StudentCycleEnrollmentDTO;
 import ptc2025.backend.Respositories.StudentCareerEnrollments.StudentCareerEnrollmentsRepository;
+import ptc2025.backend.Respositories.YearCycles.YearCyclesRepository;
 import ptc2025.backend.Respositories.studentCycleEnrollments.StudentCycleEnrollmentRepository;
 
 import java.util.List;
@@ -21,7 +24,10 @@ public class StudentCycleEnrollmentService {
     private StudentCycleEnrollmentRepository repo;
 
     @Autowired
-    private StudentCareerEnrollmentsRepository studentCareerEnrollmentsRepository;
+    private StudentCareerEnrollmentsRepository studentCareerEnrollmentsRepo;
+
+    @Autowired
+    private YearCyclesRepository yearCyclesRepo;
 
     // GET
     public List<StudentCycleEnrollmentDTO> getEnrollments() {
@@ -46,9 +52,13 @@ public class StudentCycleEnrollmentService {
             existing.setRegisteredAt(dto.getRegisteredAt());
             existing.setCompletedAt(dto.getCompletedAt());
 
-            StudentCareerEnrollmentsEntity sce = studentCareerEnrollmentsRepository.findById(dto.getStudentCareerEnrollmentId())
+            StudentCareerEnrollmentsEntity sce = studentCareerEnrollmentsRepo.findById(dto.getStudentCareerEnrollmentId())
                     .orElseThrow(() -> new IllegalArgumentException("No se encontró StudentCareerEnrollment con ID: " + dto.getStudentCareerEnrollmentId()));
             existing.setStudentCareerEnrollment(sce);
+
+            YearCyclesEntity yearCycles = yearCyclesRepo.findById(dto.getYearCycleID())
+                    .orElseThrow(() -> new IllegalArgumentException("No se encontró YearCycle con ID: " + dto.getYearCycleID()));
+            existing.setYearCycles(yearCycles);
 
             return convertToDTO(repo.save(existing));
         }).orElseThrow(() -> new IllegalArgumentException("No se encontró inscripción con ID: " + id));
@@ -70,25 +80,41 @@ public class StudentCycleEnrollmentService {
 
     // CONVERSIONES
     private StudentCycleEnrollmentDTO convertToDTO(StudentCycleEnrollmentEntity entity) {
-        return StudentCycleEnrollmentDTO.builder()
-                .id(entity.getId())
-                .studentCareerEnrollmentId(entity.getStudentCareerEnrollment().getStudentCareerEnrollmentID())
-                .status(entity.getStatus())
-                .registeredAt(entity.getRegisteredAt())
-                .completedAt(entity.getCompletedAt())
-                .build();
+       StudentCycleEnrollmentDTO dto = new StudentCycleEnrollmentDTO();
+       dto.setId(entity.getId());
+       dto.setStatus(entity.getStatus());
+       dto.setRegisteredAt(entity.getRegisteredAt());
+       dto.setCompletedAt(entity.getCompletedAt());
+        if(entity.getStudentCareerEnrollment() != null){
+            dto.setStudentcareerenrollment(entity.getStudentCareerEnrollment().getStudentCareerEnrollmentID());
+        }else {
+            dto.setStudentcareerenrollment("Sin StudentCareerEnrollment Asignado");
+            dto.setStudentcareerenrollment(null);
+        }
+        if(entity.getYearCycles() != null){
+            dto.setYearcycle(entity.getYearCycles().getId());
+        }else {
+            dto.setYearcycle("Sin ciclo academico Asignado");
+            dto.setYearcycle(null);
+        }
+        return dto;
     }
 
     private StudentCycleEnrollmentEntity convertToEntity(StudentCycleEnrollmentDTO dto) {
-        StudentCareerEnrollmentsEntity sce = studentCareerEnrollmentsRepository.findById(dto.getStudentCareerEnrollmentId())
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró StudentCareerEnrollment con ID: " + dto.getStudentCareerEnrollmentId()));
-
-        return StudentCycleEnrollmentEntity.builder()
-                .id(dto.getId())
-                .studentCareerEnrollment(sce)
-                .status(dto.getStatus())
-                .registeredAt(dto.getRegisteredAt())
-                .completedAt(dto.getCompletedAt())
-                .build();
+       StudentCycleEnrollmentEntity entity = new StudentCycleEnrollmentEntity();
+       entity.setStatus(dto.getStatus());
+       entity.setRegisteredAt(dto.getRegisteredAt());
+       entity.setCompletedAt(dto.getCompletedAt());
+        if(dto.getStudentCareerEnrollmentId() != null){
+            StudentCareerEnrollmentsEntity studentCareerEnrollments = studentCareerEnrollmentsRepo.findById(dto.getStudentCareerEnrollmentId())
+                    .orElseThrow(() -> new IllegalArgumentException("StudentCareerEnrollmente no encontrada con ID: " + dto.getStudentCareerEnrollmentId()));
+            entity.setStudentCareerEnrollment(studentCareerEnrollments);
+        }
+        if(dto.getYearCycleID() != null){
+            YearCyclesEntity yearCycles = yearCyclesRepo.findById(dto.getYearCycleID())
+                    .orElseThrow(() -> new IllegalArgumentException("ciclo de año no encontrada con ID: " + dto.getYearCycleID()));
+            entity.setYearCycles(yearCycles);
+        }
+        return entity;
     }
 }

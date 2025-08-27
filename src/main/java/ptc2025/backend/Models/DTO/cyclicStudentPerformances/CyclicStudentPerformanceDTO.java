@@ -16,7 +16,6 @@ public class CyclicStudentPerformanceDTO {
 
     private String performanceID;
 
-    @NotBlank(message = "El studentCycleEnrollmentID es obligatorio")
     private String studentCycleEnrollmentID;
 
     private Integer totalValueUnits;
@@ -29,4 +28,6 @@ public class CyclicStudentPerformanceDTO {
     private String studentName;
     private String careerID;
     private String careerName;
+
+    private String StudentCycleEnrollment;
 }
