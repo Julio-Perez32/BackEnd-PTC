@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import ptc2025.backend.Entities.SocialService.SocialServiceEntity;
+import ptc2025.backend.Entities.SocialServiceProjects.SocialServiceProjectsEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Models.DTO.SocialService.SocialServiceDTO;
 import ptc2025.backend.Respositories.SocialService.SocialServiceRespository;
@@ -23,7 +23,7 @@ public class SocialServiceServices {
     UniversityRespository repoUniversity;
 
     public List<SocialServiceDTO> getSocialService(){
-        List<SocialServiceEntity> servicioSocial = repo.findAll();
+        List<SocialServiceProjectsEntity> servicioSocial = repo.findAll();
         return servicioSocial.stream()
                 .map(this::convertirSSDTO)
                 .collect(Collectors.toList());
@@ -35,8 +35,8 @@ public class SocialServiceServices {
             throw new IllegalArgumentException("Todos los campos deben de estar completos");
         }
         try {
-            SocialServiceEntity entidad = convertirSSEntity(dto);
-            SocialServiceEntity guardar = repo.save(entidad);
+            SocialServiceProjectsEntity entidad = convertirSSEntity(dto);
+            SocialServiceProjectsEntity guardar = repo.save(entidad);
             return convertirSSDTO(guardar);
         }catch (Exception e){
             log.error("Error al registrar el servicio social del estudiante" +  e.getMessage());
@@ -44,7 +44,7 @@ public class SocialServiceServices {
         }
     }
     public SocialServiceDTO modificarServicioSocial(String id, SocialServiceDTO dto){
-        SocialServiceEntity servicioExistente = repo.findById(id).orElseThrow(() -> new RuntimeException("El dato no pudo ser actualizado. Localidad no encontrada"));
+        SocialServiceProjectsEntity servicioExistente = repo.findById(id).orElseThrow(() -> new RuntimeException("El dato no pudo ser actualizado. Localidad no encontrada"));
 
         servicioExistente.setSocialServiceProjectName(dto.getSocialServiceProjectName());
         servicioExistente.setDescription(dto.getDescription());
@@ -55,12 +55,12 @@ public class SocialServiceServices {
         }else {
             servicioExistente.setUniversity(null);
         }
-        SocialServiceEntity actualizado = repo.save(servicioExistente);
+        SocialServiceProjectsEntity actualizado = repo.save(servicioExistente);
         return convertirSSDTO(actualizado);
     }
     public boolean eliminarServicioSocial(String id){
         try{
-            SocialServiceEntity objServicio = repo.findById(id).orElse(null);
+            SocialServiceProjectsEntity objServicio = repo.findById(id).orElse(null);
             if (objServicio != null){
                 repo.deleteById(id);
                 return true;
@@ -72,7 +72,7 @@ public class SocialServiceServices {
             throw new EmptyResultDataAccessException("No se encontro ninguna servicio social con el ID" + id , 1);
         }
     }
-    private SocialServiceDTO convertirSSDTO(SocialServiceEntity entity){
+    private SocialServiceDTO convertirSSDTO(SocialServiceProjectsEntity entity){
         SocialServiceDTO dto = new SocialServiceDTO();
         dto.setSocialServiceProjectID(entity.getSocialServiceProjectID());
         dto.setSocialServiceProjectName(entity.getSocialServiceProjectName());
@@ -88,8 +88,8 @@ public class SocialServiceServices {
         return dto;
 
     }
-    private SocialServiceEntity convertirSSEntity (SocialServiceDTO dto){
-        SocialServiceEntity entity = new SocialServiceEntity();
+    private SocialServiceProjectsEntity convertirSSEntity (SocialServiceDTO dto){
+        SocialServiceProjectsEntity entity = new SocialServiceProjectsEntity();
         entity.setSocialServiceProjectName(dto.getSocialServiceProjectName());
         entity.setDescription(dto.getDescription());
 

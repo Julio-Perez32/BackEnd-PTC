@@ -38,18 +38,18 @@ public class FacultiesEntity {
     @Column(name = "CORRELATIVECODE")
     private String correlativeCode;
 
-    @OneToMany(mappedBy = "faculties", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL)
     private List<facultyCorrelativesEntity> academicLevels = new ArrayList<>();
 
-    @OneToMany(mappedBy = "faculties", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL)
     private List<SubjectFamiliesEntity> academicYear = new ArrayList<>();
 
-    @OneToMany(mappedBy = "faculties", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL)
     private List<FacultyDeansEntity> cycleTypes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "faculties", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL)
     private List<DepartmentsEntity> degreeTypes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "faculties", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL)
     private List<DocumentCategoriesEntity> documentCategories = new ArrayList<>();
 }

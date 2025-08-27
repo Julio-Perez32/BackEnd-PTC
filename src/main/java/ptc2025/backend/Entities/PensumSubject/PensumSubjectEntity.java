@@ -27,7 +27,7 @@ public class PensumSubjectEntity {
 
     @ManyToOne
     @JoinColumn(name = "PENSUMID", referencedColumnName = "PENSUMID")
-    private PensumEntity pensum;
+    private PensumEntity Pensum;
 
     @ManyToOne
     @JoinColumn(name = "SUBJECTID", referencedColumnName = "SUBJECTID")

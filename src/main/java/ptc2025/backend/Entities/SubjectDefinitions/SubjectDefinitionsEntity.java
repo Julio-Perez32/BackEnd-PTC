@@ -25,19 +25,18 @@ public class SubjectDefinitionsEntity {
     @GeneratedValue(generator = "SUBJECTDEFINITIONID")
     @Column(name = "SUBJECTID")
     private String SubjectID;
-    @Column(name = "SUBJECTFAMILYID")
-    private String SubjectFamilyID;
     @Column(name = "SUBJECTNAME")
     private String SubjectName;
     @Column(name = "SUBJECTCODE")
     private String SubjectCode;
 
     //SubjectDefinitions le da la llave a
-    @OneToMany(mappedBy = "SUBJECTDEFINITIONS", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "subjectDefinitions", cascade = CascadeType.ALL)
     private List<SubjectTeachersEntity> SubjectTeachers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "SUBJECTDEFINITIONS", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "subjectDefinitions", cascade = CascadeType.ALL)
     private List<PensumSubjectEntity> pensumSubject = new ArrayList<>();
+
 
     @ManyToOne
     @JoinColumn(name = "SUBJECTFAMILYID", referencedColumnName = "SUBJECTFAMILYID")

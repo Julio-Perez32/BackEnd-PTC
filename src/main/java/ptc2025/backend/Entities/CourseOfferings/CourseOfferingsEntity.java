@@ -33,16 +33,16 @@ public class CourseOfferingsEntity {
     @Column(name = "COURSEOFFERINGID")
     private String CourseOfferingID;
 
-    @OneToMany(mappedBy = "courseofferings", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "courseOfferings", cascade = CascadeType.ALL)
     private List<EvaluationPlansEntity> evaluationPlans = new ArrayList<>();
 
-    @OneToMany(mappedBy = "courseofferings", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "courseOfferings", cascade = CascadeType.ALL)
     private List<CourseEnrollmentEntity> courseEnrollment = new ArrayList<>();
 
-    @OneToMany(mappedBy = "courseofferings", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "courseOfferings", cascade = CascadeType.ALL)
     private List<CourseOfferingSchedulesEntity> courseOfferingSchedules = new ArrayList<>();
 
-    @OneToMany(mappedBy = "courseofferings", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "courseOfferings", cascade = CascadeType.ALL)
     private List<CourseOfferingsTeachersEntity> courseOfferingsTeachers = new ArrayList<>();
 
     @ManyToOne

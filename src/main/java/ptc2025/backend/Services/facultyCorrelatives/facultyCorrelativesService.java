@@ -57,7 +57,7 @@ public class facultyCorrelativesService {
             FacultiesEntity faculties = repoFaculties.findById(dto.getCorrelativeID())
                     .orElseThrow(()-> new IllegalArgumentException("Facultad no encontrada"));
         }else {
-            correlativo.setFaculties(null);
+            correlativo.setFaculty(null);
         }
 
         facultyCorrelativesEntity actulizado = repo.save(correlativo);
@@ -85,9 +85,9 @@ public class facultyCorrelativesService {
         facultyCorrelativesDTO dto = new facultyCorrelativesDTO();
         dto.setCorrelativeID(entity.getCorrelativeID());
         dto.setCorrelativeNumber(entity.getCorrelativeNumber());
-        if(entity.getFaculties() != null){
-            dto.setFacultyName(entity.getFaculties().getFacultyName());
-            dto.setFacultyName(entity.getFaculties().getFacultyID());
+        if(entity.getFaculty() != null){
+            dto.setFacultyName(entity.getFaculty().getFacultyName());
+            dto.setFacultyName(entity.getFaculty().getFacultyID());
         }else {
             dto.setFacultyName("Sin Facultad aisgnada");
             dto.setFacultyID(null);

@@ -27,7 +27,7 @@ public class SubjectTeachersEntity {
 
     @ManyToOne
     @JoinColumn(name = "EMPLOYEEID", referencedColumnName = "EMPLOYEEID")
-    private EmployeeEntity Employee;
+    private EmployeeEntity employee;
 
     @ManyToOne
     @JoinColumn(name = "SUBJECTID", referencedColumnName = "SUBJECTID")

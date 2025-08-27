@@ -34,13 +34,13 @@ public class YearCyclesEntity {
     private LocalDate endDate;
 
 
-    @OneToMany(mappedBy = "yearcycle", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "yearCycles", cascade = CascadeType.ALL)
     private List<CareerCycleAvailabilityEntity> careerCycleAvailability = new ArrayList<>();
 
-    @OneToMany(mappedBy = "yearcycle", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "yearCycles", cascade = CascadeType.ALL)
     private List<StudentCycleEnrollmentEntity> studentCycleEnrollment = new ArrayList<>();
 
-    @OneToMany(mappedBy = "yearcycle", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "yearCycles", cascade = CascadeType.ALL)
     private List<CourseOfferingsEntity> courseOfferings = new ArrayList<>();
 
     @ManyToOne
@@ -48,7 +48,7 @@ public class YearCyclesEntity {
     private CycleTypesEntity cycleTypes;
 
     @ManyToOne
-    @JoinColumn(name = "ACADEMICYEAR", referencedColumnName = "ACADEMICYEAR")
-    private AcademicYearEntity academicYear;
+    @JoinColumn(name = "ACADEMICYEARID", referencedColumnName = "ACADEMICYEARID")
+    private AcademicYearEntity ACADEMICYEAR;
 
 }

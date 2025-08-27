@@ -42,13 +42,13 @@ public class EmployeeEntity {
     @JoinColumn(name = "PERSONID", referencedColumnName = "PERSONID")
     private PeopleEntity people;
 
-    @OneToMany(mappedBy = "employees", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<FacultyDeansEntity> facultyDeans = new ArrayList<>();
 
-    @OneToMany(mappedBy = "employees", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<CourseOfferingsTeachersEntity> courseOfferingsTeachers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "employees", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<SubjectTeachersEntity> subjectTeachers = new ArrayList<>();
 
     @ManyToOne
