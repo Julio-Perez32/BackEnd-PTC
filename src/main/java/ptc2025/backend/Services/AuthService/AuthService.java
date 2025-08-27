@@ -17,7 +17,7 @@ public class AuthService {
                         return new LoginResponseDTO(
                                 false,
                                 "Contraseña incorrecta",
-                                user.getId(),           // <-- ID del usuario
+                                user.getId(),
                                 user.getEmail(),
                                 user.getSystemRoles() != null ? user.getSystemRoles().getRoleName() : null,
                                 user.getPeople() != null ? user.getPeople().getFirstName() : null
@@ -27,7 +27,7 @@ public class AuthService {
                     return new LoginResponseDTO(
                             true,
                             "Inicio de sesión exitoso",
-                            user.getId(),           // <-- ID del usuario
+                            user.getId(),
                             user.getEmail(),
                             user.getSystemRoles() != null ? user.getSystemRoles().getRoleName() : null,
                             user.getPeople() != null ? user.getPeople().getFirstName() : null
