@@ -12,4 +12,7 @@ public class RequirementConditionsDTO {
     private String ConditionID;
     private String RequirementID;
     private String SubjectID;
+
+    private String requirements;
+    private String subject;
 }

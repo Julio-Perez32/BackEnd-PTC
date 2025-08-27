@@ -13,21 +13,11 @@ import java.time.LocalDate;
 public class DocumentDTO {
 
     @NotBlank(message = "El ID del documento es obligatorio")
-    private String id;
+    private String documentID;
+    @NotBlank
+    private String documentCategoryID;
+    @NotBlank
+    private String documentName;
 
-    @NotBlank(message = "El nombre del documento es obligatorio")
-    private String name;
-
-    @NotBlank(message = "El tipo de documento es obligatorio")
-    private String type;
-
-    private LocalDate uploadDate;
-
-    @NotBlank(message = "El propietario es obligatorio")
-    private String ownerId;
-
-    private Boolean isActive = true;
-
-    @NotBlank(message = "La categoría es obligatoria")
-    private String categoriesId;
+    private String documentCategory;
 }

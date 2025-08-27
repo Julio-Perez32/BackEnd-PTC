@@ -6,6 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.Documents.DocumentEntity;
+import ptc2025.backend.Entities.Requirements.RequirementsEntity;
+import ptc2025.backend.Entities.Students.StudentsEntity;
+import ptc2025.backend.Entities.SubjectDefinitions.SubjectDefinitionsEntity;
 
 import java.time.LocalDate;
 
@@ -22,12 +26,6 @@ public class StudentDocumentsEntity {
     @Column(name = "STUDENTDOCUMENTID")
     private String studentDocumentID;
 
-    @Column(name = "STUDENTID")
-    private String studentID;
-
-    @Column(name = "DOCUMENTID")
-    private String documentID;
-
     @Column(name = "SUBMITTED")
     private Character submitted;
 
@@ -36,4 +34,12 @@ public class StudentDocumentsEntity {
 
     @Column(name = "VERIFIED")
     private Character verified;
+
+    @ManyToOne
+    @JoinColumn(name = "STUDENTID", referencedColumnName = "STUDENTID")
+    private StudentsEntity students;
+
+    @ManyToOne
+    @JoinColumn(name = "DOCUMENTID", referencedColumnName = "DOCUMENTID")
+    private DocumentEntity document;
 }

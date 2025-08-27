@@ -6,9 +6,13 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Pensum.PensumEntity;
 import ptc2025.backend.Entities.RequirementConditions.RequirementConditionsEntity;
+import ptc2025.backend.Entities.Requirements.RequirementsEntity;
+import ptc2025.backend.Entities.SubjectDefinitions.SubjectDefinitionsEntity;
 import ptc2025.backend.Models.DTO.Pensum.PensumDTO;
 import ptc2025.backend.Models.DTO.RequirementConditions.RequirementConditionsDTO;
 import ptc2025.backend.Respositories.RequirementConditions.RequirementConditionsRepository;
+import ptc2025.backend.Respositories.Requirements.RequirementsRepository;
+import ptc2025.backend.Respositories.SubjectDefinitions.SubjectDefinitionsRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +23,12 @@ public class RequirementConditionsService {
 
     @Autowired
     RequirementConditionsRepository repo;
+
+    @Autowired
+    RequirementsRepository repoRequirement;
+
+    @Autowired
+    SubjectDefinitionsRepository repoSubjectDefinitions;
 
     public RequirementConditionsDTO convertToRequirementDTO(RequirementConditionsEntity entity){
         RequirementConditionsDTO dto = new RequirementConditionsDTO();
@@ -41,14 +51,24 @@ public class RequirementConditionsService {
     public RequirementConditionsEntity convertToRequirementEntity(RequirementConditionsDTO dto){
         RequirementConditionsEntity entity = new RequirementConditionsEntity();
         entity.setConditionID(dto.getConditionID());
-        entity.setRequirementID(dto.getRequirementID());
-        entity.setSubjectID(dto.getSubjectID());
+
+        if(dto.getRequirementID() != null){
+            RequirementsEntity requirements = repoRequirement.findById(dto.getRequirementID()).orElseThrow(
+                    () -> new IllegalArgumentException("Requisito no encontrado con ID " + dto.getRequirementID()));
+            entity.setRequirements(requirements);
+        }
+
+        if(dto.getSubjectID() != null){
+            SubjectDefinitionsEntity subjectDefinitions = repoSubjectDefinitions.findById(dto.getSubjectID()).orElseThrow(
+                    () -> new IllegalArgumentException("Materia no encontrada con ID " + dto.getSubjectID()));
+            entity.setSubjectDefinitions(subjectDefinitions);
+        }
         return entity;
     }
 
     public List<RequirementConditionsDTO> getAllRequirements(){
-        List<RequirementConditionsEntity> pensa = repo.findAll();
-        return pensa.stream()
+        List<RequirementConditionsEntity> requirementsConditions = repo.findAll();
+        return requirementsConditions.stream()
                 .map(this::convertToRequirementDTO)
                 .collect(Collectors.toList());
     }
@@ -70,8 +90,22 @@ public class RequirementConditionsService {
 
     public RequirementConditionsDTO updateRequirementCondition (String id, RequirementConditionsDTO json){
         RequirementConditionsEntity exists = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Requisito no encontrado"));
-        exists.setRequirementID(json.getRequirementID());
-        exists.setSubjectID(json.getSubjectID());
+
+        if(json.getSubjectID() != null){
+            SubjectDefinitionsEntity subjectDefinitions = repoSubjectDefinitions.findById(json.getSubjectID()).orElseThrow(
+                    () -> new IllegalArgumentException("Materia no encontrada con ID " + json.getSubjectID()));
+            exists.setSubjectDefinitions(subjectDefinitions);
+        }else {
+            exists.setSubjectDefinitions(null);
+        }
+
+        if(json.getRequirementID() != null){
+            RequirementsEntity requirements = repoRequirement.findById(json.getRequirementID()).orElseThrow(
+                    () -> new IllegalArgumentException("Requisito no encontrado con ID " + json.getRequirementID()));
+            exists.setRequirements(requirements);
+        }else {
+            exists.setRequirements(null);
+        }
 
         RequirementConditionsEntity updatedRequirement = repo.save(exists);
 
