@@ -25,6 +25,9 @@ public class SubjectDefinitionsService {
     @Autowired
     SubjectFamiliesRepository repoSubjectFamilies;
 
+    @Autowired
+    SubjectDefinitionsRepository repoSubjectDefinitions;
+
     public SubjectDefinitionsDTO convertToDefinitionDTO(SubjectDefinitionsEntity entity){
         SubjectDefinitionsDTO dto = new SubjectDefinitionsDTO();
         dto.setSubjectID(entity.getSubjectID());
@@ -42,14 +45,18 @@ public class SubjectDefinitionsService {
 
     public SubjectDefinitionsEntity convertToDefinitionEntity(SubjectDefinitionsDTO dto){
         SubjectDefinitionsEntity entity = new SubjectDefinitionsEntity();
-        entity.setSubjectID(dto.getSubjectID());
         entity.setSubjectName(dto.getSubjectName());
         entity.setSubjectCode(dto.getSubjectCode());
 
         if(dto.getSubjectFamilyID() != null){
             SubjectFamiliesEntity families = repoSubjectFamilies.findById(dto.getSubjectFamilyID()).orElseThrow(
-                    () -> new IllegalArgumentException("Materias no encontradas con ID" + dto.getSubjectFamilyID()));
+                    () -> new IllegalArgumentException("Familia de Materias no encontradas con ID" + dto.getSubjectFamilyID()));
             entity.setSubjectFamilies(families);
+        }
+
+        if (dto.getSubjectID() != null) {
+            SubjectDefinitionsEntity subjectDefinitions = repoSubjectDefinitions.findById(dto.getSubjectID()).orElseThrow(
+                    () -> new IllegalArgumentException("Materia no encontrada con ID " + dto.getSubjectID()));
         }
 
         return entity;
@@ -79,13 +86,17 @@ public class SubjectDefinitionsService {
 
     public SubjectDefinitionsDTO updateDefinition(String id,SubjectDefinitionsDTO json){
         SubjectDefinitionsEntity exists = repo.findById(id).orElseThrow(() -> new IllegalArgumentException(""));
-        exists.setSubjectFamilyID(json.getSubjectFamilyID());
         exists.setSubjectName(json.getSubjectName());
         exists.setSubjectCode(json.getSubjectCode());
 
         if (json.getSubjectID() != null) {
+            SubjectDefinitionsEntity subjectDefinitions = repoSubjectDefinitions.findById(json.getSubjectID()).orElseThrow(
+                    () -> new IllegalArgumentException("Materia no encontrada con ID " + json.getSubjectID()));
+        }
+
+        if (json.getSubjectFamilyID() != null) {
             SubjectFamiliesEntity subjectFamilies = repoSubjectFamilies.findById(json.getSubjectFamilyID()).orElseThrow(
-                    () -> new IllegalArgumentException("Materia no encontrada con ID " + json.getSubjectFamilyID()));
+                    () -> new IllegalArgumentException("Familia de Materia no encontrada con ID " + json.getSubjectFamilyID()));
         }
 
         SubjectDefinitionsEntity updated = repo.save(exists);

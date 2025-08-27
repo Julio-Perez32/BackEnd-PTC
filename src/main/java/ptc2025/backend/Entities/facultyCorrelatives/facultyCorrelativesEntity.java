@@ -33,5 +33,5 @@ public class facultyCorrelativesEntity {
 
     @ManyToOne
     @JoinColumn(name = "FACULTYID", referencedColumnName = "FACULTYID")
-    private FacultiesEntity faculties;
+    private FacultiesEntity faculty;
 }

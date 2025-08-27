@@ -7,10 +7,14 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
+import ptc2025.backend.Entities.FacultyDeans.FacultyDeansEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Entities.YearCycles.YearCyclesEntity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "ACADEMICYEARS")
@@ -42,6 +46,9 @@ public class AcademicYearEntity {
 
     @Column(name = "DEFAULTCYCLEDURATION")
     private Integer defaultCycleDuration;
+
+    @OneToMany(mappedBy = "ACADEMICYEAR", cascade = CascadeType.ALL)
+    private List<YearCyclesEntity> yearCycles = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "UNIVERSITYID", referencedColumnName = "UNIVERSITYID")

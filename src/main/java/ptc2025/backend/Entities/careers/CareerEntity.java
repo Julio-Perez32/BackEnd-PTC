@@ -12,6 +12,7 @@ import ptc2025.backend.Entities.Modalities.ModalitiesEntity;
 import ptc2025.backend.Entities.Pensum.PensumEntity;
 import ptc2025.backend.Entities.YearCycles.YearCyclesEntity;
 import ptc2025.backend.Entities.careerCycleAvailability.CareerCycleAvailabilityEntity;
+import ptc2025.backend.Entities.careerSocialServiceProjects.CareerSocialServiceProjectEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +69,9 @@ public class CareerEntity {
     @OneToMany(mappedBy = "career", cascade = CascadeType.ALL)
     private List<CareerCycleAvailabilityEntity> careerCycleAvailability = new ArrayList<>();
 
-    @OneToMany(mappedBy = "carrer", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "career", cascade = CascadeType.ALL)
     private  List<PensumEntity> pensum = new ArrayList<>();
+
+    @OneToMany(mappedBy = "career", cascade = CascadeType.ALL)
+    private  List<CareerSocialServiceProjectEntity> socialServiceProjects = new ArrayList<>();
 }

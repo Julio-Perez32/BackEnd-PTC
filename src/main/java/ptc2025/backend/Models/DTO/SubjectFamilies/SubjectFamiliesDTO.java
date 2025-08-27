@@ -10,7 +10,6 @@ import lombok.Setter;
 public class SubjectFamiliesDTO {
 
     private String subjectFamilyID;
-    @NotBlank
     private String facultyID;
     @NotBlank @Size(max = 10)
     private String subjectPrefix;
@@ -22,4 +21,5 @@ public class SubjectFamiliesDTO {
     private Long lastAssignedNumber;
 
     private String faculty;
+    private String facultyName;
 }

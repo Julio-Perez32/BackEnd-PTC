@@ -46,8 +46,8 @@ public class YearCyclesService {
         dto.setId(yearCyclesEntity.getId());
         dto.setStartDate(yearCyclesEntity.getStartDate());
         dto.setEndDate(yearCyclesEntity.getEndDate());
-        if(yearCyclesEntity.getAcademicYear() != null){
-            dto.setAcademicyear(yearCyclesEntity.getAcademicYear().getAcademicYearId());
+        if(yearCyclesEntity.getACADEMICYEAR() != null){
+            dto.setAcademicyear(yearCyclesEntity.getACADEMICYEAR().getAcademicYearId());
         }else {
             dto.setAcademicyear("Sin año academico Asignado");
             dto.setAcademicyear(null);
@@ -84,7 +84,7 @@ public class YearCyclesService {
         if(data.getAcademicYearID() != null){
             AcademicYearEntity academicYear = academicYearRepo.findById(data.getAcademicYearID())
                     .orElseThrow(() -> new IllegalArgumentException("año academico no encontrado con ID: " + data.getAcademicYearID()));
-            entity.setAcademicYear(academicYear);
+            entity.setACADEMICYEAR(academicYear);
         }
         if(data.getCycleTypeID() != null){
             CycleTypesEntity cycleTypes = cycleTypesRepo.findById(data.getCycleTypeID())
@@ -101,9 +101,9 @@ public class YearCyclesService {
         if(json.getAcademicYearID() != null){
             AcademicYearEntity academicYear = academicYearRepo.findById(json.getCycleTypeID())
                     .orElseThrow(() -> new IllegalArgumentException("Año academico no encontrado con ID: " + json.getCycleTypeID()));
-            existente.setAcademicYear(academicYear);
+            existente.setACADEMICYEAR(academicYear);
         }else {
-            existente.setAcademicYear(null);
+            existente.setACADEMICYEAR(null);
         }
         if(json.getCycletype() != null){
             CycleTypesEntity cycleTypes = cycleTypesRepo.findById(json.getCycleTypeID())

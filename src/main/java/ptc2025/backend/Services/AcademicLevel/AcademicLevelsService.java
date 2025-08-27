@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class AcademicLevelsService {
+public class    AcademicLevelsService {
 
     @Autowired
     AcademicLevelsRepository repo;

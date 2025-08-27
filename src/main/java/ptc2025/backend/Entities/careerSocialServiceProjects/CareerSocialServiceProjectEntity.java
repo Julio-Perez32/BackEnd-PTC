@@ -1,22 +1,30 @@
 package ptc2025.backend.Entities.careerSocialServiceProjects;
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import ptc2025.backend.Entities.SocialService.SocialServiceEntity;
-import ptc2025.backend.Entities.Universities.UniversityEntity;
+import lombok.ToString;
+import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.SocialServiceProjects.SocialServiceProjectsEntity;
+import ptc2025.backend.Entities.StudentCareerEnrollments.StudentCareerEnrollmentsEntity;
 import ptc2025.backend.Entities.careers.CareerEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 //careerSocialServiceProjects
 @Entity
 @Table(name = "CAREERSOCIALSERVICEPROJECTS")
-@Getter
-@Setter
+@Getter @Setter @EqualsAndHashCode @ToString
 public class CareerSocialServiceProjectEntity {
 
     @Id
+    @GenericGenerator(name = "careerProjectid", strategy = "guid")
+    @GeneratedValue(generator = "careerProjectid")
     @Column(name = "CAREERPROJECTID")
     private String id;
+
 
     //Llave de career
     @ManyToOne
@@ -26,7 +34,7 @@ public class CareerSocialServiceProjectEntity {
     //llave de socialserviceproyects
     @ManyToOne
     @JoinColumn(name = "SOCIALSERVICEPROJECTID", referencedColumnName = "SOCIALSERVICEPROJECTID")
-    private SocialServiceEntity socialService;
+    private SocialServiceProjectsEntity SocialServiceProject;
 
 
 

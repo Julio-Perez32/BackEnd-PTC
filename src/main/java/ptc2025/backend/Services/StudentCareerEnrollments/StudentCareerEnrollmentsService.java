@@ -4,9 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.SocialServiceProjects.SocialServiceProjectsEntity;
 import ptc2025.backend.Entities.StudentCareerEnrollments.StudentCareerEnrollmentsEntity;
 import ptc2025.backend.Entities.Students.StudentsEntity;
+import ptc2025.backend.Entities.careerSocialServiceProjects.CareerSocialServiceProjectEntity;
 import ptc2025.backend.Models.DTO.StudentCareerEnrollments.StudentCareerEnrollmentsDTO;
+import ptc2025.backend.Respositories.SocialService.SocialServiceRespository;
 import ptc2025.backend.Respositories.StudentCareerEnrollments.StudentCareerEnrollmentsRepository;
 import ptc2025.backend.Respositories.Students.StudentsRepository;
 import ptc2025.backend.Respositories.careerSocialServiceProjects.CareerSocialServiceProjectRepository;
@@ -29,7 +32,10 @@ public class StudentCareerEnrollmentsService {
     private StudentsRepository studentsRepository;
 
     @Autowired
-    private CareerSocialServiceProjectRepository careerSocialRepo;
+    SocialServiceRespository repoSocialService;
+
+    @Autowired
+    CareerSocialServiceProjectRepository repoCareerSocial;
 
     // GET
     public List<StudentCareerEnrollmentsDTO> getAllEnrollments(){
@@ -70,11 +76,10 @@ public class StudentCareerEnrollmentsService {
                     .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado con ID: " + dto.getStudentID()));
             exists.setStudent(student);
         }
-        if(dto.getCareerSocialServiceProjectID() != null){
-            ptc2025.backend.Entities.careerSocialServiceProjects.CareerSocialServiceProjectEntity project =
-                    careerSocialRepo.findById(dto.getCareerSocialServiceProjectID())
-                            .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado con ID: " + dto.getCareerSocialServiceProjectID()));
-            exists.setCareerSocialServiceProject(project);
+        if(dto.getSocialServiceProjectID() != null){
+            SocialServiceProjectsEntity project = repoSocialService.findById(dto.getSocialServiceProjectID()).orElseThrow(
+                    () -> new IllegalArgumentException("Proyecto no encontrado con ID: " + dto.getSocialServiceProjectID()));
+            exists.setSocialServiceProject(project);
         }
 
         return convertToDTO(repo.save(exists));
@@ -107,14 +112,15 @@ public class StudentCareerEnrollmentsService {
 
         if(entity.getCareer() != null){
             dto.setCareerID(entity.getCareer().getId());
-            dto.setCareerName(entity.getCareer().getName());
+            dto.setCareerName(entity.getCareer().getNameCareer());
         }
         if(entity.getStudent() != null){
+            dto.setStudentName(entity.getStudent().getPeople().getFirstName());
             dto.setStudentID(entity.getStudent().getStudentID());
-            dto.setStudentName(entity.getStudent().getStudentName());
         }
-        if(entity.getCareerSocialServiceProject() != null){
-            dto.setCareerSocialServiceProjectID(entity.getCareerSocialServiceProject().getCareerId());
+        if(entity.getSocialServiceProject() != null){
+            dto.setSocialServiceProjectName(entity.getSocialServiceProject().getSocialServiceProjectName());
+            dto.setSocialServiceProjectID(entity.getSocialServiceProject().getSocialServiceProjectID());
         }
         return dto;
     }
@@ -141,11 +147,10 @@ public class StudentCareerEnrollmentsService {
                     .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado con ID: " + dto.getStudentID()));
             entity.setStudent(student);
         }
-        if(dto.getCareerSocialServiceProjectID() != null){
-            ptc2025.backend.Entities.careerSocialServiceProjects.CareerSocialServiceProjectEntity project =
-                    careerSocialRepo.findById(dto.getCareerSocialServiceProjectID())
-                            .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado con ID: " + dto.getCareerSocialServiceProjectID()));
-            entity.setCareerSocialServiceProject(project);
+        if(dto.getSocialServiceProjectID() != null){
+            SocialServiceProjectsEntity project = repoSocialService.findById(dto.getSocialServiceProjectID()).orElseThrow(
+                            () -> new IllegalArgumentException("Proyecto no encontrado con ID: " + dto.getSocialServiceProjectID()));
+            entity.setSocialServiceProject(project);
         }
 
         return entity;

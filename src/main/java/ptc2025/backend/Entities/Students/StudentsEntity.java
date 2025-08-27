@@ -7,6 +7,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 import ptc2025.backend.Entities.People.PeopleEntity;
+import ptc2025.backend.Entities.StudentCareerEnrollments.StudentCareerEnrollmentsEntity;
+import ptc2025.backend.Entities.StudentDocument.StudentDocumentsEntity;
 import ptc2025.backend.Entities.SubjectTeachers.SubjectTeachersEntity;
 
 import java.util.ArrayList;
@@ -22,13 +24,14 @@ public class  StudentsEntity {
     @GeneratedValue(generator = "studentID")
     @Column(name = "STUDENTID")
     private String studentID;
-    @Column(name = "STUDENTNAME")
-    private String studentName;
     @Column(name = "STUDENTCODE")
     private String studentCode;
 
-    @OneToMany(mappedBy = "STUDENTS", cascade = CascadeType.ALL)
-    private List<StudentsEntity> Students = new ArrayList<>();
+    @OneToMany(mappedBy = "students", cascade = CascadeType.ALL)
+    private List<StudentDocumentsEntity> studentDocument = new ArrayList<>();
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    private List<StudentCareerEnrollmentsEntity> studentCareerEnrollment = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "PERSONID", referencedColumnName = "PERSONID")

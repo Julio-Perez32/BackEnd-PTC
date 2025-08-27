@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import ptc2025.backend.Entities.SocialService.SocialServiceEntity;
+import ptc2025.backend.Entities.SocialServiceProjects.SocialServiceProjectsEntity;
 import ptc2025.backend.Entities.careerSocialServiceProjects.CareerSocialServiceProjectEntity;
 import ptc2025.backend.Entities.careers.CareerEntity;
 import ptc2025.backend.Models.DTO.careerSocialServiceProjects.CareerSocialServiceProjectDTO;
@@ -57,11 +57,11 @@ public class CareerSocialServiceProjectService {
             exist.setCareer(null);
         }
         if (dto.getSocialServiceProjectId() != null){
-            SocialServiceEntity social = socialServiceRespository.findById(dto.getSocialServiceProjectId())
+            SocialServiceProjectsEntity social = socialServiceRespository.findById(dto.getSocialServiceProjectId())
                     .orElseThrow(() -> new IllegalArgumentException("Carrera no encontrada con ID: " + dto.getSocialServiceProjectId()));
-            exist.setSocialService(social);
+            exist.setSocialServiceProject(social);
         }else{
-            exist.setSocialService(null);
+            exist.setSocialServiceProject(null);
         }
 
         CareerSocialServiceProjectEntity entity = repo.getById(id);
@@ -91,9 +91,9 @@ public class CareerSocialServiceProjectService {
             dto.setCareerName("Sin Carrera Asignada");
             dto.setCareerId(null);
         }
-        if(entity.getSocialService() != null){
-            dto.setSocialServiceProjectName(entity.getSocialService().getSocialServiceProjectName());
-            dto.setSocialServiceProjectId(entity.getSocialService().getSocialServiceProjectID());
+        if(entity.getSocialServiceProject() != null){
+            dto.setSocialServiceProjectName(entity.getSocialServiceProject().getSocialServiceProjectName());
+            dto.setSocialServiceProjectId(entity.getSocialServiceProject().getSocialServiceProjectID());
         }else{
             dto.setSocialServiceProjectName("Sin Servicio Social Asiganado");
             dto.setSocialServiceProjectId(null);
@@ -110,9 +110,9 @@ public class CareerSocialServiceProjectService {
             entity.setCareer(career);
         }
         if (dto.getSocialServiceProjectId() != null){
-            SocialServiceEntity social = socialServiceRespository.findById(dto.getSocialServiceProjectId())
+            SocialServiceProjectsEntity social = socialServiceRespository.findById(dto.getSocialServiceProjectId())
                     .orElseThrow(() -> new IllegalArgumentException("Carrera no encontrada con ID: " + dto.getSocialServiceProjectId()));
-            entity.setSocialService(social);
+            entity.setSocialServiceProject(social);
         }
 
 

@@ -32,23 +32,24 @@ public class SubjectFamiliesService {
 
     private SubjectFamiliesDTO convertToSubjectFamDTO(SubjectFamiliesEntity families) {
         SubjectFamiliesDTO dto = new SubjectFamiliesDTO();
-        dto.setSubjectFamilyID(families.getSubjectFamilyID());
         dto.setSubjectPrefix(families.getSubjectPrefix());
         dto.setReservedSlots(families.getReservedSlots());
         dto.setStartingNumber(families.getStartingNumber());
         dto.setLastAssignedNumber(families.getLastAssignedNumber());
 
         if(families.getFaculty() != null){
+            dto.setFacultyName(families.getFaculty().getFacultyName());
             dto.setFacultyID(families.getFaculty().getFacultyID());
         }else{
+            dto.setFacultyName("Sin facultad asignada");
             dto.setFacultyID(null);
         }
+
         return dto;
     }
 
     private SubjectFamiliesEntity convertToSubjectFamEntity(SubjectFamiliesDTO dto){
         SubjectFamiliesEntity entity = new SubjectFamiliesEntity();
-        entity.setSubjectFamilyID(dto.getSubjectFamilyID());
         entity.setSubjectPrefix(dto.getSubjectPrefix());
         entity.setReservedSlots(dto.getReservedSlots());
         entity.setStartingNumber(dto.getStartingNumber());

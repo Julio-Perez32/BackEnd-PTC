@@ -13,13 +13,11 @@ public class StudentCareerEnrollmentsDTO {
 
     private String studentCareerEnrollmentID;
 
-    @NotBlank
     private String careerID;
 
-    @NotBlank
     private String studentID;
 
-    private String careerSocialServiceProjectID;
+    private String SocialServiceProjectID;
 
     private LocalDate startDate;
     private LocalDate endDate;
@@ -33,5 +31,5 @@ public class StudentCareerEnrollmentsDTO {
     // Campos derivados para respuesta
     private String careerName;
     private String studentName;
-    private String careerSocialServiceProjectName;
+    private String SocialServiceProjectName;
 }

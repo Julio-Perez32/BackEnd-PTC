@@ -28,10 +28,10 @@ public class PensumEntity {
     @Column(name = "EFFECTIVEYEAR")
     private Long EffectiveYear;
 
-    @OneToMany(mappedBy = "PENSA", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "Pensum", cascade = CascadeType.ALL)
     private List<PensumSubjectEntity> PensumSubject = new ArrayList<>();
 
     @ManyToOne
-    @JoinColumn(name = "CAREERID", referencedColumnName = "CAREER")
+    @JoinColumn(name = "CAREERID", referencedColumnName = "CAREERID")
     private CareerEntity career;
 }

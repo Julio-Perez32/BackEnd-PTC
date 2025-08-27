@@ -29,7 +29,7 @@ public class DocumentEntity {
     @Column(name = "DOCUMENTNAME", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "STUDENTDOCUMENTS", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
     private List<StudentDocumentsEntity> studentDocuments = new ArrayList<>();
 
     @OneToOne

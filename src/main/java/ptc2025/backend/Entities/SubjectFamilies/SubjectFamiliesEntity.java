@@ -33,7 +33,7 @@ public class SubjectFamiliesEntity {
     private Long lastAssignedNumber;
 
     //SubjectFamilies le da la llave a
-    @OneToMany(mappedBy = "SUBJECTFAMILIES", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "subjectFamilies", cascade = CascadeType.ALL)
     private List<SubjectDefinitionsEntity> SubjectDefinitions = new ArrayList<>();
 
     //Faculties le da la llave a SubjectTeachers

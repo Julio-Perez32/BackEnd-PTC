@@ -25,12 +25,14 @@ public class AcademicLevelsController {
     AcademicLevelsService service;
 
     @GetMapping("/getAcademicLevels")
-    public ResponseEntity<Page<AcademicLevelsDTO>> getAcademicLevels(int page, int size){
+    public ResponseEntity<Page<AcademicLevelsDTO>> getAcademicLevels(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
         Page<AcademicLevelsDTO> levels = service.getAllAcademicLevels(page, size);
-        if(levels == null){
-            ResponseEntity.badRequest().body(Map.of(
-                    "status","No hay niveles registrados"
-            ));
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
         }
         return ResponseEntity.ok(levels);
     }

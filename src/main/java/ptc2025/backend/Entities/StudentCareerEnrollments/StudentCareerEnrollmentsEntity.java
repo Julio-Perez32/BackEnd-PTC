@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.SocialServiceProjects.SocialServiceProjectsEntity;
 import ptc2025.backend.Entities.Students.StudentsEntity;
 import ptc2025.backend.Entities.careerSocialServiceProjects.CareerSocialServiceProjectEntity;
 import ptc2025.backend.Entities.careers.CareerEntity;
@@ -33,8 +34,8 @@ public class StudentCareerEnrollmentsEntity {
 
     //la llave de
     @ManyToOne
-    @JoinColumn(name = "CAREERSOCIALSERVICEPROJECTID", referencedColumnName = "CAREERSOCIALSERVICEPROJECTID")
-    private CareerSocialServiceProjectEntity careerSocialServiceProject;
+    @JoinColumn(name = "SOCIALSERVICEPROJECTID", referencedColumnName = "SOCIALSERVICEPROJECTID")
+    private SocialServiceProjectsEntity socialServiceProject;
 
     @Column(name = "STARTDATE")
     private LocalDate startDate;
