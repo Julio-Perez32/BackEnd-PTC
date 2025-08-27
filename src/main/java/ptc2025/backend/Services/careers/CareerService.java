@@ -140,7 +140,7 @@ public class CareerService {
 
         if(entity.getCareerCode() != null){
             dto.setAcademicLevelName(entity.getAcademicLevels().getAcademicLevelName());
-            dto.setAcademicLevelName(entity.getAcademicLevels().getAcademicLevelID());
+            dto.setAcademicLevelId(entity.getAcademicLevels().getAcademicLevelID());
         }else{
             dto.setAcademicLevelName("Sin Nivel Academico Asignado");
             dto.setAcademicLevelId(null);
