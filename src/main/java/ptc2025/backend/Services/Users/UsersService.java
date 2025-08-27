@@ -2,6 +2,7 @@ package ptc2025.backend.Services.Users;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import ptc2025.backend.Respositories.Users.UsersRespository;
 import ptc2025.backend.Respositories.systemRoles.systemRolesRespository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 @Slf4j
 @Service
@@ -163,6 +165,10 @@ public class UsersService {
         }catch (EmptyResultDataAccessException e){
             throw new EmptyResultDataAccessException("No se encontro el usuario", 1);
         }
+    }
+    public Optional<UsersDTO> findById(String id){
+        Optional <UsersEntity> entity = repo.findById(id);
+        return entity.map(this::convertirUsuarioADTO);
     }
 }
 

@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ptc2025.backend.Entities.Users.UsersEntity;
 import ptc2025.backend.Models.DTO.Users.UsersDTO;
 import ptc2025.backend.Services.Users.UsersService;
 
@@ -15,6 +16,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/Users")
@@ -100,6 +102,15 @@ public class UsersController {
                 "message", "Error al eliminar el usuario",
                 "detail", e.getMessage()
             ));
+        }
+    }
+    @GetMapping("/findUsersById/{id}")
+    public ResponseEntity<UsersDTO> getUserId(@PathVariable String id){
+        Optional<UsersDTO> dto = services.findById(id);
+        if(dto.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }else {
+            return ResponseEntity.ok(dto.get());
         }
     }
 
