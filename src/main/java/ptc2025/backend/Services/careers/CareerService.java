@@ -7,6 +7,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.AcademicLevel.AcademicLevelsEntity;
+import ptc2025.backend.Entities.DegreeTypes.DegreeTypesEntity;
+import ptc2025.backend.Entities.Departments.DepartmentsEntity;
+import ptc2025.backend.Entities.Localities.LocalitiesEntity;
+import ptc2025.backend.Entities.Modalities.ModalitiesEntity;
 import ptc2025.backend.Entities.careers.CareerEntity;
 import ptc2025.backend.Models.DTO.careers.CareerDTO;
 import ptc2025.backend.Respositories.AcademicLevel.AcademicLevelsRepository;
@@ -67,13 +72,47 @@ public class CareerService {
 
     // PUT
     public CareerDTO updateCareer(String id, CareerDTO dto) {
-        if (!repo.existsById(id))
-            throw new IllegalArgumentException("La carrera con ID " + id + " no existe");
+        CareerEntity exist = repo.findById(id).orElseThrow(() -> new RuntimeException("El dato no pudo ser actualizado. Carrera no encontrada"));
 
-        CareerEntity entity = convertToEntity(dto);
-        entity.setId(id);
-        CareerEntity saved = repo.save(entity);
-        return convertToDTO(saved);
+        exist.setNameCarrer(dto.getName());
+        exist.setCareerCode(dto.getCareerCode());
+        exist.setDescription(dto.getDescription());
+        exist.setMinPassingScore(dto.getMinPassingScore());
+        exist.setMinMUC(dto.getMinMUC());
+        exist.setCompulsorySubjects(dto.getCompulsorySubjects());
+        exist.setTotalValueUnits(dto.getTotalValueUnits());
+
+        if (dto.getAcademicLevelId() != null){
+            AcademicLevelsEntity academicLevels = academicRepo.findById(dto.getAcademicLevelId())
+                    .orElseThrow(() -> new IllegalArgumentException("Nivel académico no encontrado"));
+            exist.setAcademicLevels(academicLevels);
+        }else {
+            exist.setAcademicLevels(null);
+        }
+        if (dto.getDegreeTypeId() != null){
+            DegreeTypesEntity degreeTypesEntity = degreeRepo.findById(dto.getDegreeTypeId())
+                    .orElseThrow(() -> new IllegalArgumentException("Tipo de grado no encontrado"));
+            exist.setDegreeTypes(degreeTypesEntity);
+        }else {
+            exist.setDegreeTypes(null);
+        }
+        if (dto.getModalityId() != null){
+            ModalitiesEntity modalities = modalityRepo.findById(dto.getModalityId())
+                    .orElseThrow(() -> new IllegalArgumentException("Modalidad no encontrada"));
+            exist.setModalities(modalities);
+        }else{
+            exist.setModalities(null);
+        }
+        if (dto.getDepartmentId() != null){
+            DepartmentsEntity modalities = departmentRepo.findById(dto.getDepartmentId())
+                    .orElseThrow(() -> new IllegalArgumentException("Departamento no encontrado"));
+            exist.setDepartments(modalities);
+        }else {
+            exist.setDepartments(null);
+        }
+
+        CareerEntity actualizado = repo.save(exist);
+        return convertToDTO(actualizado);
     }
 
     // DELETE
@@ -97,8 +136,40 @@ public class CareerService {
         dto.setDegreeTypeId(entity.getDegreeTypes().getId());
         dto.setModalityId(entity.getModalities().getId());
         dto.setDepartmentId(entity.getDepartments().getDepartmentID());
-        dto.setYearCycleId(entity.getYearCycles().getId()); // 👈 agregado
-        dto.setName(entity.getName());
+        dto.setName(entity.getNameCarrer());
+
+        if(entity.getCareerCode() != null){
+            dto.setAcademicLevelName(entity.getAcademicLevels().getAcademicLevelName());
+            dto.setAcademicLevelName(entity.getAcademicLevels().getAcademicLevelID());
+        }else{
+            dto.setAcademicLevelName("Sin Nivel Academico Asignado");
+            dto.setAcademicLevelId(null);
+        }
+
+        if(entity.getDegreeTypes() != null){
+            dto.setDegreeTypeName(entity.getDegreeTypes().getDegreeTypeName());
+            dto.setDegreeTypeName(entity.getDegreeTypes().getId());
+        }else{
+            dto.setDegreeTypeName("Sin Tipo de Nivel Academico Asignado");
+            dto.setDegreeTypeId(null);
+        }
+
+        if(entity.getModalities() != null){
+            dto.setModalityName(entity.getModalities().getModalityName());
+            dto.setModalityId(entity.getModalities().getId());
+        }else{
+            dto.setModalityName("Sin Nivel Academico Asignado");
+            dto.setModalityId(null);
+        }
+
+        if(entity.getDepartments() != null){
+            dto.setDepartmentName(entity.getDepartments().getDepartmentName());
+            dto.setDepartmentName(entity.getDepartments().getDepartmentID());
+        }else{
+            dto.setDepartmentName("Sin Departamente Asignado");
+            dto.setDepartmentId(null);
+        }
+
         dto.setCareerCode(entity.getCareerCode());
         dto.setDescription(entity.getDescription());
         dto.setMinPassingScore(entity.getMinPassingScore());
@@ -110,24 +181,35 @@ public class CareerService {
 
     private CareerEntity convertToEntity(CareerDTO dto) {
         CareerEntity entity = new CareerEntity();
-        entity.setId(dto.getId());
-        entity.setAcademicLevels(academicRepo.findById(dto.getAcademicLevelId())
-                .orElseThrow(() -> new IllegalArgumentException("Nivel académico no encontrado")));
-        entity.setDegreeTypes(degreeRepo.findById(dto.getDegreeTypeId())
-                .orElseThrow(() -> new IllegalArgumentException("Tipo de grado no encontrado")));
-        entity.setModalities(modalityRepo.findById(dto.getModalityId())
-                .orElseThrow(() -> new IllegalArgumentException("Modalidad no encontrada")));
-        entity.setDepartments(departmentRepo.findById(dto.getDepartmentId())
-                .orElseThrow(() -> new IllegalArgumentException("Departamento no encontrado")));
-        entity.setYearCycles(yearCycleRepo.findById(dto.getYearCycleId()) // 👈 agregado
-                .orElseThrow(() -> new IllegalArgumentException("Ciclo lectivo no encontrado")));
-        entity.setName(dto.getName());
+        entity.setNameCarrer(dto.getName());
         entity.setCareerCode(dto.getCareerCode());
         entity.setDescription(dto.getDescription());
         entity.setMinPassingScore(dto.getMinPassingScore());
         entity.setMinMUC(dto.getMinMUC());
         entity.setCompulsorySubjects(dto.getCompulsorySubjects());
         entity.setTotalValueUnits(dto.getTotalValueUnits());
+        if (dto.getAcademicLevelId() != null){
+            AcademicLevelsEntity academicLevels = academicRepo.findById(dto.getAcademicLevelId())
+                    .orElseThrow(() -> new IllegalArgumentException("Nivel académico no encontrado"));
+            entity.setAcademicLevels(academicLevels);
+        }
+        if (dto.getDegreeTypeId() != null){
+            DegreeTypesEntity degreeTypesEntity = degreeRepo.findById(dto.getDegreeTypeId())
+                    .orElseThrow(() -> new IllegalArgumentException("Tipo de grado no encontrado"));
+            entity.setDegreeTypes(degreeTypesEntity);
+        }
+        if (dto.getModalityId() != null){
+            ModalitiesEntity modalities = modalityRepo.findById(dto.getModalityId())
+                    .orElseThrow(() -> new IllegalArgumentException("Modalidad no encontrada"));
+            entity.setModalities(modalities);
+        }
+        if (dto.getDepartmentId() != null){
+            DepartmentsEntity modalities = departmentRepo.findById(dto.getDepartmentId())
+                    .orElseThrow(() -> new IllegalArgumentException("Departamento no encontrado"));
+            entity.setDepartments(modalities);
+        }
+
+
         return entity;
     }
 }

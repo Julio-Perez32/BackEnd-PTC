@@ -45,7 +45,7 @@ public class CareerEntity {
     private DepartmentsEntity departments;
 
     @Column(name = "CAREERNAME", nullable = false)
-    private String name;
+    private String nameCarrer;
 
     @Column(name = "CAREERCODE")
     private String careerCode;
