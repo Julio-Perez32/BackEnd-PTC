@@ -62,7 +62,7 @@ public class UsersService {
             dto.setPersonId(null);
         }
         //para convertir a DTO el rol del sistema del usuario
-        if(usuario.getPeople() != null){
+        if(usuario.getSystemRoles() != null){
             dto.setRolesName(usuario.getSystemRoles().getRoleName());
             dto.setRoleId(usuario.getSystemRoles().getRoleId());
         }else {
