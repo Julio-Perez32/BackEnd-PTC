@@ -3,15 +3,18 @@ package ptc2025.backend.Controller.RequirementConditions;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ptc2025.backend.Models.DTO.PlanComponents.PlanComponentsDTO;
 import ptc2025.backend.Models.DTO.RequirementConditions.RequirementConditionsDTO;
 import ptc2025.backend.Services.RequirementConditions.RequirementConditionsService;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -22,6 +25,22 @@ public class RequirementConditionsController {
     @Autowired
     RequirementConditionsService service;
 
+    @GetMapping("/getRequirementCondition")
+    public List<RequirementConditionsDTO> getRequirementCondition(){
+        return  service.getAllRequirements();
+    }
+    @GetMapping("/getRequirementConditionPagination")
+    public ResponseEntity<Page<RequirementConditionsDTO>> getRequirementConditionPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<RequirementConditionsDTO> levels = service.getRequirementConditionPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
     @PostMapping("/newRequirementCondition")
     public ResponseEntity<?> newRequirementConditions(@Valid @RequestBody RequirementConditionsDTO json, HttpServletRequest request){
         try{

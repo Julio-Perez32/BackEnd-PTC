@@ -3,6 +3,9 @@ package ptc2025.backend.Services.studentCycleEnrollments;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.StudentCareerEnrollments.StudentCareerEnrollmentsEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
@@ -34,6 +37,12 @@ public class StudentCycleEnrollmentService {
         return repo.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<StudentCycleEnrollmentDTO> getStudentCycleEnrollmentPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<StudentCycleEnrollmentEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertToDTO);
     }
 
     // POST

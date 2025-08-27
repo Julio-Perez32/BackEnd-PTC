@@ -2,6 +2,9 @@ package ptc2025.backend.Services.careerCycleAvailability;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.AcademicYear.AcademicYearEntity;
 import ptc2025.backend.Entities.CycleTypes.CycleTypesEntity;
@@ -35,6 +38,12 @@ public class CareerCycleAvailabilityService {
         return repo.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<CareerCycleAvailabilityDTO> getAvailabilityPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CareerCycleAvailabilityEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertToDTO);
     }
 
     public CareerCycleAvailabilityDTO insertAvailability(CareerCycleAvailabilityDTO data) {
@@ -100,6 +109,7 @@ public class CareerCycleAvailabilityService {
         if(entity.getCareer() != null){
             dto.setCareer(entity.getCareer().getCareerCode());
             dto.setCareerId(entity.getCareer().getId());
+
         }else {
             dto.setCareer("Sin Carrera Asignada");
             dto.setCareerId(null);

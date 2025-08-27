@@ -3,6 +3,9 @@ package ptc2025.backend.Services.Students;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.People.PeopleEntity;
 import ptc2025.backend.Entities.Students.StudentsEntity;
@@ -28,6 +31,12 @@ public class StudentsService {
         return students.stream()
                 .map(this::convertToStudentsDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<StudentsDTO> getStudentsPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<StudentsEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertToStudentsDTO);
     }
 
     public StudentsDTO convertToStudentsDTO(StudentsEntity students) {

@@ -15,18 +15,17 @@ public class AuthController {
     @PostMapping("/login")
     public LoginResponseDTO login(@RequestBody LoginRequestDTO loginRequest) {
         try {
-            return service.login(
-                    loginRequest.getEmail(),
-                    loginRequest.getPassword()
-            );
+            return service.login(loginRequest.getEmail(), loginRequest.getPassword());
         } catch (Exception e) {
             return new LoginResponseDTO(
                     false,
                     "Error en el servidor: " + e.getMessage(),
                     null,
                     null,
+                    null,
                     null
             );
         }
     }
+
 }

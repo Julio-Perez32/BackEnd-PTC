@@ -3,6 +3,9 @@ package ptc2025.backend.Services.SubjectDefinitions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Pensum.PensumEntity;
 import ptc2025.backend.Entities.SubjectDefinitions.SubjectDefinitionsEntity;
@@ -69,6 +72,11 @@ public class SubjectDefinitionsService {
                 .collect(Collectors.toList());
     }
 
+    public Page<SubjectDefinitionsDTO> getSubjectDefinitonPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<SubjectDefinitionsEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertToDefinitionDTO);
+    }
     public SubjectDefinitionsDTO insertDefintion(SubjectDefinitionsDTO dto){
         if(dto == null || dto.getSubjectFamilyID() == null || dto.getSubjectFamilyID().isBlank() || dto.getSubjectName() == null ||
                 dto.getSubjectName().isBlank() || dto.getSubjectCode() == null || dto.getSubjectCode().isBlank()){

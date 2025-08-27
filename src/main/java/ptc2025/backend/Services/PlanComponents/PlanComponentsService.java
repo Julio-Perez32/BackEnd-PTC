@@ -3,6 +3,9 @@ package ptc2025.backend.Services.PlanComponents;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import ptc2025.backend.Entities.EvaluationPlans.EvaluationPlansEntity;
@@ -29,6 +32,12 @@ public class PlanComponentsService {
         return components.stream()
                 .map(this:: convertirADTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<PlanComponentsDTO> getPlanComponentPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<PlanComponentsEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertirADTO);
     }
     //post
     public PlanComponentsDTO insertPlanComponents (@RequestBody PlanComponentsDTO dto){

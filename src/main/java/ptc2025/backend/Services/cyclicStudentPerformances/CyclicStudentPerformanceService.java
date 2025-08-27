@@ -2,6 +2,9 @@ package ptc2025.backend.Services.cyclicStudentPerformances;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.AcademicLevel.AcademicLevelsEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
@@ -27,6 +30,12 @@ public class CyclicStudentPerformanceService {
         return repo.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<CyclicStudentPerformanceDTO> getPerformancesPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CyclicStudentPerformanceEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertToDTO);
     }
 
     public CyclicStudentPerformanceDTO insertPerformance(CyclicStudentPerformanceDTO dto){

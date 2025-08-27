@@ -3,6 +3,7 @@ package ptc2025.backend.Controller.personTypes;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -23,9 +24,22 @@ public class personTypesController {
     @Autowired
     private personTypesService services;
 
-    @GetMapping("/getDataUniversity")
+    @GetMapping("/getPersonType")
     public List<personTypesDTO> getUniversity() {
         return services.getPersonType();
+    }
+
+    @GetMapping("/getPersonTypePagination")
+    public ResponseEntity<Page<personTypesDTO>> getPersonTypePagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<personTypesDTO> levels = services.getPersonTypePagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
     }
 
     @PostMapping("/newPersonType")

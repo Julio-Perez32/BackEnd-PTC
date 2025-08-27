@@ -3,6 +3,7 @@ package ptc2025.backend.Controller.SubjectFamilies;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,19 @@ public class SubjectFamiliesController {
 
     @GetMapping("/getSubjectFamilies")
     public List<SubjectFamiliesDTO> geSubjectFamilies(){return service.getSubjectFam();}
+
+    @GetMapping("/getSubjectFamiliesPagination")
+    public ResponseEntity<Page<SubjectFamiliesDTO>> getSubjectFamiliesPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<SubjectFamiliesDTO> levels = service.getSubjectFamPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
 
     @PostMapping("/newSubjectFamily")
     public ResponseEntity<?> newSubjectFamily(@Valid @RequestBody SubjectFamiliesDTO json, HttpServletRequest request){

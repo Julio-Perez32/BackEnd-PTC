@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,19 @@ public class StudentEvaluationsController {
 
     @GetMapping("/GetAllStudentsEvaluations")
     public List<StudentEvaluationsDTO> obtenerDatos(){return service.getAllStudentsEvaluations();}
+
+    @GetMapping("/getStudentEvaluationsPagination")
+    public ResponseEntity<Page<StudentEvaluationsDTO>> getStudentEvaluationPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<StudentEvaluationsDTO> levels = service.getStudentEvaluationPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
 
     @PostMapping("/AddStudentEvaluation")
     public ResponseEntity<?> AgregarRegistro(@Valid @RequestBody StudentEvaluationsDTO json, HttpServletRequest request){

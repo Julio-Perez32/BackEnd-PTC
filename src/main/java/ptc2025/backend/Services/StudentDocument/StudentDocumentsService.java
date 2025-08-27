@@ -3,6 +3,9 @@ package ptc2025.backend.Services.StudentDocument;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import ptc2025.backend.Entities.Documents.DocumentEntity;
@@ -34,6 +37,12 @@ public class StudentDocumentsService {
         return documents.stream()
                 .map(this:: convertirADTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<StudentDocumentsDTO> getStudentDocumentPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<StudentDocumentsEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertirADTO);
     }
     public StudentDocumentsDTO insertStudentDocuments(@RequestBody StudentDocumentsDTO dto){
         if (dto == null || dto.getStudentID() == null || dto.getStudentID().isBlank()

@@ -3,6 +3,9 @@ package ptc2025.backend.Services.CourseOfferingsTeachers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
 import ptc2025.backend.Entities.CourseOfferingsTeachers.CourseOfferingsTeachersEntity;
@@ -33,6 +36,12 @@ public class CourseOfferingsTeachersService {
         return teachers.stream()
                 .map(this::convertToOfferingsTeachersDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<CourseOfferingsTeachersDTO> getCourseOfferingTeachersPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CourseOfferingsTeachersEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertToOfferingsTeachersDTO);
     }
 
     private CourseOfferingsTeachersDTO convertToOfferingsTeachersDTO(CourseOfferingsTeachersEntity entity){

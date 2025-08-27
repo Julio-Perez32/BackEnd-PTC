@@ -3,7 +3,11 @@ package ptc2025.backend.Services.StudentCareerEnrollments;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Controller.StudentCareerEnrollments.StudentCareerEnrollmentsController;
 import ptc2025.backend.Entities.SocialServiceProjects.SocialServiceProjectsEntity;
 import ptc2025.backend.Entities.StudentCareerEnrollments.StudentCareerEnrollmentsEntity;
 import ptc2025.backend.Entities.Students.StudentsEntity;
@@ -43,6 +47,12 @@ public class StudentCareerEnrollmentsService {
                 .stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<StudentCareerEnrollmentsDTO> getStudentCareerEnrollmentPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<StudentCareerEnrollmentsEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertToDTO);
     }
 
     // INSERT

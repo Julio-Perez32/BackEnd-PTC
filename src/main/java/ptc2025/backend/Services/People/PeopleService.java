@@ -3,6 +3,9 @@ package ptc2025.backend.Services.People;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.People.PeopleEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
@@ -30,6 +33,12 @@ public class PeopleService {
         return people.stream()
                 .map(this::convertToPeopleDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<PeopleDTO> getPeoplePagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<PeopleEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertToPeopleDTO);
     }
 
     private PeopleDTO convertToPeopleDTO(PeopleEntity people){

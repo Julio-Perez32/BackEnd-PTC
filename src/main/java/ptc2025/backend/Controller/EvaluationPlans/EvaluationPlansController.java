@@ -3,6 +3,7 @@ package ptc2025.backend.Controller.EvaluationPlans;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,19 @@ public class EvaluationPlansController {
     @GetMapping("/getEvaluationPlan")
         public List<EvaluationPlansDTO> getEvaluationPlan(){
         return service.getEvaluationPlans();
+    }
+
+    @GetMapping("/getEvaluationPlansPagination")
+    public ResponseEntity<Page<EvaluationPlansDTO>> getEvaluationPlansPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<EvaluationPlansDTO> levels = service.getEvaluationPlansPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
     }
 
     @PostMapping("/insertEvaluationPlan")

@@ -3,6 +3,9 @@ package ptc2025.backend.Services.SubjectFamilies;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Faculties.FacultiesEntity;
 import ptc2025.backend.Entities.SubjectFamilies.SubjectFamiliesEntity;
@@ -28,6 +31,12 @@ public class SubjectFamiliesService {
         return families.stream()
                 .map(this::convertToSubjectFamDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<SubjectFamiliesDTO> getSubjectFamPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<SubjectFamiliesEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertToSubjectFamDTO);
     }
 
     private SubjectFamiliesDTO convertToSubjectFamDTO(SubjectFamiliesEntity families) {

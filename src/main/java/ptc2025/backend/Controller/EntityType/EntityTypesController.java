@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -28,6 +29,19 @@ public class EntityTypesController{
     @GetMapping("/getEntityType")
     public List<EntityTypesDTO> getEntityType(){
         return  service.getEntityTypes();
+    }
+
+    @GetMapping("/getEntityTypePagination")
+    public ResponseEntity<Page<EntityTypesDTO>> getEntityTypesPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<EntityTypesDTO> levels = service.getEntityTypesPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
     }
     @PostMapping("/newEntityType")
     public ResponseEntity<Map<String, Object>> newEntityType(

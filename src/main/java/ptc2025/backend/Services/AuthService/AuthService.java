@@ -17,8 +17,9 @@ public class AuthService {
                         return new LoginResponseDTO(
                                 false,
                                 "Contraseña incorrecta",
+                                user.getId(),
                                 user.getEmail(),
-                                user.getSystemRoles().getRoleName(),
+                                user.getSystemRoles() != null ? user.getSystemRoles().getRoleName() : null,
                                 user.getPeople() != null ? user.getPeople().getFirstName() : null
                         );
                     }
@@ -26,8 +27,9 @@ public class AuthService {
                     return new LoginResponseDTO(
                             true,
                             "Inicio de sesión exitoso",
+                            user.getId(),
                             user.getEmail(),
-                            user.getSystemRoles().getRoleName(),
+                            user.getSystemRoles() != null ? user.getSystemRoles().getRoleName() : null,
                             user.getPeople() != null ? user.getPeople().getFirstName() : null
                     );
                 })
@@ -36,7 +38,9 @@ public class AuthService {
                         "Usuario no encontrado",
                         null,
                         null,
+                        null,
                         null
                 ));
     }
+
 }

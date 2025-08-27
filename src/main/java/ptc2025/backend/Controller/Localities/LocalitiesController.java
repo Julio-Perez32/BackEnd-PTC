@@ -3,6 +3,7 @@ package ptc2025.backend.Controller.Localities;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,19 @@ public class LocalitiesController {
     @GetMapping("/getDataLocality")
     public List<LocalitiesDTO> getLocality(){
         return service.getLocalitiesService();
+    }
+
+    @GetMapping("/getLocalitiesPagination")
+    public ResponseEntity<Page<LocalitiesDTO>> getLocalitiesPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<LocalitiesDTO> levels = service.getLocalitiesPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
     }
     @PostMapping("/newLocality")
     public ResponseEntity<Map<String, Object>> registrarLocalidad(

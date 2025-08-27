@@ -3,6 +3,7 @@ package ptc2025.backend.Controller.SocialService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,19 @@ public class SocialServiceController {
     @GetMapping("/getDataSocialService")
     public List<SocialServiceDTO> getSocialService(){
         return services.getSocialService();
+    }
+
+    @GetMapping("/getSocialServicePagination")
+    public ResponseEntity<Page<SocialServiceDTO>> getSocialServicePagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<SocialServiceDTO> levels = services.getSocialServicePagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
     }
     @PostMapping("/newSocialService")
     public ResponseEntity<Map<String, Object>> registrarServicioSocial(

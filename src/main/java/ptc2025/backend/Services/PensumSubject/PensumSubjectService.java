@@ -3,6 +3,9 @@ package ptc2025.backend.Services.PensumSubject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Pensum.PensumEntity;
 import ptc2025.backend.Entities.PensumSubject.PensumSubjectEntity;
@@ -68,6 +71,12 @@ public class PensumSubjectService {
         return pensa.stream()
                 .map(this::convertToPensumSubjectDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<PensumSubjectDTO> getPensumSubjectsPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<PensumSubjectEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertToPensumSubjectDTO);
     }
 
     public PensumSubjectDTO insertPensumSubject(PensumSubjectDTO dto){

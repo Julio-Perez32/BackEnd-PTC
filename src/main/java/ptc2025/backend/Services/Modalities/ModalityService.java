@@ -1,9 +1,11 @@
 package ptc2025.backend.Services.Modalities;
 
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Modalities.ModalitiesEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
@@ -28,6 +30,12 @@ public class ModalityService {
         return modalities.stream()
                 .map(this::convertirModalidadesADTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<ModalitiesDTO> getModalitiesPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ModalitiesEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertirModalidadesADTO);
     }
 
     public ModalitiesDTO convertirModalidadesADTO(ModalitiesEntity modalida){

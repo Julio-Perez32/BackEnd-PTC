@@ -3,6 +3,7 @@ package ptc2025.backend.Controller.Faculties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,19 @@ public class FacultiesController {
 
     @GetMapping("/getFaculties")
     public List<FacultiesDTO> getFaculties(){return service.getAllFaculties();}
+
+    @GetMapping("/getFacultiesPagination")
+    public ResponseEntity<Page<FacultiesDTO>> getFacultiesPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<FacultiesDTO> levels = service.getFacultiesPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
 
     @PostMapping("/newFaculties")
     public ResponseEntity<?> newFaculty(@Valid @RequestBody FacultiesDTO json, HttpServletRequest request){

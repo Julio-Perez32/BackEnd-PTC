@@ -5,6 +5,7 @@ import jakarta.servlet.http.MappingMatch;
 import jakarta.validation.Valid;
 import org.hibernate.validator.constraints.pl.REGON;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,6 +29,19 @@ public class FacultyLocalitiesController {
 
     @GetMapping("/GetAllFacultyLocalities")
     public List<FacultyLocalitiesDTO> obtenerDatos(){ return service.getAllFacultyLocalities();}
+
+    @GetMapping("/getFacultiesLocalitiesPagination")
+    public ResponseEntity<Page<FacultyLocalitiesDTO>> getFacultiesLocalitiesPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<FacultyLocalitiesDTO> levels = service.getFacultiesLocalitiesPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
 
     @PostMapping("/AddFacultyLocality")
     public ResponseEntity<?> nuevaFacultadLocalidad(@Valid @RequestBody FacultyLocalitiesDTO json, HttpServletRequest request){
