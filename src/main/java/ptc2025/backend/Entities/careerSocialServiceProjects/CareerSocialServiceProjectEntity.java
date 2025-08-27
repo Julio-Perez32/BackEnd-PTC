@@ -1,12 +1,13 @@
 package ptc2025.backend.Entities.careerSocialServiceProjects;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import ptc2025.backend.Entities.SocialService.SocialServiceEntity;
+import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Entities.careers.CareerEntity;
 
+//careerSocialServiceProjects
 @Entity
 @Table(name = "CAREERSOCIALSERVICEPROJECTS")
 @Getter
@@ -17,9 +18,17 @@ public class CareerSocialServiceProjectEntity {
     @Column(name = "CAREERPROJECTID")
     private String id;
 
-    @Column(name = "CAREERID", nullable = false)
-    private String careerId;
+    //Llave de career
+    @ManyToOne
+    @JoinColumn(name = "CAREERID", referencedColumnName = "CAREERID")
+    private CareerEntity career;
 
-    @Column(name = "SOCIALSERVICEPROJECTID", nullable = false)
-    private String socialServiceProjectId;
+    //llave de socialserviceproyects
+    @ManyToOne
+    @JoinColumn(name = "SOCIALSERVICEPROJECTID", referencedColumnName = "SOCIALSERVICEPROJECTID")
+    private SocialServiceEntity socialService;
+
+
+
+
 }

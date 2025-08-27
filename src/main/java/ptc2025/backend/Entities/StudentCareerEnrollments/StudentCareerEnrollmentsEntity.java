@@ -8,6 +8,7 @@ import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 import ptc2025.backend.Entities.Students.StudentsEntity;
 import ptc2025.backend.Entities.careerSocialServiceProjects.CareerSocialServiceProjectEntity;
+import ptc2025.backend.Entities.careers.CareerEntity;
 
 import java.time.LocalDate;
 
@@ -24,12 +25,13 @@ public class StudentCareerEnrollmentsEntity {
 
     @ManyToOne
     @JoinColumn(name = "CAREERID", referencedColumnName = "CAREERID")
-    private ptc2025.backend.Entities.careers.CareerEntity career;
+    private CareerEntity career;
 
     @ManyToOne
     @JoinColumn(name = "STUDENTID", referencedColumnName = "STUDENTID")
     private StudentsEntity student;
 
+    //la llave de
     @ManyToOne
     @JoinColumn(name = "CAREERSOCIALSERVICEPROJECTID", referencedColumnName = "CAREERSOCIALSERVICEPROJECTID")
     private CareerSocialServiceProjectEntity careerSocialServiceProject;
