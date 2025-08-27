@@ -10,9 +10,10 @@ public class CareerCycleAvailabilityDTO {
 
     private String id;
 
-    @NotBlank(message = "El ciclo académico es obligatorio")
     private String yearCycleId;
 
-    @NotBlank(message = "El ID de la carrera es obligatorio")
     private String careerId;
+
+    private String career;
+    private String yearCycle;
 }
