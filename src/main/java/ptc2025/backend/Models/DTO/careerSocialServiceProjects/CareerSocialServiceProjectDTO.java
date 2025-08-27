@@ -15,4 +15,8 @@ public class CareerSocialServiceProjectDTO {
 
     @NotBlank(message = "El proyecto de servicio social es obligatorio")
     private String socialServiceProjectId;
+
+    private String careerName;
+
+    private String socialServiceProjectName;
 }

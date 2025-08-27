@@ -74,7 +74,7 @@ public class CareerService {
     public CareerDTO updateCareer(String id, CareerDTO dto) {
         CareerEntity exist = repo.findById(id).orElseThrow(() -> new RuntimeException("El dato no pudo ser actualizado. Carrera no encontrada"));
 
-        exist.setNameCarrer(dto.getName());
+        exist.setNameCareer(dto.getName());
         exist.setCareerCode(dto.getCareerCode());
         exist.setDescription(dto.getDescription());
         exist.setMinPassingScore(dto.getMinPassingScore());
@@ -136,7 +136,7 @@ public class CareerService {
         dto.setDegreeTypeId(entity.getDegreeTypes().getId());
         dto.setModalityId(entity.getModalities().getId());
         dto.setDepartmentId(entity.getDepartments().getDepartmentID());
-        dto.setName(entity.getNameCarrer());
+        dto.setName(entity.getNameCareer());
 
         if(entity.getCareerCode() != null){
             dto.setAcademicLevelName(entity.getAcademicLevels().getAcademicLevelName());
@@ -181,7 +181,7 @@ public class CareerService {
 
     private CareerEntity convertToEntity(CareerDTO dto) {
         CareerEntity entity = new CareerEntity();
-        entity.setNameCarrer(dto.getName());
+        entity.setNameCareer(dto.getName());
         entity.setCareerCode(dto.getCareerCode());
         entity.setDescription(dto.getDescription());
         entity.setMinPassingScore(dto.getMinPassingScore());

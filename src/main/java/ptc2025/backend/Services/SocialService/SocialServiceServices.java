@@ -48,7 +48,6 @@ public class SocialServiceServices {
 
         servicioExistente.setSocialServiceProjectName(dto.getSocialServiceProjectName());
         servicioExistente.setDescription(dto.getDescription());
-        SocialServiceEntity actualizado = repo.save(servicioExistente);
         if(dto.getUniversityID() != null){
             UniversityEntity university = repoUniversity.findById(dto.getUniversityID())
                     .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + dto.getUniversityID()));
@@ -56,6 +55,7 @@ public class SocialServiceServices {
         }else {
             servicioExistente.setUniversity(null);
         }
+        SocialServiceEntity actualizado = repo.save(servicioExistente);
         return convertirSSDTO(actualizado);
     }
     public boolean eliminarServicioSocial(String id){

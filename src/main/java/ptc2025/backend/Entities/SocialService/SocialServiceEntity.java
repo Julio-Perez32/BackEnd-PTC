@@ -6,8 +6,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.StudentCareerEnrollments.StudentCareerEnrollmentsEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Entities.careerCycleAvailability.CareerCycleAvailabilityEntity;
+import ptc2025.backend.Entities.careerSocialServiceProjects.CareerSocialServiceProjectEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+//SocialServiceProjects
 @Entity
 @Table(name = "SOCIALSERVICEPROJECTS")
 @Getter @Setter @ToString
@@ -23,8 +30,16 @@ public class SocialServiceEntity
     private String socialServiceProjectName;
     @Column(name = "DESCRIPTION")
     private String description;
-
+    //Llave de university
     @ManyToOne
     @JoinColumn(name = "UNIVERSITYID", referencedColumnName = "UNIVERSITYID")
     private UniversityEntity university;
+
+    //Dando sus llaves
+    @OneToMany(mappedBy = "socialService", cascade = CascadeType.ALL)
+    private List<CareerSocialServiceProjectEntity> careerSocialService = new ArrayList<>();
+
+    @OneToMany(mappedBy = "socialService", cascade = CascadeType.ALL)
+    private List<StudentCareerEnrollmentsEntity> studentCareerEnrollments = new ArrayList<>();
+
 }
