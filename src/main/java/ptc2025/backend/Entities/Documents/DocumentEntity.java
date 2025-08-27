@@ -18,7 +18,7 @@ import java.util.List;
 @Entity
 @Table(name = "DOCUMENTS")
 @Getter @Setter
-@ToString(exclude = "CATEGORIES") @EqualsAndHashCode
+@ToString @EqualsAndHashCode
 public class DocumentEntity {
 
     @Id
