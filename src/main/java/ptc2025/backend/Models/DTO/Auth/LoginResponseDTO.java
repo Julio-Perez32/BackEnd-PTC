@@ -11,6 +11,8 @@ import lombok.*;
 public class LoginResponseDTO {
     private boolean success;
     private String message;
+
+    private String userId;
     private String email;
     private String role;
     private String personName;
