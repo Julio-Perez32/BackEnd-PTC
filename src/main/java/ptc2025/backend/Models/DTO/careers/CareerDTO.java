@@ -30,13 +30,22 @@ public class CareerDTO {
     @NotBlank(message = "El nombre de la carrera no puede estar vacío")
     private String name;
 
-    @NotBlank(message = "El ciclo académico es obligatorio")
-    private String yearCycleId;
-
+    @NotBlank(message = "Ingrese el codigo de la carrera")
     private String careerCode;
+    @NotBlank(message = "Ingrese la descripcion de la carrera")
     private String description;
+    @NotBlank(message = "Ingrese la nota minima para la carrera")
     private Integer minPassingScore;
+    @NotBlank(message = "Ingrese el MUC minimo para la carrera")
     private Integer minMUC;
+    @NotBlank(message = "Ingrese las materias obligatorias de la carrera")
     private Integer compulsorySubjects;
+    @NotBlank(message = "Ingrese el total de unidades valorativas de la carrera")
     private Integer totalValueUnits;
+
+    private String academicLevelName;
+    private String modalityName;
+    private String degreeTypeName;
+    private String departmentName;
+
 }
