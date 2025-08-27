@@ -4,7 +4,9 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import ptc2025.backend.Controller.Users.UsersController;
 import ptc2025.backend.Entities.Users.UsersEntity;
+import ptc2025.backend.Models.DTO.Users.UsersDTO;
 
 import java.util.Optional;
 
