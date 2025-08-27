@@ -45,7 +45,7 @@ public class CourseOfferingsService {
 
         if(entity.getSubjectDefinitions() != null){
             dto.setSubject(entity.getSubjectDefinitions().getSubjectName());
-            dto.setSubject(entity.getSubjectDefinitions().getSubjectID());
+            dto.setSubjectID(entity.getSubjectDefinitions().getSubjectID());
         }else {
             dto.setSubject("Sin Materia Asignada");
             dto.setSubjectID(null);
