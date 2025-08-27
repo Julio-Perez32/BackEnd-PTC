@@ -31,4 +31,7 @@ public class StudentDocumentsDTO {
     @Pattern(regexp = "[YN]", message = "¿Se verifico? debe ser 'Y' o 'N'")
     private Character verified;
 
+    private String student;
+    private String document;
+
 }

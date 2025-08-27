@@ -24,7 +24,7 @@ public class DocumentService {
     private DocumentRepository repository;
 
     @Autowired
-    private DocumentCategoriesRepository categoriesRepository;
+    private DocumentCategoriesRepository repocategoriesRepository;
 
     // GET
     public List<DocumentDTO> getDocuments() {
@@ -44,39 +44,34 @@ public class DocumentService {
 
     // POST
     public DocumentDTO insertDocument(DocumentDTO dto) {
-        if (dto == null) {
-            throw new IllegalArgumentException("Documento no puede ser nulo o vacío");
+        if(dto == null || dto.getDocumentName() == null || dto.getDocumentName().isBlank()){
+            throw new IllegalArgumentException("Los campos deben de estar completos");
         }
-
-        if (repository.existsById(dto.getId())) {
-            throw new IllegalArgumentException("El documento con ID " + dto.getId() + " ya existe");
+        try{
+            DocumentEntity entity = convertToEntity(dto);
+            DocumentEntity save = repository.save(entity);
+            return convertToDTO(save);
+        }catch (Exception e){
+            log.error("Error al registrar el documento " + e.getMessage());
+            throw new IllegalArgumentException("Error al registrar el documento");
         }
-
-        DocumentCategoriesEntity category = categoriesRepository.findById(dto.getCategoriesId())
-                .orElseThrow(() -> new IllegalArgumentException("Categoría con ID " + dto.getCategoriesId() + " no existe"));
-
-        DocumentEntity entity = convertToEntity(dto);
-        entity.setCategories(category);
-
-        DocumentEntity saved = repository.save(entity);
-        return convertToDTO(saved);
     }
 
     // PUT
     public DocumentDTO updateDocument(String id, DocumentDTO dto) {
-        return repository.findById(id).map(entity -> {
-            entity.setName(dto.getName());
-            entity.setType(dto.getType());
-            entity.setUploadDate(dto.getUploadDate());
-            entity.setOwnerId(dto.getOwnerId());
-            entity.setIsActive(dto.getIsActive());
+        DocumentEntity exists = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Documento no encontrado"));
+        exists.setName(dto.getDocumentName());
 
-            DocumentCategoriesEntity category = categoriesRepository.findById(dto.getCategoriesId())
-                    .orElseThrow(() -> new IllegalArgumentException("Categoría con ID " + dto.getCategoriesId() + " no existe"));
-            entity.setCategories(category);
+        if(dto.getDocumentCategoryID() != null){
+            DocumentCategoriesEntity documentCategories = repocategoriesRepository.findById(dto.getDocumentCategoryID()).orElseThrow(
+                    () -> new IllegalArgumentException("Categoria de documento no econtrado con ID " +dto.getDocumentCategoryID()));
+            exists.setDocumentCategory(documentCategories);
+        }else {
+            exists.setDocumentCategory(null);
+        }
 
-            return convertToDTO(repository.save(entity));
-        }).orElseThrow(() -> new IllegalArgumentException("El documento con ID " + id + " no existe"));
+        DocumentEntity updatedDocument = repository.save(exists);
+        return convertToDTO(updatedDocument);
     }
 
     // DELETE
@@ -95,25 +90,26 @@ public class DocumentService {
     // Convertir a DTO
     private DocumentDTO convertToDTO(DocumentEntity entity) {
         DocumentDTO dto = new DocumentDTO();
-        dto.setId(entity.getId());
-        dto.setName(entity.getName());
-        dto.setType(entity.getType());
-        dto.setUploadDate(entity.getUploadDate());
-        dto.setOwnerId(entity.getOwnerId());
-        dto.setIsActive(entity.getIsActive());
-        dto.setCategoriesId(entity.getCategories().getId());
+        dto.setDocumentID(entity.getId());
+
+        if(entity.getDocumentCategory() != null){
+            dto.setDocumentCategoryID(entity.getDocumentCategory().getId());
+        }else {
+            dto.setDocumentCategoryID( null);
+        }
         return dto;
     }
 
     // Convertir a Entity
     private DocumentEntity convertToEntity(DocumentDTO dto) {
         DocumentEntity entity = new DocumentEntity();
-        entity.setId(dto.getId());
-        entity.setName(dto.getName());
-        entity.setType(dto.getType());
-        entity.setUploadDate(dto.getUploadDate());
-        entity.setOwnerId(dto.getOwnerId());
-        entity.setIsActive(dto.getIsActive());
+        entity.setId(dto.getDocumentID());
+
+        if (dto.getDocumentCategoryID() != null){
+            DocumentCategoriesEntity documentCategories = repocategoriesRepository.findById(dto.getDocumentCategoryID()).orElseThrow(
+                    () -> new IllegalArgumentException("Categoria de documento no encontrado con ID " + dto.getDocumentCategoryID()));
+            entity.setDocumentCategory(documentCategories);
+        }
         return entity;
     }
 }

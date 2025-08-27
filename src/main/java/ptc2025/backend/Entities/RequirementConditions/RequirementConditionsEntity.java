@@ -23,17 +23,11 @@ public class RequirementConditionsEntity {
     @GeneratedValue(generator = "ConditionID")
     @Column(name = "CONDITIONID")
     private String ConditionID;
-    @Column(name = "REQUIREMENTID")
-    private String RequirementID;
-    @Column(name = "SUBJECTID")
-    private String SubjectID;
 
-    //Faculties le da la llave a SubjectTeachers
     @ManyToOne
     @JoinColumn(name = "SUBJECTID", referencedColumnName = "SUBJECTID")
     private SubjectDefinitionsEntity subjectDefinitions;
 
-    //Faculties le da la llave a SubjectTeachers
     @ManyToOne
     @JoinColumn(name = "REQUIREMENTID", referencedColumnName = "REQUIREMENTID")
     private RequirementsEntity requirements;
