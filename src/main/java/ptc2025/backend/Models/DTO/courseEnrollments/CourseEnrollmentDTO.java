@@ -1,23 +1,28 @@
 package ptc2025.backend.Models.DTO.courseEnrollments;
 
-import jakarta.validation.constraints.*;
-import lombok.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@ToString
+@EqualsAndHashCode
 public class CourseEnrollmentDTO {
 
     private String id;
 
-    @NotBlank(message = "El ID de la oferta del curso es obligatorio")
+    @NotNull(message = "El ID de la oferta del curso es obligatorio")
     private String courseOfferingId;
 
-    @NotBlank(message = "El ID de la inscripción en la carrera es obligatorio")
+    @NotNull(message = "El ID de la inscripción en la carrera es obligatorio")
     private String studentCareerEnrollmentId;
 
     @NotBlank(message = "El estado de la inscripción es obligatorio")
@@ -31,4 +36,9 @@ public class CourseEnrollmentDTO {
     private LocalDate enrollmentDate;
 
     private Double meritUnit;
+
+    // Derivados (igual que en CareerDTO agregaron nombres relacionados)
+    private String courseOfferingName;
+    private String studentName;
+    private String careerName;
 }

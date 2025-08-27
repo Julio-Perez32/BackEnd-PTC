@@ -1,43 +1,44 @@
 package ptc2025.backend.Entities.courseEnrollments;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
 import ptc2025.backend.Entities.StudentCareerEnrollments.StudentCareerEnrollmentsEntity;
 
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "courseEnrollments")
+@Table(name = "COURSEENROLLMENTS")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@ToString
+@EqualsAndHashCode
 public class CourseEnrollmentEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "courseEnrollmentID")
+    @Column(name = "COURSEENROLLMENTID")
     private String id;
 
     @ManyToOne
-    @JoinColumn(name = "courseOfferingID", referencedColumnName = "courseOfferingID")
+    @JoinColumn(name = "COURSEOFFERINGID", referencedColumnName = "COURSEOFFERINGID")
     private CourseOfferingsEntity courseOfferings;
 
     @ManyToOne
-    @JoinColumn(name = "studentCareerEnrollmentID", referencedColumnName = "studentCareerEnrollmentID")
+    @JoinColumn(name = "STUDENTCAREERENROLLMENTID", referencedColumnName = "STUDENTCAREERENROLLMENTID")
     private StudentCareerEnrollmentsEntity studentCareerEnrollments;
 
-    @Column(name = "enrollmentStatus")
+    @Column(name = "ENROLLMENTSTATUS", nullable = false)
     private String enrollmentStatus;
 
-    @Column(name = "finalGrade")
+    @Column(name = "FINALGRADE")
     private Double finalGrade;
 
-    @Column(name = "enrollmentDate")
+    @Column(name = "ENROLLMENTDATE", nullable = false)
     private LocalDate enrollmentDate;
 
-    @Column(name = "meritUnit")
+    @Column(name = "MERITUNIT")
     private Double meritUnit;
 }

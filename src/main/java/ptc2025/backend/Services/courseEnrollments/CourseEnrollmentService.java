@@ -3,6 +3,9 @@ package ptc2025.backend.Services.courseEnrollments;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
 import ptc2025.backend.Entities.StudentCareerEnrollments.StudentCareerEnrollmentsEntity;
@@ -35,31 +38,51 @@ public class CourseEnrollmentService {
                 .collect(Collectors.toList());
     }
 
+    // GET DE PAGINACION
+    public Page<CourseEnrollmentDTO> getPaginatedEnrollments(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return repo.findAll(pageable).map(this::convertToDTO);
+    }
+
+
     // POST
     public CourseEnrollmentDTO insertEnrollment(CourseEnrollmentDTO dto) {
         if (dto == null) throw new IllegalArgumentException("Inscripción no puede ser nula");
+        if (repo.existsById(dto.getId())) throw new IllegalArgumentException("La inscripción ya existe");
+
         CourseEnrollmentEntity entity = convertToEntity(dto);
-        return convertToDTO(repo.save(entity));
+        CourseEnrollmentEntity saved = repo.save(entity);
+        return convertToDTO(saved);
     }
 
     // PUT
     public CourseEnrollmentDTO updateEnrollment(String id, CourseEnrollmentDTO dto) {
-        return repo.findById(id).map(existing -> {
-            existing.setEnrollmentStatus(dto.getEnrollmentStatus());
-            existing.setFinalGrade(dto.getFinalGrade());
-            existing.setEnrollmentDate(dto.getEnrollmentDate());
-            existing.setMeritUnit(dto.getMeritUnit());
+        CourseEnrollmentEntity exist = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("El dato no pudo ser actualizado. Inscripción no encontrada"));
 
+        exist.setEnrollmentStatus(dto.getEnrollmentStatus());
+        exist.setFinalGrade(dto.getFinalGrade());
+        exist.setEnrollmentDate(dto.getEnrollmentDate());
+        exist.setMeritUnit(dto.getMeritUnit());
+
+        if (dto.getCourseOfferingId() != null) {
             CourseOfferingsEntity co = courseOfferingsRepository.findById(dto.getCourseOfferingId())
                     .orElseThrow(() -> new IllegalArgumentException("No se encontró CourseOffering con ID: " + dto.getCourseOfferingId()));
-            existing.setCourseOfferings(co);
+            exist.setCourseOfferings(co);
+        } else {
+            exist.setCourseOfferings(null);
+        }
 
+        if (dto.getStudentCareerEnrollmentId() != null) {
             StudentCareerEnrollmentsEntity sce = studentCareerEnrollmentsRepository.findById(dto.getStudentCareerEnrollmentId())
                     .orElseThrow(() -> new IllegalArgumentException("No se encontró StudentCareerEnrollment con ID: " + dto.getStudentCareerEnrollmentId()));
-            existing.setStudentCareerEnrollments(sce);
+            exist.setStudentCareerEnrollments(sce);
+        } else {
+            exist.setStudentCareerEnrollments(null);
+        }
 
-            return convertToDTO(repo.save(existing));
-        }).orElseThrow(() -> new IllegalArgumentException("No se encontró inscripción con ID: " + id));
+        CourseEnrollmentEntity actualizado = repo.save(exist);
+        return convertToDTO(actualizado);
     }
 
     // DELETE
@@ -68,7 +91,8 @@ public class CourseEnrollmentService {
             if (repo.existsById(id)) {
                 repo.deleteById(id);
                 return true;
-            } else return false;
+            }
+            return false;
         } catch (EmptyResultDataAccessException e) {
             throw new EmptyResultDataAccessException("La inscripción con ID " + id + " no existe", 1);
         }
@@ -76,32 +100,49 @@ public class CourseEnrollmentService {
 
     // CONVERSIONES
     private CourseEnrollmentDTO convertToDTO(CourseEnrollmentEntity entity) {
-        return CourseEnrollmentDTO.builder()
-                .id(entity.getId())
-                .courseOfferingId(entity.getCourseOfferings().getCourseOfferingID())
-                .studentCareerEnrollmentId(entity.getStudentCareerEnrollments().getStudentCareerEnrollmentID())
-                .enrollmentStatus(entity.getEnrollmentStatus())
-                .finalGrade(entity.getFinalGrade())
-                .enrollmentDate(entity.getEnrollmentDate())
-                .meritUnit(entity.getMeritUnit())
-                .build();
+        CourseEnrollmentDTO dto = new CourseEnrollmentDTO();
+        dto.setId(entity.getId());
+
+        if (entity.getCourseOfferings() != null) {
+            dto.setCourseOfferingId(entity.getCourseOfferings().getCourseOfferingID());
+        } else {
+            dto.setCourseOfferingId(null);
+        }
+
+        if (entity.getStudentCareerEnrollments() != null) {
+            dto.setStudentCareerEnrollmentId(entity.getStudentCareerEnrollments().getStudentCareerEnrollmentID());
+        } else {
+            dto.setStudentCareerEnrollmentId(null);
+        }
+
+        dto.setEnrollmentStatus(entity.getEnrollmentStatus());
+        dto.setFinalGrade(entity.getFinalGrade());
+        dto.setEnrollmentDate(entity.getEnrollmentDate());
+        dto.setMeritUnit(entity.getMeritUnit());
+
+        return dto;
     }
 
     private CourseEnrollmentEntity convertToEntity(CourseEnrollmentDTO dto) {
-        CourseOfferingsEntity co = courseOfferingsRepository.findById(dto.getCourseOfferingId())
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró CourseOffering con ID: " + dto.getCourseOfferingId()));
+        CourseEnrollmentEntity entity = new CourseEnrollmentEntity();
+        entity.setId(dto.getId());
+        entity.setEnrollmentStatus(dto.getEnrollmentStatus());
+        entity.setFinalGrade(dto.getFinalGrade());
+        entity.setEnrollmentDate(dto.getEnrollmentDate());
+        entity.setMeritUnit(dto.getMeritUnit());
 
-        StudentCareerEnrollmentsEntity sce = studentCareerEnrollmentsRepository.findById(dto.getStudentCareerEnrollmentId())
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró StudentCareerEnrollment con ID: " + dto.getStudentCareerEnrollmentId()));
+        if (dto.getCourseOfferingId() != null) {
+            CourseOfferingsEntity co = courseOfferingsRepository.findById(dto.getCourseOfferingId())
+                    .orElseThrow(() -> new IllegalArgumentException("No se encontró CourseOffering con ID: " + dto.getCourseOfferingId()));
+            entity.setCourseOfferings(co);
+        }
 
-        return CourseEnrollmentEntity.builder()
-                .id(dto.getId())
-                .courseOfferings(co)
-                .studentCareerEnrollments(sce)
-                .enrollmentStatus(dto.getEnrollmentStatus())
-                .finalGrade(dto.getFinalGrade())
-                .enrollmentDate(dto.getEnrollmentDate())
-                .meritUnit(dto.getMeritUnit())
-                .build();
+        if (dto.getStudentCareerEnrollmentId() != null) {
+            StudentCareerEnrollmentsEntity sce = studentCareerEnrollmentsRepository.findById(dto.getStudentCareerEnrollmentId())
+                    .orElseThrow(() -> new IllegalArgumentException("No se encontró StudentCareerEnrollment con ID: " + dto.getStudentCareerEnrollmentId()));
+            entity.setStudentCareerEnrollments(sce);
+        }
+
+        return entity;
     }
 }
