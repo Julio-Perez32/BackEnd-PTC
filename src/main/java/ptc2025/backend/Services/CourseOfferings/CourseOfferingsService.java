@@ -52,22 +52,28 @@ public class CourseOfferingsService {
         CourseOfferingsDTO dto = new CourseOfferingsDTO();
         dto.setCourseOfferingID(entity.getCourseOfferingID());
 
-        if(entity.getSubjectDefinitions() != null){
+        if (entity.getSubjectDefinitions() != null) {
             dto.setSubject(entity.getSubjectDefinitions().getSubjectName());
             dto.setSubjectID(entity.getSubjectDefinitions().getSubjectID());
-        }else {
+        } else {
             dto.setSubject("Sin Materia Asignada");
             dto.setSubjectID(null);
         }
 
-        if(entity.getYearCycles() != null){
-            dto.setYearcycle(entity.getYearCycles().getId());
-        }else {
-            dto.setYearcycle("Sin Año Asignado");
-            dto.setYearcycle(null);
+        if (entity.getYearCycles() != null) {
+            dto.setYearCycleID(entity.getYearCycles().getId());
+            // Concatenamos startDate y endDate para mostrar el rango
+            dto.setYearcycleName(
+                    entity.getYearCycles().getStartDate() + " a " + entity.getYearCycles().getEndDate()
+            );
+        } else {
+            dto.setYearcycleName("Sin Año Asignado");
+            dto.setYearCycleID(null);
         }
+
         return dto;
     }
+
 
     public CourseOfferingsEntity convertToCoursesEntity(CourseOfferingsDTO dto){
         CourseOfferingsEntity entity = new CourseOfferingsEntity();

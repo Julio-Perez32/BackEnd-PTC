@@ -69,7 +69,7 @@ public class AcademicYearController {
                     ));
         }
     }
-    @PutMapping("/updateEvaluationPlan/{id}")
+    @PutMapping("/updateAcademicYear/{id}")
     public ResponseEntity<?> updateAcademicYear(@PathVariable String id, @Valid @RequestBody AcademicYearDTO dto, BindingResult binding ){
         if(binding.hasErrors()){
             Map<String, String> errors = new HashMap<>();

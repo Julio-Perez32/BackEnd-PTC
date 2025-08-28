@@ -80,7 +80,7 @@ public class CodeGeneratorsController {
         }
     }
 
-    @DeleteMapping("/DeleteUser/{id}")
+    @DeleteMapping("/DeleteCodeGenerator/{id}")
     public ResponseEntity<?> eliminarUsuario(@PathVariable String id){
         try{
             if (!service.deleteCode(id)){

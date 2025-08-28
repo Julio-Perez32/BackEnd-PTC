@@ -93,9 +93,9 @@ public class CodeGeneratorsService {
     }
     public CodeGeneratorsEntity convertToEntity (CodeGeneratorsDTO dto){
         CodeGeneratorsEntity entity = new CodeGeneratorsEntity();
-        dto.setPrefix(entity.getPrefix());
-        dto.setSuffixLength(entity.getSuffixLength());
-        dto.setLastAssignedNumber(entity.getLastAssignedNumber());
+        entity.setPrefix(dto.getPrefix());
+        entity.setSuffixLength(dto.getSuffixLength());
+        entity.setLastAssignedNumber(dto.getLastAssignedNumber());
         if(dto.getEntityTypeID() != null){
             EntityTypesEntity entityTypes = repoEntityType.findById(dto.getEntityTypeID())
                     .orElseThrow(() -> new IllegalArgumentException("Tipo de entidad no encontrada con ID: " + dto.getEntityTypeID()));
@@ -112,16 +112,15 @@ public class CodeGeneratorsService {
     public CodeGeneratorsDTO convertToDTO(CodeGeneratorsEntity entity){
         CodeGeneratorsDTO dto = new CodeGeneratorsDTO();
         dto.setGeneratorID(entity.getGeneratorID());
-        entity.setPrefix(dto.getPrefix());
-        entity.setSuffixLength(dto.getSuffixLength());
-        entity.setLastAssignedNumber(dto.getLastAssignedNumber());
+        dto.setPrefix(entity.getPrefix());
+        dto.setSuffixLength(entity.getSuffixLength());
+        dto.setLastAssignedNumber(entity.getLastAssignedNumber());
         if(entity.getEntityType() != null){
             dto.setEntityTypeName(entity.getEntityType().getEntityType());
             dto.setEntityTypeID(entity.getEntityType().getEntityTypeID());
         }
         if (entity.getFacultyCorrelative() != null) {
             dto.setFacultyCorrelativesID(entity.getFacultyCorrelative().getCorrelativeID());
-            //para evitar el conflicto de convirtio con el .valueOf el Intenger a String
             dto.setFacultyCorrelativesName(
                     String.valueOf(entity.getFacultyCorrelative().getCorrelativeNumber())
             );
