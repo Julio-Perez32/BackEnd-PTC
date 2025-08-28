@@ -44,24 +44,46 @@ public class CourseOfferingsTeachersService {
         return pageEntity.map(this::convertToOfferingsTeachersDTO);
     }
 
-    private CourseOfferingsTeachersDTO convertToOfferingsTeachersDTO(CourseOfferingsTeachersEntity entity){
+    private CourseOfferingsTeachersDTO convertToOfferingsTeachersDTO(CourseOfferingsTeachersEntity entity) {
         CourseOfferingsTeachersDTO dto = new CourseOfferingsTeachersDTO();
 
-        if(entity.getCourseOfferings() != null){
-            dto.setCoureOffering(entity.getCourseOfferings().getCourseOfferingID());
-        }else{
-            dto.setCoureOffering("Sin curso asignado");
+        // ID del CourseOfferingTeacher
+        dto.setCourseOfferingTeacherID(entity.getCourseOfferingTeacherID());
+
+        // CourseOffering
+        if (entity.getCourseOfferings() != null) {
+            dto.setCourseOfferingID(entity.getCourseOfferings().getCourseOfferingID());
+
+            if (entity.getCourseOfferings().getSubjectDefinitions() != null) {
+                dto.setCoureOffering(entity.getCourseOfferings().getSubjectDefinitions().getSubjectName());
+            } else {
+                dto.setCoureOffering("Sin curso asignado");
+            }
+        } else {
             dto.setCourseOfferingID(null);
+            dto.setCoureOffering("Sin curso asignado");
         }
 
-        if(entity.getEmployee() != null){
+        // Employee
+        if (entity.getEmployee() != null) {
             dto.setEmployeeID(entity.getEmployee().getId());
-        }else {
-            dto.setEmployeeID("Sin empleado asignado");
+
+            if (entity.getEmployee().getPeople() != null) {
+                dto.setEmployee(
+                        entity.getEmployee().getPeople().getFirstName() + " " +
+                                entity.getEmployee().getPeople().getLastName()
+                );
+            } else {
+                dto.setEmployee("Sin nombre asignado");
+            }
+        } else {
             dto.setEmployeeID(null);
+            dto.setEmployee("Sin empleado asignado");
         }
+
         return dto;
     }
+
 
     private CourseOfferingsTeachersEntity convertToOfferingsTeachersEntity(CourseOfferingsTeachersDTO dto){
         CourseOfferingsTeachersEntity entity = new CourseOfferingsTeachersEntity();

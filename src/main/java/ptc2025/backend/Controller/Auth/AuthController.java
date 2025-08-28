@@ -8,6 +8,7 @@ import ptc2025.backend.Services.AuthService.AuthService;
 
 @RestController
 @RequestMapping("/api/Auth")
+@CrossOrigin
 public class AuthController {
     @Autowired
     private AuthService service;

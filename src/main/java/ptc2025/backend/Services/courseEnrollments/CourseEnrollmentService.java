@@ -105,14 +105,40 @@ public class CourseEnrollmentService {
 
         if (entity.getCourseOfferings() != null) {
             dto.setCourseOfferingId(entity.getCourseOfferings().getCourseOfferingID());
+
+            // courseOfferingName desde SubjectDefinitions
+            if (entity.getCourseOfferings().getSubjectDefinitions() != null) {
+                dto.setCourseOfferingName(entity.getCourseOfferings().getSubjectDefinitions().getSubjectName());
+            } else {
+                dto.setCourseOfferingName(null);
+            }
         } else {
             dto.setCourseOfferingId(null);
+            dto.setCourseOfferingName(null);
         }
 
         if (entity.getStudentCareerEnrollments() != null) {
             dto.setStudentCareerEnrollmentId(entity.getStudentCareerEnrollments().getStudentCareerEnrollmentID());
+
+
+            if (entity.getStudentCareerEnrollments().getStudent() != null) {
+                dto.setStudentName(entity.getStudentCareerEnrollments().getStudent().getPeople().getFirstName()
+                        + " " + entity.getStudentCareerEnrollments().getStudent().getPeople().getLastName());
+            } else {
+                dto.setStudentName(null);
+            }
+
+            // careerName desde CareerEntity
+            if (entity.getStudentCareerEnrollments().getCareer() != null) {
+                dto.setCareerName(entity.getStudentCareerEnrollments().getCareer().getNameCareer());
+            } else {
+                dto.setCareerName(null);
+            }
+
         } else {
             dto.setStudentCareerEnrollmentId(null);
+            dto.setStudentName(null);
+            dto.setCareerName(null);
         }
 
         dto.setEnrollmentStatus(entity.getEnrollmentStatus());
@@ -122,6 +148,7 @@ public class CourseEnrollmentService {
 
         return dto;
     }
+
 
     private CourseEnrollmentEntity convertToEntity(CourseEnrollmentDTO dto) {
         CourseEnrollmentEntity entity = new CourseEnrollmentEntity();

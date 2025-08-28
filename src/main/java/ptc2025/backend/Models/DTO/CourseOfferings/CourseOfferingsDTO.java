@@ -16,5 +16,5 @@ public class CourseOfferingsDTO {
     private String YearCycleID;
 
     private String subject;
-    private String yearcycle;
+    private String yearcycleName;
 }

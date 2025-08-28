@@ -23,12 +23,12 @@ public class CareerCycleAvailabilityController {
     @Autowired
     private CareerCycleAvailabilityService service;
 
-    @GetMapping("/getAvailability")
+    @GetMapping("/getCareerCycleAvailability")
     public List<CareerCycleAvailabilityDTO> getAvailability() {
         return service.getAvailability();
     }
 
-    @GetMapping("/getAvailabilityPagination")
+    @GetMapping("/getCareerCycleAvailabilityPagination")
     public ResponseEntity<Page<CareerCycleAvailabilityDTO>> getAvailabilityPagination(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -41,7 +41,7 @@ public class CareerCycleAvailabilityController {
         return ResponseEntity.ok(levels);
     }
 
-    @PostMapping("/insertAvailability")
+    @PostMapping("/insertCareerCycleAvailability")
     public ResponseEntity<Map<String, Object>> insertAvailability(@Valid @RequestBody CareerCycleAvailabilityDTO dto, BindingResult binding) {
         if(binding.hasErrors()){
             Map<String, String> errors = new HashMap<>();
@@ -62,7 +62,7 @@ public class CareerCycleAvailabilityController {
         }
     }
 
-    @PutMapping("/updateAvailability/{id}")
+    @PutMapping("/updateCareerCycleAvailability/{id}")
     public ResponseEntity<?> updateAvailability(@PathVariable String id, @Valid @RequestBody CareerCycleAvailabilityDTO dto, BindingResult binding) {
         if(binding.hasErrors()){
             Map<String, String> errors = new HashMap<>();
@@ -83,7 +83,7 @@ public class CareerCycleAvailabilityController {
         }
     }
 
-    @DeleteMapping("/deleteAvailability/{id}")
+    @DeleteMapping("/deleteCareerCycleAvailability/{id}")
     public ResponseEntity<Map<String, Object>> deleteAvailability(@PathVariable String id){
         try{
             if(!service.deleteAvailability(id)){
