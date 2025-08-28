@@ -3,6 +3,7 @@ package ptc2025.backend.Controller.Notification;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,19 @@ public class NotificationController {
     @GetMapping("/getNotifications")
     public List<NotificationDTO> getNotification(){
         return  service.getNotification();
+    }
+
+    @GetMapping("/getNotificationPagination")
+    public ResponseEntity<Page<NotificationDTO>> getNotificationPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<NotificationDTO> levels = service.getNotificationPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
     }
     @PostMapping("/newNotification")
     public ResponseEntity<Map<String, Object>> newNotification(

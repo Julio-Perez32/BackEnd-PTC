@@ -4,6 +4,9 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import ptc2025.backend.Entities.AcademicYear.AcademicYearEntity;
@@ -41,6 +44,12 @@ public class StudentEvaluationsService {
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
 
+    }
+
+    public Page<StudentEvaluationsDTO> getStudentEvaluationPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<StudentEvaluationsEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertirADTO);
     }
 
     private StudentEvaluationsDTO convertirADTO(StudentEvaluationsEntity entity) {

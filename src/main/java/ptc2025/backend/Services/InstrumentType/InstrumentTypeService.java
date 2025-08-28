@@ -3,6 +3,9 @@ package ptc2025.backend.Services.InstrumentType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import ptc2025.backend.Entities.InstrumentType.InstrumentTypeEntity;
@@ -24,6 +27,12 @@ public class InstrumentTypeService {
         return instrumentos.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<InstrumentTypeDTO> getInstrumentTypePagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<InstrumentTypeEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertirADTO);
     }
 
     //Post

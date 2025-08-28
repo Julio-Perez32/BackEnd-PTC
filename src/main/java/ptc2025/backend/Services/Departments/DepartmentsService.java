@@ -3,6 +3,9 @@ package ptc2025.backend.Services.Departments;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Departments.DepartmentsEntity;
 import ptc2025.backend.Entities.Faculties.FacultiesEntity;
@@ -28,6 +31,12 @@ public class DepartmentsService {
         return departments.stream()
                 .map(this::convertToDepartmentsDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<DepartmentsDTO> getDepartmentsPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<DepartmentsEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertToDepartmentsDTO);
     }
 
     private DepartmentsDTO convertToDepartmentsDTO(DepartmentsEntity departments){

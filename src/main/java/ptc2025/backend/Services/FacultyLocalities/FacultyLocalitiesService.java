@@ -4,6 +4,9 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.EvaluationInstruments.EvaluationInstrumentsEntity;
 import ptc2025.backend.Entities.Faculties.FacultiesEntity;
@@ -37,6 +40,12 @@ public class FacultyLocalitiesService {
         return facultyLocalities.stream()
                 .map(this::ConvertirADTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<FacultyLocalitiesDTO> getFacultiesLocalitiesPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<FacultyLocalitiesEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::ConvertirADTO);
     }
 
     private FacultyLocalitiesDTO ConvertirADTO(FacultyLocalitiesEntity facultyLocalities) {

@@ -3,12 +3,14 @@ package ptc2025.backend.Controller.FacultyDeans;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ptc2025.backend.Exceptions.ExcepcionDatosDuplicados;
+import ptc2025.backend.Models.DTO.Faculties.FacultiesDTO;
 import ptc2025.backend.Models.DTO.FacultyDeans.FacultyDeansDTO;
 import ptc2025.backend.Services.FacultyDeans.FacultyDeansService;
 import ptc2025.backend.Services.FacultyLocalities.FacultyLocalitiesService;
@@ -28,6 +30,19 @@ public class FacultyDeansController {
 
     @GetMapping("/GetAllFacultyDeans")
     public List<FacultyDeansDTO> obtenerDatos() { return service.obtenerDatos();}
+
+    @GetMapping("/getAllFacultiesDeansPagination")
+    public ResponseEntity<Page<FacultyDeansDTO>> getFacultiesDeansPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<FacultyDeansDTO> levels = service.getFacultiesDeansPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
 
     @PostMapping("/addFacultyDean")
     public ResponseEntity<?> nuevoRegistro(@Valid @RequestBody FacultyDeansDTO json, HttpServletRequest request){

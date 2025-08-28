@@ -3,10 +3,12 @@ package ptc2025.backend.Controller.AcademicYears;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ptc2025.backend.Models.DTO.AcademicLevel.AcademicLevelsDTO;
 import ptc2025.backend.Models.DTO.AcademicYear.AcademicYearDTO;
 import ptc2025.backend.Services.AcademicYear.AcademicYearService;
 
@@ -25,6 +27,19 @@ public class AcademicYearController {
     @GetMapping("/getAcademicYear")
     public List<AcademicYearDTO> getAcademicYear(){
         return service.getAcademicYear();
+    }
+
+    @GetMapping("/getAcademicYearPagination")
+    public ResponseEntity<Page<AcademicYearDTO>> getAcademicYearPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<AcademicYearDTO> years = service.getAcademicYearPagination(page, size);
+
+        if(years.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(years);
     }
 
     @PostMapping("/insertAcademicYear")

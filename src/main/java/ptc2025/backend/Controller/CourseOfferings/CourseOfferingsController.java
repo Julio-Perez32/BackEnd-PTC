@@ -3,6 +3,7 @@ package ptc2025.backend.Controller.CourseOfferings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -27,6 +28,19 @@ public class CourseOfferingsController {
 
     @GetMapping("/getAllCourseOfferings")
     public List<CourseOfferingsDTO> getCourseOfferings(){ return service.getAllCourses();}
+
+    @GetMapping("/getAllCourseOfferingPagination")
+    public ResponseEntity<Page<CourseOfferingsDTO>> getAllCourseOfferingPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<CourseOfferingsDTO> levels = service.getAllCoursesPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
 
     @PostMapping("/insertCourseOffering")
     public ResponseEntity<?> insertCourseOffering(@Valid @RequestBody CourseOfferingsDTO usuario, HttpServletRequest request){

@@ -3,6 +3,7 @@ package ptc2025.backend.Controller.Pensum;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,19 @@ public class PensumController {
 
     @GetMapping("/getPensa")
     public List<PensumDTO> getPensa(){return service.getPensa();}
+
+    @GetMapping("/getPensumPagination")
+    public ResponseEntity<Page<PensumDTO>> getPensumPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<PensumDTO> levels = service.getPensumPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
 
     @PostMapping("/newPensum")
     public ResponseEntity<?> newPensum(@Valid @RequestBody PensumDTO json, HttpServletRequest request){

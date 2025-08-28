@@ -3,15 +3,18 @@ package ptc2025.backend.Controller.SubjectDefinitions;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ptc2025.backend.Models.DTO.Students.StudentsDTO;
 import ptc2025.backend.Models.DTO.SubjectDefinitions.SubjectDefinitionsDTO;
 import ptc2025.backend.Services.SubjectDefinitions.SubjectDefinitionsService;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -21,6 +24,23 @@ public class SubjectDefinitionsController {
 
     @Autowired
     SubjectDefinitionsService service;
+
+
+    @GetMapping("/getSubjectDefinition")
+    public List<SubjectDefinitionsDTO> getSubjectDefinition(){return service.getAllSubjectDefinitions();}
+
+    @GetMapping("/getSubjectDefinitionPagination")
+    public ResponseEntity<Page<SubjectDefinitionsDTO>> getSubjectDefinitionPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<SubjectDefinitionsDTO> levels = service.getSubjectDefinitonPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
 
     @PostMapping("/newSubjectDefinition")
     public ResponseEntity<?> newSubjectDefinition(@Valid @RequestBody SubjectDefinitionsDTO json, HttpServletRequest request){

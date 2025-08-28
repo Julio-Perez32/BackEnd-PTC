@@ -3,9 +3,14 @@ package ptc2025.backend.Services.AcademicYear;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.AcademicLevel.AcademicLevelsEntity;
 import ptc2025.backend.Entities.AcademicYear.AcademicYearEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Models.DTO.AcademicLevel.AcademicLevelsDTO;
 import ptc2025.backend.Models.DTO.AcademicYear.AcademicYearDTO;
 import ptc2025.backend.Respositories.AcademicYear.AcademicYearRepository;
 import ptc2025.backend.Respositories.Universities.UniversityRespository;
@@ -29,6 +34,12 @@ public class AcademicYearService {
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
 
+    }
+
+    public Page<AcademicYearDTO> getAcademicYearPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<AcademicYearEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertirADTO);
     }
 
     //POST

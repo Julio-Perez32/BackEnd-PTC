@@ -3,6 +3,9 @@ package ptc2025.backend.Services.SocialService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.SocialServiceProjects.SocialServiceProjectsEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
@@ -27,6 +30,12 @@ public class SocialServiceServices {
         return servicioSocial.stream()
                 .map(this::convertirSSDTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<SocialServiceDTO> getSocialServicePagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<SocialServiceProjectsEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertirSSDTO);
     }
     public SocialServiceDTO insertarServicioSocial(SocialServiceDTO dto){
         if(dto.getUniversityID() == null || dto.getUniversityID().isBlank() ||

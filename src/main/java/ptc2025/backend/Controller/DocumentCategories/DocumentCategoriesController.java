@@ -3,10 +3,12 @@ package ptc2025.backend.Controller.DocumentCategories;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.w3c.dom.Document;
 import ptc2025.backend.Models.DTO.DocumentCategories.DocumentCategoriesDTO;
 import ptc2025.backend.Services.DocumentCategories.DocumentCategoriesService;
 
@@ -25,6 +27,19 @@ public class DocumentCategoriesController {
 
     @GetMapping("/getAllDocumentCategories")
     public List<DocumentCategoriesDTO> getData() { return services.getDocumentCategories(); }
+
+    @GetMapping("/getAllDocumentCategoriesPagination")
+    public ResponseEntity<Page<DocumentCategoriesDTO>> getDocumentCategoriesPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<DocumentCategoriesDTO> levels = services.getDocumentCategoriesPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
 
     @PostMapping("/AddDocumentCategory")
     public ResponseEntity<?> nunevoDocumentCategory(@Valid @RequestBody DocumentCategoriesDTO json, HttpServletRequest request){

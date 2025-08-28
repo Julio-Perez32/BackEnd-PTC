@@ -2,6 +2,7 @@ package ptc2025.backend.Controller.CareerCycleAvailability;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,19 @@ public class CareerCycleAvailabilityController {
     @GetMapping("/getAvailability")
     public List<CareerCycleAvailabilityDTO> getAvailability() {
         return service.getAvailability();
+    }
+
+    @GetMapping("/getAvailabilityPagination")
+    public ResponseEntity<Page<CareerCycleAvailabilityDTO>> getAvailabilityPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<CareerCycleAvailabilityDTO> levels = service.getAvailabilityPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
     }
 
     @PostMapping("/insertAvailability")

@@ -3,6 +3,7 @@ package ptc2025.backend.Controller.Departments;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,19 @@ public class DepartmentsController {
 
     @RequestMapping("/getDepartments")
     public List<DepartmentsDTO> getDepartments(){return service.getAllDepartments();}
+
+    @GetMapping("/getDepartmentsPagination")
+    public ResponseEntity<Page<DepartmentsDTO>> getDepartmentsPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<DepartmentsDTO> levels = service.getDepartmentsPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
 
     @PostMapping("/newDepartment")
     public ResponseEntity<?> newDepartment(@Valid @RequestBody DepartmentsDTO json, HttpServletRequest request){

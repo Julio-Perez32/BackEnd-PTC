@@ -4,6 +4,7 @@ package ptc2025.backend.Controller.Modalities;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,19 @@ public class ModalitiesController {
 
     @GetMapping("/getModalities")
     public List<ModalitiesDTO> getData() { return service.getAllModalities(); }
+
+    @GetMapping("/getModalitiesPagination")
+    public ResponseEntity<Page<ModalitiesDTO>> getModalitiesPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<ModalitiesDTO> levels = service.getModalitiesPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
 
     @PostMapping("/insertModality")
     public ResponseEntity<?> nuevaModality(@Valid @RequestBody ModalitiesDTO json, HttpServletRequest request){

@@ -3,6 +3,9 @@ package ptc2025.backend.Services.DegreeTypes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.DegreeTypes.DegreeTypesEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
@@ -27,6 +30,12 @@ public class DegreeTypesService {
         return degreetype.stream()
                 .map(this::hacerdegreestypeADTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<DegreeTypesDTO> getAllDegreeTypesPagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<DegreeTypesEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::hacerdegreestypeADTO);
     }
 
     public DegreeTypesDTO insertarDatos(DegreeTypesDTO data) {

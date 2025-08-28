@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -26,6 +27,19 @@ public class PeopleController {
 
     @GetMapping("/getPeople")
     public List<PeopleDTO> getPeople(){return service.getAllPeople();}
+
+    @GetMapping("/getPeoplePagination")
+    public ResponseEntity<Page<PeopleDTO>> getPeoplePagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<PeopleDTO> levels = service.getPeoplePagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
 
     @PostMapping("/newPeople")
     public ResponseEntity<?> newPeople(@Valid @RequestBody PeopleDTO json, HttpServletRequest request){

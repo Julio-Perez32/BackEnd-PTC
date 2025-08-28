@@ -3,6 +3,9 @@ package ptc2025.backend.Services.personTypes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Entities.personTypes.personTypesEntity;
@@ -24,6 +27,12 @@ public class personTypesService {
         return universidad.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
+    }
+
+    public Page<personTypesDTO> getPersonTypePagination(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<personTypesEntity> pageEntity = repo.findAll(pageable);
+        return pageEntity.map(this::convertirADTO);
     }
     public personTypesDTO insertPersonTypes(personTypesDTO dto){
         // Validaciones combinadas

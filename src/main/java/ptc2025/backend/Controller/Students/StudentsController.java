@@ -3,6 +3,7 @@ package ptc2025.backend.Controller.Students;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,19 @@ public class StudentsController {
 
     @GetMapping("/getStudents")
     public List<StudentsDTO> getStudents(){return service.getAllStudents();}
+
+    @GetMapping("/getStudentsPagination")
+    public ResponseEntity<Page<StudentsDTO>> getStudentPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<StudentsDTO> levels = service.getStudentsPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
 
     @PostMapping("/newStudent")
     public ResponseEntity<?> newStudent(@Valid @RequestBody StudentsDTO json, HttpServletRequest request){
