@@ -9,6 +9,7 @@ import org.hibernate.annotations.GenericGenerator;
 import ptc2025.backend.Entities.DocumentCategories.DocumentCategoriesEntity;
 import ptc2025.backend.Entities.Notification.NotificationEntity;
 import ptc2025.backend.Entities.People.PeopleEntity;
+import ptc2025.backend.Entities.StudentEvaluations.StudentEvaluationsEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Entities.systemRoles.SystemRolesEntity;
 
@@ -46,7 +47,6 @@ public class UsersEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<NotificationEntity> notification = new ArrayList<>();
 
-
-
-
+    @OneToMany(mappedBy = "userID", cascade = CascadeType.ALL)
+    private List<StudentEvaluationsEntity> studentEvaluations = new ArrayList<>();
 }
