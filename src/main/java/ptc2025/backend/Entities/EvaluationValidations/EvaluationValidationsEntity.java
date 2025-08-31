@@ -6,13 +6,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
+import ptc2025.backend.Entities.Faculties.FacultiesEntity;
+import ptc2025.backend.Entities.StudentEvaluations.StudentEvaluationsEntity;
 
 import java.util.Date;
 
 @Entity
-@Table(name = "EVALUATIONVALIDATION")
+@Table(name = "EVALUATIONVALIDATIONS")
 @Getter @Setter @EqualsAndHashCode @ToString
-public class EvaluationValidationEntity {
+public class EvaluationValidationsEntity {
 
     @Id
     @GenericGenerator(name = "VALIDATIONID", strategy = "guid")
@@ -25,4 +27,17 @@ public class EvaluationValidationEntity {
     private Date reviewedAt;
     @Column(name = "COMMENTS")
     private String comments;
+
+    //Faculties le da la llave a SubjectTeachers
+    @ManyToOne
+    @JoinColumn(name = "STUDENTEVALUATIONID", referencedColumnName = "STUDENTEVALUATIONID")
+    private StudentEvaluationsEntity studentEvaluationID;
+
+    @ManyToOne
+    @JoinColumn(name = "CREATEDBY", referencedColumnName = "STUDENTEVALUATIONID")
+    private StudentEvaluationsEntity createdBy;
+
+    @ManyToOne
+    @JoinColumn(name = "REVIEWEDBY", referencedColumnName = "STUDENTEVALUATIONID")
+    private StudentEvaluationsEntity reviewedBy;
 }
