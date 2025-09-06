@@ -19,7 +19,9 @@ public class CloudinaryService {
 
     private final Cloudinary cloudinary;
 
-    public CloudinaryService(Cloudinary cloudinary) {this.cloudinary = cloudinary;}
+    public CloudinaryService(Cloudinary cloudinary) {
+        this.cloudinary = cloudinary;
+    }
 
     public String uploadImage(MultipartFile file)throws IOException{
         validateImage(file);
