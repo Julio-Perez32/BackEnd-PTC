@@ -13,9 +13,9 @@ import java.util.UUID;
 @Service
 public class CloudinaryService {
 
-    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
+    private static final long MAX_FILE_SIZE = 20 * 1024 * 1024;
 
-    private static final String[] ALLOWED_EXTENSIONS = {".jpg",".png",".jepg"};
+    private static final String[] ALLOWED_EXTENSIONS = {".jpg",".png",".jpeg"};
 
     private final Cloudinary cloudinary;
 
@@ -54,11 +54,11 @@ public class CloudinaryService {
 
     private void validateImage(MultipartFile file) {
         if(file.isEmpty()) throw new IllegalArgumentException("El archivo no puede estar vacío");
-        if(file.getSize() > MAX_FILE_SIZE) throw new IllegalArgumentException("El tamaño del archivo no puede exceder los 5MB");
+        if(file.getSize() > MAX_FILE_SIZE) throw new IllegalArgumentException("El tamaño del archivo no puede exceder los 20MB");
         String originalFileName = file.getOriginalFilename();
         if(originalFileName == null) throw new IllegalArgumentException("Nombre de archivo no valido");
         String extension = originalFileName.substring(originalFileName.lastIndexOf(".")).toLowerCase();
-        if(!Arrays.asList(ALLOWED_EXTENSIONS).contains(extension)) throw new IllegalArgumentException("Solo se permiten archivos .jpg, .jepg, y .png");
+        if(!Arrays.asList(ALLOWED_EXTENSIONS).contains(extension)) throw new IllegalArgumentException("Solo se permiten archivos .jpg, .jpeg, y .png");
         if(!file.getContentType().startsWith("image/")) throw new IllegalArgumentException("El archivo debe ser una imagen valida");
     }
 }
