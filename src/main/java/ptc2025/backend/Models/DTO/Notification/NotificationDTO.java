@@ -22,7 +22,6 @@ public class NotificationDTO {
     private String title;
     @Size(max = 300, message = "La descripción no debe exceder los 300 caracteres")
     private String body;
-    @NotBlank (message = "Ingrese la fecha de envio")
     private LocalDate sentAt;
 
     private String UserName;

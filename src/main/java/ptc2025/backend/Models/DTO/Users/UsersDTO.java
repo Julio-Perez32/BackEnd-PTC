@@ -16,16 +16,14 @@ import java.util.Date;
 public class UsersDTO {
 
     private String id;
-    @NotNull
+
     private String universityID;
-    @NotNull
     private String personId;
-    @NotNull
     private String roleId;
     @NotNull @Email
     private String email;
 
-    @NotNull @Size(min = 8, message = "La contraseña debe de ser de almenos por hay unos caracteres no jeje")
+    @NotNull @Size(min = 8, message = "La contraseña debe de tener 8 caracteres")
     private String contrasena;
 
 

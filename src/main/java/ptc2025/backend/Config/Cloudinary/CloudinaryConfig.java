@@ -16,6 +16,7 @@ public class CloudinaryConfig {
     private String apiKey;
     private String apiSecret;
 
+    @Bean
     public Cloudinary cloudinary(){
 
         Dotenv dotenv = Dotenv.load();

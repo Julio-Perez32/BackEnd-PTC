@@ -119,8 +119,8 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
         String method = request.getMethod();
 
         // Endpoints públicos
-        return (path.equals("/api/auth/login") && "POST".equals(method)) ||
-                (path.equals("/api/auth/register") && "POST".equals(method)) ||
-                (path.equals("/api/public/") && "GET".equals(method));
+        return (path.equals("/api/Auth/login") && "POST".equals(method)) ||
+                (path.equals("/api/Auth/register") && "POST".equals(method)) ||
+                (path.equals("/api/Public/") && "GET".equals(method));
     }
 }
