@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.CourseOfferingSchedules.CourseOfferingSchedulesEntity;
 import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Exceptions.ExceptionNotFound;
+import ptc2025.backend.Exceptions.ExceptionServerError;
 import ptc2025.backend.Models.DTO.CourseOfferingSchedules.CourseOfferingSchedulesDTO;
 import ptc2025.backend.Respositories.CourseOfferingSchedules.CourseOfferingSchedulesRepository;
 import ptc2025.backend.Respositories.CourseOfferings.CourseOfferingsRepository;
@@ -68,9 +70,9 @@ public class CourseOfferingSchedulesService {
             CourseOfferingSchedulesEntity entity = convertirAEntity(data);
             CourseOfferingSchedulesEntity courseOfferingSchedulesGuardado = repo.save(entity);
             return convertirADTO(courseOfferingSchedulesGuardado);
-        }catch (Exception e){
-            log.error("Error al registrar el nuevo dato" + e.getMessage());
-            throw new RuntimeException("Error al registrar el nuevo dato");
+        } catch (Exception e) {
+            log.error("Error al registrar el nuevo dato: " + e.getMessage());
+            throw new ExceptionServerError("Error interno al registrar el nuevo dato", e);
         }
     }
 
@@ -89,35 +91,45 @@ public class CourseOfferingSchedulesService {
     }
 
     public CourseOfferingSchedulesDTO actualizarDatos(String id, CourseOfferingSchedulesDTO json) {
-        CourseOfferingSchedulesEntity existente = repo.findById(id).orElseThrow(() -> new RuntimeException("Registro no encontrado"));
-        existente.setWeekday(json.getWeekday());
-        existente.setStartTime(json.getStartTime());
-        existente.setEndTime(json.getEndTime());
-        existente.setClassroom(json.getClassroom());
+        try {
+            CourseOfferingSchedulesEntity existente = repo.findById(id)
+                    .orElseThrow(() -> new ExceptionNotFound("Registro no encontrado con ID: " + id));
 
-        if(json.getCourseOfferingID() != null){
-            CourseOfferingsEntity courseOfferings = courseOfferingsRepo.findById(json.getCourseOfferingID())
-                    .orElseThrow(() -> new IllegalArgumentException("courseOffering no encontrada con ID: " + json.getCourseOfferingID()));
-            existente.setCourseOfferings(courseOfferings);
-        }else {
-            existente.setCourseOfferings(null);
+            existente.setWeekday(json.getWeekday());
+            existente.setStartTime(json.getStartTime());
+            existente.setEndTime(json.getEndTime());
+            existente.setClassroom(json.getClassroom());
+
+            if(json.getCourseOfferingID() != null){
+                CourseOfferingsEntity courseOfferings = courseOfferingsRepo.findById(json.getCourseOfferingID())
+                        .orElseThrow(() -> new IllegalArgumentException("courseOffering no encontrada con ID: " + json.getCourseOfferingID()));
+                existente.setCourseOfferings(courseOfferings);
+            } else {
+                existente.setCourseOfferings(null);
+            }
+
+            CourseOfferingSchedulesEntity courseOfferingSchedulesActualizado = repo.save(existente);
+            return convertirADTO(courseOfferingSchedulesActualizado);
+        } catch (ExceptionNotFound e) {
+            throw e; // se propaga directamente
+        } catch (Exception e) {
+            log.error("Error al actualizar el registro: " + e.getMessage());
+            throw new ExceptionServerError("Error interno al actualizar el registro", e);
         }
-
-        CourseOfferingSchedulesEntity courseOfferingSchedulesActualizado = repo.save(existente);
-        return convertirADTO(courseOfferingSchedulesActualizado);
     }
 
     public boolean eliminarcourseOfferingSchedule(String id) {
-        try{
-            CourseOfferingSchedulesEntity existente = repo.findById(id).orElse(null);
-            if (existente != null){
-                repo.deleteById(id);
-                return true;
-            }else {
-                return false;
-            }
-        }catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("No se encontro el registro", 1);
+        try {
+            CourseOfferingSchedulesEntity existente = repo.findById(id)
+                    .orElseThrow(() -> new ExceptionNotFound("No se encontró el registro con ID: " + id));
+
+            repo.deleteById(id);
+            return true;
+        } catch (EmptyResultDataAccessException e) {
+            throw new ExceptionNotFound("No se encontró el registro con ID: " + id);
+        } catch (Exception e) {
+            log.error("Error al eliminar el registro: " + e.getMessage());
+            throw new ExceptionServerError("Error interno al eliminar el registro", e);
         }
     }
 }

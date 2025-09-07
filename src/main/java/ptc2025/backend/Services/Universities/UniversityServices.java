@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Exceptions.ExceptionNotFound;
+import ptc2025.backend.Exceptions.ExceptionServerError;
 import ptc2025.backend.Models.DTO.Universities.UniversityDTO;
 import ptc2025.backend.Respositories.Universities.UniversityRespository;
 
@@ -19,88 +21,99 @@ import java.util.stream.Collectors;
 @Service
 public class UniversityServices {
 
-    //Inyectando el repositorio
     @Autowired
     UniversityRespository repo;
 
-    public List<UniversityDTO> getUniversityService(){
-        List<UniversityEntity> universidad = repo.findAll();
-        return universidad.stream()
-                .map(this::convertirAUniversityDTO)
-                .collect(Collectors.toList());
+    // Obtener todas las universidades
+    public List<UniversityDTO> getUniversityService() {
+        try {
+            List<UniversityEntity> universidad = repo.findAll();
+            return universidad.stream()
+                    .map(this::convertirAUniversityDTO)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error al obtener las universidades", e);
+            throw new ExceptionServerError("Error interno al obtener las universidades");
+        }
     }
 
-    public UniversityDTO insertarUniversidad(UniversityDTO dto){
+    // Insertar nueva universidad
+    public UniversityDTO insertarUniversidad(UniversityDTO dto) {
         // Validaciones combinadas
         if (dto.getUniversityName() == null || dto.getUniversityName().isBlank() ||
                 dto.getRector() == null || dto.getRector().isBlank() ||
                 dto.getWebPage() == null || dto.getWebPage().isBlank()) {
             throw new IllegalArgumentException("Todos los campos obligatorios deben estar completos: nombre de universidad, rector y página web.");
         }
+
         // Validación de URL
         if (!dto.getWebPage().matches("^https?://.+")) {
             throw new IllegalArgumentException("La página web debe iniciar con http:// o https://");
         }
+
         try {
-            // Convertir DTO → Entity
             UniversityEntity entidad = convertirAUniversityEntity(dto);
-
-            // Guardar en BD
             UniversityEntity guardado = repo.save(entidad);
-
-            // Convertir Entity → DTO
             return convertirAUniversityDTO(guardado);
-        }catch (Exception e){
-            log.error("Error al registrar una nueva universidad " + e.getMessage());
-            throw new RuntimeException("Error interno al guardar la universidad");
+        } catch (Exception e) {
+            log.error("Error al registrar una nueva universidad: " + e.getMessage(), e);
+            throw new ExceptionServerError("Error interno al guardar la universidad");
         }
-
     }
-    public UniversityDTO modificarUniversidad(String id, UniversityDTO dto){
-        UniversityEntity universidadExistente = repo.findById(id).orElseThrow(() -> new RuntimeException("El dato no pudo ser actualizado. Universidad no encontrada"));
-        //Actualizacion de los datos
-        universidadExistente.setUniversityName(dto.getUniversityName());
-        universidadExistente.setRector(dto.getRector());
-        universidadExistente.setWebPage(dto.getWebPage());
 
-        UniversityEntity actulizado = repo.save(universidadExistente);
-        return convertirAUniversityDTO(actulizado);
+    // Actualizar universidad
+    public UniversityDTO modificarUniversidad(String id, UniversityDTO dto) {
+        UniversityEntity universidadExistente = repo.findById(id)
+                .orElseThrow(() -> new ExceptionNotFound("El dato no pudo ser actualizado. Universidad no encontrada"));
 
-
-    }
-    public boolean elminarUniversidad (String id){
         try {
-            //Validacion de existencia de Universidad
+            universidadExistente.setUniversityName(dto.getUniversityName());
+            universidadExistente.setRector(dto.getRector());
+            universidadExistente.setWebPage(dto.getWebPage());
+
+            UniversityEntity actualizado = repo.save(universidadExistente);
+            return convertirAUniversityDTO(actualizado);
+        } catch (Exception e) {
+            log.error("Error al actualizar la universidad con ID " + id, e);
+            throw new ExceptionServerError("Error interno al actualizar la universidad");
+        }
+    }
+
+    // Eliminar universidad
+    public boolean elminarUniversidad(String id) {
+        try {
             UniversityEntity objUniversidad = repo.findById(id).orElse(null);
-            //Si existe se procede a eliminar
-            if (objUniversidad != null){
+
+            if (objUniversidad != null) {
                 repo.deleteById(id);
                 return true;
-            }else {
-                System.out.println("Universidad no encontrada");
-                return false;
+            } else {
+                throw new ExceptionNotFound("Universidad no encontrada con el ID: " + id);
             }
-        }catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("No se encontro ninguna Universidad con el ID:" + id + "para poder ser eliminada", 1);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ExceptionNotFound("No se encontró ninguna universidad con el ID: " + id + " para ser eliminada");
+        } catch (Exception e) {
+            log.error("Error interno al eliminar la universidad con ID " + id, e);
+            throw new ExceptionServerError("Error interno al eliminar la universidad");
         }
     }
-    //Conviertiendo los valores del Entity a la clase de DTO
-    private UniversityDTO convertirAUniversityDTO(UniversityEntity university){
+
+    // Convertir Entity → DTO
+    private UniversityDTO convertirAUniversityDTO(UniversityEntity university) {
         UniversityDTO DTO = new UniversityDTO();
         DTO.setUniversityID(university.getUniversityID());
         DTO.setUniversityName(university.getUniversityName());
         DTO.setRector(university.getRector());
         DTO.setWebPage(university.getWebPage());
         return DTO;
-
     }
-    //Convirtiendo DTO  a Entity
-    private UniversityEntity convertirAUniversityEntity(UniversityDTO dto){
+
+    // Convertir DTO → Entity
+    private UniversityEntity convertirAUniversityEntity(UniversityDTO dto) {
         UniversityEntity entity = new UniversityEntity();
         entity.setUniversityName(dto.getUniversityName());
         entity.setRector(dto.getRector());
         entity.setWebPage(dto.getWebPage());
         return entity;
     }
-
 }

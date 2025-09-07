@@ -16,6 +16,7 @@ import ptc2025.backend.Entities.StudentEvaluations.StudentEvaluationsEntity;
 import ptc2025.backend.Entities.Students.StudentsEntity;
 import ptc2025.backend.Entities.YearCycles.YearCyclesEntity;
 import ptc2025.backend.Entities.courseEnrollments.CourseEnrollmentEntity;
+import ptc2025.backend.Exceptions.ExceptionNotFound;
 import ptc2025.backend.Models.DTO.StudentEvaluations.StudentEvaluationsDTO;
 import ptc2025.backend.Respositories.PlanComponents.PlanComponentsRespository;
 import ptc2025.backend.Respositories.StudentEvaluations.StudentEvaluationsRepository;
@@ -40,15 +41,20 @@ public class StudentEvaluationsService {
 
     public List<StudentEvaluationsDTO> getAllStudentsEvaluations() {
         List<StudentEvaluationsEntity> students = repo.findAll();
+        if (students.isEmpty()) {
+            throw new ExceptionNotFound("No se encontraron registros de evaluaciones de estudiantes");
+        }
         return students.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
-
     }
 
     public Page<StudentEvaluationsDTO> getStudentEvaluationPagination(int page, int size){
         Pageable pageable = PageRequest.of(page, size);
         Page<StudentEvaluationsEntity> pageEntity = repo.findAll(pageable);
+        if (pageEntity.isEmpty()) {
+            throw new ExceptionNotFound("No se encontraron evaluaciones de estudiantes en la paginación");
+        }
         return pageEntity.map(this::convertirADTO);
     }
 
@@ -61,32 +67,31 @@ public class StudentEvaluationsService {
 
         if(entity.getPlanComponents() != null){
             dto.setComponent(entity.getPlanComponents().getComponentID());
-        }else {
+        } else {
             dto.setComponent("Sin componentes Asignado");
-            dto.setComponent(null);
+            dto.setComponentID(null);
         }
         if(entity.getCourseEnrollment() != null){
             dto.setCourseEnrollment(entity.getCourseEnrollment().getId());
-        }else {
-            dto.setCourseEnrollment("Sin CourseEnrollment Asignado");
-            dto.setCourseEnrollment(null);
+        } else {
+            dto.setCourseEnrollment("Sin curso de Inscripción asignado");
+            dto.setCourseEnrollmentID(null);
         }
         return dto;
     }
 
     public StudentEvaluationsDTO insertarDatos(StudentEvaluationsDTO data) {
-        if (data == null){
-            throw new IllegalArgumentException("Datos no correctoss");
+        if (data == null) {
+            throw new IllegalArgumentException("Datos no correctos");
         }
         try {
             StudentEvaluationsEntity entity = convertirAEntity(data);
             StudentEvaluationsEntity registroGuardado = repo.save(entity);
             return convertirADTO(registroGuardado);
         } catch (Exception e) {
-            log.error("Error al querer guardar los datos ingresados" + e.getMessage());
-            throw new IllegalArgumentException("Error al registrar el nuevo dato");
+            log.error("Error al querer guardar los datos ingresados: " + e.getMessage());
+            throw new RuntimeException("Error interno al registrar el nuevo dato");
         }
-
     }
 
     private StudentEvaluationsEntity convertirAEntity(StudentEvaluationsDTO data) {
@@ -94,55 +99,59 @@ public class StudentEvaluationsService {
         entity.setScore(data.getScore());
         entity.setFeedback(data.getFeedback());
         entity.setSubmittedAt(data.getSubmittedAt());
+
         if(data.getCourseEnrollmentID() != null){
             CourseEnrollmentEntity courseEnrollment = courseEnrollmentRepo.findById(data.getCourseEnrollmentID())
-                    .orElseThrow(() -> new IllegalArgumentException("CourseEnrollments no encontrado con ID: " + data.getCourseEnrollmentID()));
+                    .orElseThrow(() -> new ExceptionNotFound("Inscripción asignada no encontrada con ID: " + data.getCourseEnrollmentID()));
             entity.setCourseEnrollment(courseEnrollment);
         }
         if(data.getComponentID() != null){
             PlanComponentsEntity planComponents = planComponentsRespo.findById(data.getComponentID())
-                    .orElseThrow(() -> new IllegalArgumentException("EvaluationPlanComponent no encontrado con ID: " + data.getComponentID()));
+                    .orElseThrow(() -> new ExceptionNotFound("Componente del plan de evaluación no encontrado con ID: " + data.getComponentID()));
             entity.setPlanComponents(planComponents);
         }
         return entity;
     }
 
     public StudentEvaluationsDTO ActualizarRegistro(String id, StudentEvaluationsDTO json) {
-        StudentEvaluationsEntity existente = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Registro no encontrado"));
+        StudentEvaluationsEntity existente = repo.findById(id)
+                .orElseThrow(() -> new ExceptionNotFound("Registro no encontrado con ID: " + id));
+
         existente.setScore(json.getScore());
         existente.setFeedback(json.getFeedback());
         existente.setSubmittedAt(json.getSubmittedAt());
 
         if(json.getComponentID() != null){
             PlanComponentsEntity planComponents = planComponentsRespo.findById(json.getComponentID())
-                    .orElseThrow(() -> new IllegalArgumentException("EvaluationPlanComponent no encontrado con ID: " + json.getComponentID()));
+                    .orElseThrow(() -> new ExceptionNotFound("Componente del plan de evaluación no encontrado con ID: " + json.getComponentID()));
             existente.setPlanComponents(planComponents);
-        }else {
+        } else {
             existente.setPlanComponents(null);
         }
+
         if(json.getCourseEnrollmentID() != null){
             CourseEnrollmentEntity courseEnrollment = courseEnrollmentRepo.findById(json.getCourseEnrollmentID())
-                    .orElseThrow(() -> new IllegalArgumentException("Tipo de año no encontrado con ID: " + json.getCourseEnrollmentID()));
+                    .orElseThrow(() -> new ExceptionNotFound("Tipo de año no encontrado con ID: " + json.getCourseEnrollmentID()));
             existente.setCourseEnrollment(courseEnrollment);
-        }else {
+        } else {
             existente.setCourseEnrollment(null);
         }
-        StudentEvaluationsEntity RegistroActualizado = repo.save(existente);
-        return convertirADTO(RegistroActualizado);
 
+        StudentEvaluationsEntity registroActualizado = repo.save(existente);
+        return convertirADTO(registroActualizado);
     }
 
     public boolean removerRegistro(String id) {
-        try{
+        try {
             StudentEvaluationsEntity existente = repo.findById(id).orElse(null);
-            if (existente != null){
+            if (existente != null) {
                 repo.deleteById(id);
                 return true;
-            }else {
+            } else {
                 return false;
             }
-        }catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("No se encontro el  registro", 1);
+        } catch (EmptyResultDataAccessException e) {
+            throw new EmptyResultDataAccessException("No se encontró el registro con ID: " + id, 1);
         }
     }
 }

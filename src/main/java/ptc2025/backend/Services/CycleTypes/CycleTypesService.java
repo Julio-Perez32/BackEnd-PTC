@@ -23,95 +23,116 @@ public class CycleTypesService {
     @Autowired
     private CycleTypesRepository repo;
 
-    @Autowired //Se inyecta el repositorio de University
-    UniversityRespository repoUniversity;
+    @Autowired
+    private UniversityRespository repoUniversity;
 
-
-    public List<CycleTypesDTO> getAllCycleTypes(){
+    public List<CycleTypesDTO> getAllCycleTypes() {
         List<CycleTypesEntity> cycletype = repo.findAll();
+        if (cycletype.isEmpty()) {
+            throw new RuntimeException("No se encontraron registros de CycleTypes");
+        }
         return cycletype.stream()
-                .map(this::ConvertCycleTypeDTO)
+                .map(this::convertCycleTypeDTO)
                 .collect(Collectors.toList());
     }
 
-    public Page<CycleTypesDTO> getAllCycleTypesPagination(int page, int size){
+    public Page<CycleTypesDTO> getAllCycleTypesPagination(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<CycleTypesEntity> pageEntity = repo.findAll(pageable);
-        return pageEntity.map(this::ConvertCycleTypeDTO);
+        return pageEntity.map(this::convertCycleTypeDTO);
     }
 
     public CycleTypesDTO insertarCycleType(CycleTypesDTO data) {
-        if(data == null){
-            throw new IllegalArgumentException("los datos no pueden ser nulos");
+        if (data == null || data.getCycleLabel() == null || data.getCycleLabel().isBlank()) {
+            throw new IllegalArgumentException("Los datos no pueden estar vacíos o nulos");
         }
-        try{
+
+        try {
             CycleTypesEntity entity = convertirAEntity(data);
             CycleTypesEntity cycleTypeGuardado = repo.save(entity);
-            return ConvertCycleTypeDTO(cycleTypeGuardado);
-        }catch (Exception e){
-            log.error("Error al ingresar el tipo de ciclo" + e.getMessage());
-            throw new RuntimeException("error interno");
+            return convertCycleTypeDTO(cycleTypeGuardado);
+        } catch (Exception e) {
+            log.error("Error al ingresar el tipo de ciclo: {}", e.getMessage(), e);
+            throw new RuntimeException("Error interno al guardar el tipo de ciclo");
         }
     }
 
-    public CycleTypesDTO ConvertCycleTypeDTO(CycleTypesEntity cycleType){
+    public CycleTypesDTO convertCycleTypeDTO(CycleTypesEntity cycleType) {
         CycleTypesDTO dto = new CycleTypesDTO();
         dto.setId(cycleType.getId());
         dto.setCycleLabel(cycleType.getCycleLabel());
 
-        if(cycleType.getUniversity() != null){
+        if (cycleType.getUniversity() != null) {
             dto.setUniversityName(cycleType.getUniversity().getUniversityName());
             dto.setUniversityID(cycleType.getUniversity().getUniversityID());
-        }else {
+        } else {
             dto.setUniversityName("Sin Universidad Asignada");
             dto.setUniversityID(null);
         }
         return dto;
     }
 
-
     private CycleTypesEntity convertirAEntity(CycleTypesDTO data) {
         CycleTypesEntity entity = new CycleTypesEntity();
         entity.setId(data.getId());
         entity.setCycleLabel(data.getCycleLabel());
 
-        if(data.getUniversityID() != null){
+        if (data.getUniversityID() != null) {
             UniversityEntity university = repoUniversity.findById(data.getUniversityID())
-                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + data.getUniversityID()));
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Universidad no encontrada con ID: " + data.getUniversityID()
+                    ));
             entity.setUniversity(university);
+        } else {
+            entity.setUniversity(null);
         }
-
 
         return entity;
     }
 
-
     public CycleTypesDTO actualizarCycleTypes(String id, CycleTypesDTO json) {
-        CycleTypesEntity existente = repo.findById(id).orElseThrow(() -> new RuntimeException("CyleType not found"));
+        CycleTypesEntity existente = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("CycleType no encontrado con ID: " + id));
+
+        if (json.getCycleLabel() == null || json.getCycleLabel().isBlank()) {
+            throw new IllegalArgumentException("El campo 'cycleLabel' no puede estar vacío");
+        }
+
         existente.setCycleLabel(json.getCycleLabel());
 
-        if(json.getUniversityID() != null){
+        if (json.getUniversityID() != null) {
             UniversityEntity university = repoUniversity.findById(json.getUniversityID())
-                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + json.getUniversityID()));
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Universidad no encontrada con ID: " + json.getUniversityID()
+                    ));
             existente.setUniversity(university);
-        }else {
+        } else {
             existente.setUniversity(null);
         }
-        CycleTypesEntity cycleTypeActualizado = repo.save(existente);
-        return ConvertCycleTypeDTO(cycleTypeActualizado);
+
+        try {
+            CycleTypesEntity cycleTypeActualizado = repo.save(existente);
+            return convertCycleTypeDTO(cycleTypeActualizado);
+        } catch (Exception e) {
+            log.error("Error al actualizar el tipo de ciclo: {}", e.getMessage(), e);
+            throw new RuntimeException("Error interno al actualizar el tipo de ciclo");
+        }
     }
 
     public boolean eliminarCycleType(String id) {
-        try{
+        try {
             CycleTypesEntity existente = repo.findById(id).orElse(null);
-            if (existente != null){
+            if (existente != null) {
                 repo.deleteById(id);
                 return true;
-            }else {
+            } else {
                 return false;
             }
-        }catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("No se encontro el CycleType", 1);
+        } catch (EmptyResultDataAccessException e) {
+            throw new EmptyResultDataAccessException("No se encontró el CycleType con ID: " + id, 1);
+        } catch (Exception e) {
+            log.error("Error al eliminar el CycleType con ID {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Error interno al eliminar el tipo de ciclo");
         }
     }
 }

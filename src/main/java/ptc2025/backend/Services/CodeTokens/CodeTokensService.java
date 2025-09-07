@@ -6,6 +6,9 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import ptc2025.backend.Entities.CodeTokens.CodeTokensEntity;
+import ptc2025.backend.Exceptions.ExcepcionDatosDuplicados;
+import ptc2025.backend.Exceptions.ExceptionNotFound;
+import ptc2025.backend.Exceptions.ExceptionServerError;
 import ptc2025.backend.Models.DTO.CodeTokens.CodeTokensDTO;
 import ptc2025.backend.Respositories.CodeTokens.CodeTokensRespository;
 
@@ -18,62 +21,71 @@ public class CodeTokensService {
     @Autowired
     CodeTokensRespository repo;
 
-    //get
-    public List<CodeTokensDTO> getCodeToken (){
-        List <CodeTokensEntity> token = repo.findAll();
+    // GET
+    public List<CodeTokensDTO> getCodeToken() {
+        List<CodeTokensEntity> token = repo.findAll();
         return token.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    //post
-    public  CodeTokensDTO insertCodeToken(@RequestBody CodeTokensDTO dto){
-        //Validacion
-        if(dto == null || dto.getUniversityID() == null || dto.getUniversityID().isBlank()||
-                 dto.getTokenKey() == null || dto.getTokenKey().isBlank()
+    // POST
+    public CodeTokensDTO insertCodeToken(@RequestBody CodeTokensDTO dto) {
+        if (dto == null || dto.getUniversityID() == null || dto.getUniversityID().isBlank()
+                || dto.getTokenKey() == null || dto.getTokenKey().isBlank()
                 || dto.getDescription() == null || dto.getDescription().isBlank()) {
             throw new IllegalArgumentException("Todos los campos son obligatorios");
         }
+
         try {
+            boolean existeDuplicado = repo.findAll().stream()
+                    .anyMatch(t -> t.getTokenKey().equalsIgnoreCase(dto.getTokenKey()));
+            if (existeDuplicado) {
+                throw new ExcepcionDatosDuplicados("El token con la clave proporcionada ya existe.", "Token duplicado detectado en la base de datos");
+            }
+
             CodeTokensEntity entity = convertirAEntity(dto);
             CodeTokensEntity guardado = repo.save(entity);
             return convertirADTO(guardado);
-        }catch (Exception e){
-            log.error("Error al registrar el toker " + e.getMessage());
-            throw new RuntimeException("Eror interno al guardar el nuevo token");
-        }
 
+        } catch (ExcepcionDatosDuplicados e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error al registrar el token: " + e.getMessage());
+            throw new ExcepcionDatosDuplicados("El token con la clave proporcionada ya existe.", "Token duplicado detectado en la base de datos");
+        }
     }
 
-    //put
-    public CodeTokensDTO updateToken(String id, CodeTokensDTO dto){
-        CodeTokensEntity existente = repo.findById(id).orElseThrow(() -> new RuntimeException("El dato no pudo ser actualizado. Evento no encontrado")) ;
+    // PUT
+    public CodeTokensDTO updateToken(String id, CodeTokensDTO dto) {
+        CodeTokensEntity existente = repo.findById(id)
+                .orElseThrow(() -> new ExceptionNotFound("El token con ID " + id + " no existe."));
+
         existente.setUniversityID(dto.getUniversityID());
         existente.setTokenKey(dto.getTokenKey());
         existente.setDescription(dto.getDescription());
 
-        CodeTokensEntity actualizar = repo.save(existente);
-        return convertirADTO(actualizar);
+        CodeTokensEntity actualizado = repo.save(existente);
+        return convertirADTO(actualizado);
     }
 
-    //delete
-    public boolean deleteToken(String id){
+    // DELETE
+    public boolean deleteToken(String id) {
         try {
             CodeTokensEntity objToken = repo.findById(id).orElse(null);
-            if (objToken != null){
+            if (objToken != null) {
                 repo.deleteById(id);
                 return true;
-            }else {
-                System.out.println("Token no encontrado");
-                return false;
+            } else {
+                throw new ExceptionNotFound("El token con ID " + id + " no existe.");
             }
-        }catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("No se encontro ningún token con el ID: " + id + "para poder ser eliminado", 1);
-
+        } catch (EmptyResultDataAccessException e) {
+            throw new ExceptionNotFound("No se encontró ningún token con el ID: " + id + " para ser eliminado.");
         }
     }
-    //Convertir a DTO
-    private CodeTokensDTO convertirADTO (CodeTokensEntity entity){
+
+    // Convertir a DTO
+    private CodeTokensDTO convertirADTO(CodeTokensEntity entity) {
         CodeTokensDTO dto = new CodeTokensDTO();
         dto.setCodeTokenID(entity.getCodeTokenID());
         dto.setUniversityID(entity.getUniversityID());
@@ -82,8 +94,8 @@ public class CodeTokensService {
         return dto;
     }
 
-    //Convertir a Entity
-    private CodeTokensEntity convertirAEntity (CodeTokensDTO dto){
+    // Convertir a Entity
+    private CodeTokensEntity convertirAEntity(CodeTokensDTO dto) {
         CodeTokensEntity entity = new CodeTokensEntity();
         entity.setUniversityID(dto.getUniversityID());
         entity.setTokenKey(dto.getTokenKey());

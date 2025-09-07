@@ -9,6 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.DocumentCategories.DocumentCategoriesEntity;
 import ptc2025.backend.Entities.Documents.DocumentEntity;
+import ptc2025.backend.Exceptions.ExceptionBadRequest;
+import ptc2025.backend.Exceptions.ExceptionNotFound;
+import ptc2025.backend.Exceptions.ExceptionServerError;
 import ptc2025.backend.Models.DTO.Documents.DocumentDTO;
 import ptc2025.backend.Respositories.DocumentCategories.DocumentCategoriesRepository;
 import ptc2025.backend.Respositories.Documents.DocumentRepository;
@@ -26,7 +29,6 @@ public class DocumentService {
     @Autowired
     private DocumentCategoriesRepository repocategoriesRepository;
 
-    // GET
     public List<DocumentDTO> getDocuments() {
         return repository.findAll()
                 .stream()
@@ -34,82 +36,90 @@ public class DocumentService {
                 .collect(Collectors.toList());
     }
 
-    // GET DE PAGINACION
     public Page<DocumentDTO> getDocumentsPaginated(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return repository.findAll(pageable)
                 .map(this::convertToDTO);
     }
 
-
-    // POST
     public DocumentDTO insertDocument(DocumentDTO dto) {
-        if(dto == null || dto.getDocumentName() == null || dto.getDocumentName().isBlank()){
-            throw new IllegalArgumentException("Los campos deben de estar completos");
+        if (dto == null || dto.getDocumentName() == null || dto.getDocumentName().isBlank()) {
+            throw new ExceptionBadRequest("Los campos no pueden estar vacíos o nulos");
         }
-        try{
+
+        try {
             DocumentEntity entity = convertToEntity(dto);
-            DocumentEntity save = repository.save(entity);
-            return convertToDTO(save);
-        }catch (Exception e){
-            log.error("Error al registrar el documento " + e.getMessage());
-            throw new IllegalArgumentException("Error al registrar el documento");
+            DocumentEntity savedDocument = repository.save(entity);
+            return convertToDTO(savedDocument);
+        } catch (Exception e) {
+            log.error("Error al registrar el documento: {}", e.getMessage());
+            throw new ExceptionServerError("Error interno al registrar el documento");
         }
     }
 
-    // PUT
     public DocumentDTO updateDocument(String id, DocumentDTO dto) {
-        DocumentEntity exists = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Documento no encontrado"));
+        DocumentEntity exists = repository.findById(id)
+                .orElseThrow(() -> new ExceptionNotFound("Documento no encontrado con ID: " + id));
+
         exists.setName(dto.getDocumentName());
 
-        if(dto.getDocumentCategoryID() != null){
-            DocumentCategoriesEntity documentCategories = repocategoriesRepository.findById(dto.getDocumentCategoryID()).orElseThrow(
-                    () -> new IllegalArgumentException("Categoria de documento no econtrado con ID " +dto.getDocumentCategoryID()));
+        if (dto.getDocumentCategoryID() != null) {
+            DocumentCategoriesEntity documentCategories = repocategoriesRepository.findById(dto.getDocumentCategoryID())
+                    .orElseThrow(() -> new ExceptionNotFound("Categoría de documento no encontrada con ID: " + dto.getDocumentCategoryID()));
             exists.setDocumentCategory(documentCategories);
-        }else {
+        } else {
             exists.setDocumentCategory(null);
         }
 
-        DocumentEntity updatedDocument = repository.save(exists);
-        return convertToDTO(updatedDocument);
+        try {
+            DocumentEntity updatedDocument = repository.save(exists);
+            return convertToDTO(updatedDocument);
+        } catch (Exception e) {
+            log.error("Error al actualizar el documento: {}", e.getMessage());
+            throw new ExceptionServerError("Error interno al actualizar el documento");
+        }
     }
 
-    // DELETE
     public boolean deleteDocument(String id) {
         try {
             if (repository.existsById(id)) {
                 repository.deleteById(id);
                 return true;
             }
-            return false;
+            throw new ExceptionNotFound("El documento con ID " + id + " no existe");
         } catch (EmptyResultDataAccessException e) {
-            throw new EmptyResultDataAccessException("El documento con ID " + id + " no existe", 1);
+            throw new ExceptionServerError("Error al intentar eliminar el documento: " + e.getMessage());
         }
     }
 
-    // Convertir a DTO
     private DocumentDTO convertToDTO(DocumentEntity entity) {
         DocumentDTO dto = new DocumentDTO();
         dto.setDocumentID(entity.getId());
+        dto.setDocumentName(entity.getName());
 
-        if(entity.getDocumentCategory() != null){
+        if (entity.getDocumentCategory() != null) {
             dto.setDocumentCategoryID(entity.getDocumentCategory().getId());
-        }else {
-            dto.setDocumentCategoryID( null);
+            dto.setDocumentCategory(entity.getDocumentCategory().getDocumentCategory());
+        } else {
+            dto.setDocumentCategoryID(null);
+            dto.setDocumentCategory("Sin categoría asignada");
         }
         return dto;
     }
 
-    // Convertir a Entity
     private DocumentEntity convertToEntity(DocumentDTO dto) {
         DocumentEntity entity = new DocumentEntity();
         entity.setId(dto.getDocumentID());
+        entity.setName(dto.getDocumentName());
 
-        if (dto.getDocumentCategoryID() != null){
-            DocumentCategoriesEntity documentCategories = repocategoriesRepository.findById(dto.getDocumentCategoryID()).orElseThrow(
-                    () -> new IllegalArgumentException("Categoria de documento no encontrado con ID " + dto.getDocumentCategoryID()));
+        if (dto.getDocumentCategoryID() != null) {
+            DocumentCategoriesEntity documentCategories = repocategoriesRepository.findById(dto.getDocumentCategoryID())
+                    .orElseThrow(() -> new ExceptionNotFound("Categoría de documento no encontrada con ID: " + dto.getDocumentCategoryID()));
             entity.setDocumentCategory(documentCategories);
+        } else {
+            entity.setDocumentCategory(null);
         }
+
         return entity;
     }
 }

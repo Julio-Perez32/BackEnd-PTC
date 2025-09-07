@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.EntityType.EntityTypesEntity;
 import ptc2025.backend.Entities.PlanComponents.PlanComponentsEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Exceptions.ExceptionNoSuchElement;
+import ptc2025.backend.Exceptions.ExceptionNotFound;
 import ptc2025.backend.Models.DTO.EntityType.EntityTypesDTO;
 import ptc2025.backend.Models.DTO.PlanComponents.PlanComponentsDTO;
 import ptc2025.backend.Respositories.EntityType.EntityTypesRepository;
@@ -21,22 +23,33 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class EntityTypesService {
+
     @Autowired
     EntityTypesRepository repo;
 
-    @Autowired //Se inyecta el repositorio de University
+    @Autowired // Se inyecta el repositorio de University
     UniversityRespository repoUniversity;
-    //Get
-    public List<EntityTypesDTO> getEntityTypes (){
+
+    // Get
+    public List<EntityTypesDTO> getEntityTypes() {
         List<EntityTypesEntity> components = repo.findAll();
+
+        if (components.isEmpty()) {
+            throw new ExceptionNotFound("No se encontraron tipos de entidad.");
+        }
+
         return components.stream()
-                .map(this:: convertirADTO)
+                .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
-    public Page<EntityTypesDTO> getEntityTypesPagination(int page, int size){
+    public Page<EntityTypesDTO> getEntityTypesPagination(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<EntityTypesEntity> pageEntity = repo.findAll(pageable);
+
+        if (pageEntity.isEmpty()) {
+            throw new ExceptionNotFound("No se encontraron tipos de entidad en la página solicitada.");
+        }
         return pageEntity.map(this::convertirADTO);
     }
 
@@ -44,13 +57,12 @@ public class EntityTypesService {
         // Validaciones
         if (dto == null ||
                 dto.getEntityType() == null || dto.getEntityType().isBlank()) {
-            throw new IllegalArgumentException("Todos los campos son obligatorios, no dejarlos vacios");
+            throw new IllegalArgumentException("Todos los campos son obligatorios, no dejarlos vacíos");
         }
 
         if (dto.getEntityType().length() > 60) {
             throw new IllegalArgumentException("El tipo de entidad no debe tener más de 60 caracteres");
         }
-
 
         try {
             EntityTypesEntity entity = convertirAEntity(dto);
@@ -61,62 +73,66 @@ public class EntityTypesService {
             throw new RuntimeException("Error interno al guardar el tipo de entidad");
         }
     }
-    public EntityTypesDTO updateEntityType(String id, EntityTypesDTO dto){
-        try{
-            if (repo.existsById(id)){
-                EntityTypesEntity existente = new EntityTypesEntity();
-                existente.setEntityType(dto.getEntityType());
 
-
-                if(dto.getUniversityID() != null){
-                    UniversityEntity university = repoUniversity.findById(dto.getUniversityID())
-                            .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + dto.getUniversityID()));
-                    existente.setUniversity(university);
-                }else {
-                    existente.setUniversity(null);
-                }
-                EntityTypesEntity actualizar = repo.save(existente);
-                return convertirADTO(actualizar);
-            }
-            throw new IllegalArgumentException("El tipo de codigo  con el id " + id + " no pudo ser actualizado");
-        }catch (Exception e){
-            throw new RuntimeException("El tipo de codigo no pudo ser editado: " + e.getMessage() );
-        }
-
-    }
-    public boolean deleteEntityType(String id){
+    public EntityTypesDTO updateEntityType(String id, EntityTypesDTO dto) {
         try {
-            EntityTypesEntity objCompo = repo.findById(id).orElse(null);
-            if (objCompo != null){
-                repo.deleteById(id);
-                return true;
-            }else{
-                System.out.println("Tipo de entidad no encontrado");
-                return false;
-            }
-        }catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException ("No se encontro ningún tipo de entidad con el ID: " + id + "para poder ser eliminado", 1);
-        }
+            EntityTypesEntity existente = repo.findById(id)
+                    .orElseThrow(() -> new ExceptionNoSuchElement("El tipo de entidad con ID " + id + " no existe."));
 
+            existente.setEntityType(dto.getEntityType());
+
+            if (dto.getUniversityID() != null) {
+                UniversityEntity university = repoUniversity.findById(dto.getUniversityID())
+                        .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + dto.getUniversityID()));
+                existente.setUniversity(university);
+            } else {
+                existente.setUniversity(null);
+            }
+
+            EntityTypesEntity actualizado = repo.save(existente);
+            return convertirADTO(actualizado);
+
+        } catch (IllegalArgumentException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("El tipo de entidad no pudo ser editado: " + e.getMessage());
+        }
     }
-    private EntityTypesDTO convertirADTO (EntityTypesEntity entity){
+
+    public boolean deleteEntityType(String id) {
+        try {
+            EntityTypesEntity objCompo = repo.findById(id)
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Tipo de entidad no encontrado con el ID: " + id));
+
+            repo.deleteById(id);
+            return true;
+
+        } catch (EmptyResultDataAccessException e) {
+            throw new EmptyResultDataAccessException(
+                    "No se encontró ningún tipo de entidad con el ID: " + id + " para poder ser eliminado", 1);
+        }
+    }
+
+    private EntityTypesDTO convertirADTO(EntityTypesEntity entity) {
         EntityTypesDTO dto = new EntityTypesDTO();
         dto.setEntityTypeID(entity.getEntityTypeID());
         dto.setEntityType(entity.getEntityType());
-        if(entity.getUniversity() != null){
+
+        if (entity.getUniversity() != null) {
             dto.setUniversityName(entity.getUniversity().getUniversityName());
             dto.setUniversityID(entity.getUniversity().getUniversityID());
-        }else {
+        } else {
             dto.setUniversityName("Sin Universidad Asignada");
             dto.setEntityTypeID(null);
         }
         return dto;
     }
+
     public EntityTypesEntity convertirAEntity(EntityTypesDTO dto) {
         EntityTypesEntity entity = new EntityTypesEntity();
         entity.setEntityType(dto.getEntityType());
 
-        if(dto.getUniversityID() != null){
+        if (dto.getUniversityID() != null) {
             UniversityEntity university = repoUniversity.findById(dto.getUniversityID())
                     .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + dto.getUniversityID()));
             entity.setUniversity(university);

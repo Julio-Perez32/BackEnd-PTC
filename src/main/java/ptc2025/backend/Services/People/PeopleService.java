@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.People.PeopleEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Entities.personTypes.personTypesEntity;
+import ptc2025.backend.Exceptions.ExceptionBadRequest;
+import ptc2025.backend.Exceptions.ExceptionNoSuchElement;
 import ptc2025.backend.Models.DTO.People.PeopleDTO;
 import ptc2025.backend.Respositories.People.PeopleRepository;
 import ptc2025.backend.Respositories.personTypes.personTypesRepository;
@@ -27,21 +29,20 @@ public class PeopleService {
     @Autowired
     personTypesRepository repoTypesPerson;
 
-
-    public List<PeopleDTO> getAllPeople(){
+    public List<PeopleDTO> getAllPeople() {
         List<PeopleEntity> people = repo.findAll();
         return people.stream()
                 .map(this::convertToPeopleDTO)
                 .collect(Collectors.toList());
     }
 
-    public Page<PeopleDTO> getPeoplePagination(int page, int size){
+    public Page<PeopleDTO> getPeoplePagination(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<PeopleEntity> pageEntity = repo.findAll(pageable);
         return pageEntity.map(this::convertToPeopleDTO);
     }
 
-    private PeopleDTO convertToPeopleDTO(PeopleEntity people){
+    private PeopleDTO convertToPeopleDTO(PeopleEntity people) {
         PeopleDTO dto = new PeopleDTO();
         dto.setPersonID(people.getPersonID());
         dto.setFirstName(people.getFirstName());
@@ -49,17 +50,18 @@ public class PeopleService {
         dto.setBirthDate(people.getBirthDate());
         dto.setContactEmail(people.getContactEmail());
         dto.setPhone(people.getPhone());
-        if(people.getPersonTypes() != null){
+
+        if (people.getPersonTypes() != null) {
             dto.setPersonType(people.getPersonTypes().getPersonType());
             dto.setPersonTypesID(people.getPersonTypes().getPersonTypeID());
-        }else {
+        } else {
             dto.setPersonType("Sin Tipo de Persona Asignado");
             dto.setPersonTypesID(null);
         }
         return dto;
     }
 
-    private PeopleEntity convertToPeopleEntity(PeopleDTO dto){
+    private PeopleEntity convertToPeopleEntity(PeopleDTO dto) {
         PeopleEntity entity = new PeopleEntity();
         entity.setPersonID(dto.getPersonID());
         entity.setFirstName(dto.getFirstName());
@@ -67,60 +69,67 @@ public class PeopleService {
         entity.setBirthDate(dto.getBirthDate());
         entity.setContactEmail(dto.getContactEmail());
         entity.setPhone(dto.getPhone());
-        if(dto.getPersonTypesID() != null){
+
+        if (dto.getPersonTypesID() != null) {
             personTypesEntity personTypes = repoTypesPerson.findById(dto.getPersonTypesID())
-                    .orElseThrow(() -> new IllegalArgumentException("Tipo de persona no encontrada con ID: " + dto.getPersonTypesID()));
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Tipo de persona no encontrada con ID: " + dto.getPersonTypesID()));
             entity.setPersonTypes(personTypes);
         }
         return entity;
     }
 
-    public PeopleDTO insertPeople(PeopleDTO dto){
-        if (dto == null || dto.getFirstName() == null || dto.getFirstName().isEmpty() || dto.getLastName() == null|| dto.getLastName().isEmpty()
-                || dto.getBirthDate() == null || dto.getContactEmail() == null || dto.getContactEmail().isEmpty() || dto.getPhone() == null || dto.getPhone().isEmpty()){
-            throw new IllegalArgumentException("Debe de llenar todos los campos de la persona.");
+    public PeopleDTO insertPeople(PeopleDTO dto) {
+        if (dto == null || dto.getFirstName() == null || dto.getFirstName().isEmpty()
+                || dto.getLastName() == null || dto.getLastName().isEmpty()
+                || dto.getBirthDate() == null
+                || dto.getContactEmail() == null || dto.getContactEmail().isEmpty()
+                || dto.getPhone() == null || dto.getPhone().isEmpty()) {
+            throw new ExceptionBadRequest("Debe llenar todos los campos de la persona.");
         }
-        try{
+
+        try {
             PeopleEntity entity = convertToPeopleEntity(dto);
             PeopleEntity peopleSaved = repo.save(entity);
             return convertToPeopleDTO(peopleSaved);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Error al registrar a la persona: " + e.getMessage());
-            throw new IllegalArgumentException("Error al registrar el usuario");
+            throw new RuntimeException("Error al registrar el usuario");
         }
     }
 
-    public PeopleDTO updatePeople(String id, PeopleDTO json){
-        PeopleEntity existsPeople = repo.findById(id).orElseThrow(()-> new IllegalArgumentException("Persona no encontrada."));
+    public PeopleDTO updatePeople(String id, PeopleDTO json) {
+        PeopleEntity existsPeople = repo.findById(id)
+                .orElseThrow(() -> new ExceptionNoSuchElement("Persona no encontrada con ID: " + id));
+
         existsPeople.setFirstName(json.getFirstName());
         existsPeople.setLastName(json.getLastName());
         existsPeople.setBirthDate(json.getBirthDate());
         existsPeople.setContactEmail(json.getContactEmail());
         existsPeople.setPhone(json.getPhone());
-        if(json.getPersonTypesID() != null){
+
+        if (json.getPersonTypesID() != null) {
             personTypesEntity personTypes = repoTypesPerson.findById(json.getPersonTypesID())
-                    .orElseThrow(() -> new IllegalArgumentException("Tipo de persona no encontrada con ID: " + json.getPersonTypesID()));
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Tipo de persona no encontrada con ID: " + json.getPersonTypesID()));
             existsPeople.setPersonTypes(personTypes);
-        }else {
+        } else {
             existsPeople.setPersonTypes(null);
         }
 
         PeopleEntity updatedPeople = repo.save(existsPeople);
-
         return convertToPeopleDTO(updatedPeople);
     }
 
-    public boolean deletePeople(String id){
-        try{
+    public boolean deletePeople(String id) {
+        try {
             PeopleEntity existsPeople = repo.findById(id).orElse(null);
-            if(existsPeople != null){
+            if (existsPeople != null) {
                 repo.deleteById(id);
                 return true;
-            }else{
+            } else {
                 return false;
             }
-        }catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("No se encontró persona con ID: " + id + " para eliminar",1);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ExceptionNoSuchElement("No se encontró persona con ID: " + id + " para eliminar");
         }
     }
 }

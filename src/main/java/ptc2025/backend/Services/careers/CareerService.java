@@ -13,6 +13,9 @@ import ptc2025.backend.Entities.Departments.DepartmentsEntity;
 import ptc2025.backend.Entities.Localities.LocalitiesEntity;
 import ptc2025.backend.Entities.Modalities.ModalitiesEntity;
 import ptc2025.backend.Entities.careers.CareerEntity;
+import ptc2025.backend.Exceptions.ExceptionAlreadyExists;
+import ptc2025.backend.Exceptions.ExceptionBadRequest;
+import ptc2025.backend.Exceptions.ExceptionNotFound;
 import ptc2025.backend.Models.DTO.careers.CareerDTO;
 import ptc2025.backend.Respositories.AcademicLevel.AcademicLevelsRepository;
 import ptc2025.backend.Respositories.DegreeTypes.DegreeTypesRepository;
@@ -62,8 +65,11 @@ public class CareerService {
 
     // POST
     public CareerDTO insertCareer(CareerDTO dto) {
-        if (dto == null) throw new IllegalArgumentException("Carrera no puede ser nula");
-        if (repo.existsById(dto.getId())) throw new IllegalArgumentException("La carrera ya existe");
+        if (dto == null)
+            throw new ExceptionBadRequest("La carrera no puede ser nula");
+
+        if (repo.existsById(dto.getId()))
+            throw new ExceptionAlreadyExists("La carrera con el ID " + dto.getId() + " ya existe");
 
         CareerEntity entity = convertToEntity(dto);
         CareerEntity saved = repo.save(entity);
@@ -72,7 +78,8 @@ public class CareerService {
 
     // PUT
     public CareerDTO updateCareer(String id, CareerDTO dto) {
-        CareerEntity exist = repo.findById(id).orElseThrow(() -> new RuntimeException("El dato no pudo ser actualizado. Carrera no encontrada"));
+        CareerEntity exist = repo.findById(id)
+                .orElseThrow(() -> new ExceptionNotFound("La carrera con el ID " + id + " no existe"));
 
         exist.setNameCareer(dto.getName());
         exist.setCareerCode(dto.getCareerCode());
@@ -82,32 +89,35 @@ public class CareerService {
         exist.setCompulsorySubjects(dto.getCompulsorySubjects());
         exist.setTotalValueUnits(dto.getTotalValueUnits());
 
-        if (dto.getAcademicLevelId() != null){
+        if (dto.getAcademicLevelId() != null) {
             AcademicLevelsEntity academicLevels = academicRepo.findById(dto.getAcademicLevelId())
-                    .orElseThrow(() -> new IllegalArgumentException("Nivel académico no encontrado"));
+                    .orElseThrow(() -> new ExceptionNotFound("Nivel académico no encontrado"));
             exist.setAcademicLevels(academicLevels);
-        }else {
+        } else {
             exist.setAcademicLevels(null);
         }
-        if (dto.getDegreeTypeId() != null){
+
+        if (dto.getDegreeTypeId() != null) {
             DegreeTypesEntity degreeTypesEntity = degreeRepo.findById(dto.getDegreeTypeId())
-                    .orElseThrow(() -> new IllegalArgumentException("Tipo de grado no encontrado"));
+                    .orElseThrow(() -> new ExceptionNotFound("Tipo de grado no encontrado"));
             exist.setDegreeTypes(degreeTypesEntity);
-        }else {
+        } else {
             exist.setDegreeTypes(null);
         }
-        if (dto.getModalityId() != null){
+
+        if (dto.getModalityId() != null) {
             ModalitiesEntity modalities = modalityRepo.findById(dto.getModalityId())
-                    .orElseThrow(() -> new IllegalArgumentException("Modalidad no encontrada"));
+                    .orElseThrow(() -> new ExceptionNotFound("Modalidad no encontrada"));
             exist.setModalities(modalities);
-        }else{
+        } else {
             exist.setModalities(null);
         }
-        if (dto.getDepartmentId() != null){
-            DepartmentsEntity modalities = departmentRepo.findById(dto.getDepartmentId())
-                    .orElseThrow(() -> new IllegalArgumentException("Departamento no encontrado"));
-            exist.setDepartments(modalities);
-        }else {
+
+        if (dto.getDepartmentId() != null) {
+            DepartmentsEntity department = departmentRepo.findById(dto.getDepartmentId())
+                    .orElseThrow(() -> new ExceptionNotFound("Departamento no encontrado"));
+            exist.setDepartments(department);
+        } else {
             exist.setDepartments(null);
         }
 
@@ -121,12 +131,14 @@ public class CareerService {
             if (repo.existsById(id)) {
                 repo.deleteById(id);
                 return true;
+            } else {
+                throw new ExceptionNotFound("La carrera con ID " + id + " no existe");
             }
-            return false;
         } catch (EmptyResultDataAccessException e) {
-            throw new EmptyResultDataAccessException("La carrera con ID " + id + " no existe", 1);
+            throw new ExceptionNotFound("La carrera con ID " + id + " no existe");
         }
     }
+
 
     // CONVERSIONES
     private CareerDTO convertToDTO(CareerEntity entity) {

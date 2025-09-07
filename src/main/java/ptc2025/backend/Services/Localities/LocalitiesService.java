@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.AcademicLevel.AcademicLevelsEntity;
 import ptc2025.backend.Entities.Localities.LocalitiesEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Exceptions.ExceptionBadRequest;
+import ptc2025.backend.Exceptions.ExceptionNoSuchElement;
 import ptc2025.backend.Models.DTO.Localities.LocalitiesDTO;
 import ptc2025.backend.Respositories.Localities.LocalitiesRespository;
 import ptc2025.backend.Respositories.Universities.UniversityRespository;
@@ -23,7 +25,7 @@ public class LocalitiesService {
     @Autowired
     LocalitiesRespository repo;
 
-    @Autowired //Se inyecta el repositorio de University
+    @Autowired
     UniversityRespository repoUniversity;
 
     public List<LocalitiesDTO> getLocalitiesService(){
@@ -45,7 +47,7 @@ public class LocalitiesService {
                 dto.getAddress() == null || dto.getAddress().isBlank() ||
                 dto.getPhoneNumber() == null || dto.getPhoneNumber().isBlank()) {
 
-            throw new IllegalArgumentException("Todos los campos obligatorios deben estar completos (universityID, isMainLocality, address, phoneNumber).");
+            throw new ExceptionBadRequest("Todos los campos obligatorios deben estar completos (universityID, isMainLocality, address, phoneNumber).");
         }
         try{
             LocalitiesEntity entidad = convertirALocaltityEntity(dto);
@@ -58,19 +60,23 @@ public class LocalitiesService {
     }
 
     public LocalitiesDTO modificarLocalidad(String id, LocalitiesDTO dto){
-        LocalitiesEntity localidadExistente = repo.findById(id).orElseThrow(() -> new RuntimeException("El dato no pudo ser actualizado. Localidad no encontrada"));
+        LocalitiesEntity localidadExistente = repo.findById(id)
+                .orElseThrow(() -> new ExceptionNoSuchElement("El dato no pudo ser actualizado. Localidad no encontrada con ID: " + id));
 
         localidadExistente.setIsMainLocality(dto.getIsMainLocality());
         localidadExistente.setAddress(dto.getAddress());
         localidadExistente.setPhoneNumber(dto.getPhoneNumber());
+
         LocalitiesEntity actualizado = repo.save(localidadExistente);
+
         if(dto.getLocalityID() != null){
             UniversityEntity university = repoUniversity.findById(dto.getLocalityID())
-                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + dto.getLocalityID()));
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Universidad no encontrada con ID: " + dto.getLocalityID()));
             localidadExistente.setUniversity(university);
-        }else {
+        } else {
             localidadExistente.setUniversity(null);
         }
+
         return convertirALocaltityDTO(actualizado);
     }
 
@@ -80,12 +86,11 @@ public class LocalitiesService {
             if (objLocalidad != null){
                 repo.deleteById(id);
                 return true;
-            }else{
-                System.out.println("Localidad no encontrada");
+            } else {
                 return false;
             }
-        }catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("No se encontro ninguna localidad con el ID" + id , 1);
+        } catch (EmptyResultDataAccessException e) {
+            throw new EmptyResultDataAccessException("No se encontro ninguna localidad con el ID: " + id , 1);
         }
     }
 
@@ -100,7 +105,7 @@ public class LocalitiesService {
         if(localities.getUniversity() != null){
             dto.setUniversityName(localities.getUniversity().getUniversityName());
             dto.setUniversityID(localities.getUniversity().getUniversityID());
-        }else {
+        } else {
             dto.setUniversityName("Sin Universidad Asignada");
             dto.setUniversityID(null);
         }
@@ -116,7 +121,7 @@ public class LocalitiesService {
 
         if(dto.getUniversityID() != null){
             UniversityEntity university = repoUniversity.findById(dto.getLocalityID())
-                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + dto.getUniversityID()));
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Universidad no encontrada con ID: " + dto.getUniversityID()));
             entity.setUniversity(university);
         }
 

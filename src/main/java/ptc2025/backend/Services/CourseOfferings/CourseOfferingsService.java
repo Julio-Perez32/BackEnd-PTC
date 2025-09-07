@@ -11,6 +11,9 @@ import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
 import ptc2025.backend.Entities.SubjectDefinitions.SubjectDefinitionsEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Entities.YearCycles.YearCyclesEntity;
+import ptc2025.backend.Exceptions.ExceptionBadRequest;
+import ptc2025.backend.Exceptions.ExceptionNotFound;
+import ptc2025.backend.Exceptions.ExceptionServerError;
 import ptc2025.backend.Models.DTO.CourseOfferings.CourseOfferingsDTO;
 import ptc2025.backend.Respositories.CourseOfferings.CourseOfferingsRepository;
 import ptc2025.backend.Respositories.SubjectDefinitions.SubjectDefinitionsRepository;
@@ -30,24 +33,25 @@ public class CourseOfferingsService {
     @Autowired
     SubjectDefinitionsRepository subjectDefinitionsRepo;
 
-
     @Autowired
     YearCyclesRepository yearCyclesRepo;
 
-
-    public List<CourseOfferingsDTO> getAllCourses(){
+    // Obtener todos los cursos
+    public List<CourseOfferingsDTO> getAllCourses() {
         List<CourseOfferingsEntity> courses = repo.findAll();
         return courses.stream()
                 .map(this::convertToCoursesDTO)
                 .collect(Collectors.toList());
     }
 
-    public Page<CourseOfferingsDTO> getAllCoursesPagination(int page, int size){
+    // Paginación
+    public Page<CourseOfferingsDTO> getAllCoursesPagination(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<CourseOfferingsEntity> pageEntity = repo.findAll(pageable);
         return pageEntity.map(this::convertToCoursesDTO);
     }
 
+    // Conversión a DTO
     private CourseOfferingsDTO convertToCoursesDTO(CourseOfferingsEntity entity) {
         CourseOfferingsDTO dto = new CourseOfferingsDTO();
         dto.setCourseOfferingID(entity.getCourseOfferingID());
@@ -62,7 +66,6 @@ public class CourseOfferingsService {
 
         if (entity.getYearCycles() != null) {
             dto.setYearCycleID(entity.getYearCycles().getId());
-            // Concatenamos startDate y endDate para mostrar el rango
             dto.setYearcycleName(
                     entity.getYearCycles().getStartDate() + " a " + entity.getYearCycles().getEndDate()
             );
@@ -74,74 +77,85 @@ public class CourseOfferingsService {
         return dto;
     }
 
-
-    public CourseOfferingsEntity convertToCoursesEntity(CourseOfferingsDTO dto){
+    // Conversión a Entity
+    public CourseOfferingsEntity convertToCoursesEntity(CourseOfferingsDTO dto) {
         CourseOfferingsEntity entity = new CourseOfferingsEntity();
         entity.setCourseOfferingID(dto.getCourseOfferingID());
 
-        if(dto.getSubjectID() != null){
+        if (dto.getSubjectID() != null) {
             SubjectDefinitionsEntity subjectDefinitions = subjectDefinitionsRepo.findById(dto.getSubjectID())
-                    .orElseThrow(() -> new IllegalArgumentException("Materia no encontrada con ID: " + dto.getSubjectID()));
+                    .orElseThrow(() -> new ExceptionNotFound("Materia no encontrada con ID: " + dto.getSubjectID()));
             entity.setSubjectDefinitions(subjectDefinitions);
         }
 
-        if(dto.getYearCycleID() != null){
+        if (dto.getYearCycleID() != null) {
             YearCyclesEntity yearCycles = yearCyclesRepo.findById(dto.getYearCycleID())
-                    .orElseThrow(() -> new IllegalArgumentException("Año no encontrado con ID: " + dto.getYearCycleID()));
+                    .orElseThrow(() -> new ExceptionNotFound("Año no encontrado con ID: " + dto.getYearCycleID()));
             entity.setYearCycles(yearCycles);
         }
         return entity;
     }
 
-    public CourseOfferingsDTO insertCourse(CourseOfferingsDTO dto){
-        if(dto == null || dto.getSubjectID() == null || dto.getSubjectID().isBlank() ||
-        dto.getYearCycleID() == null || dto.getYearCycleID().isBlank()){
-            throw new IllegalArgumentException("Todos los campos deben de estar llenos");
+    // Insertar
+    public CourseOfferingsDTO insertCourse(CourseOfferingsDTO dto) {
+        if (dto == null || dto.getSubjectID() == null || dto.getSubjectID().isBlank() ||
+                dto.getYearCycleID() == null || dto.getYearCycleID().isBlank()) {
+            throw new ExceptionBadRequest("Todos los campos deben de estar llenos");
         }
-        try{
+        try {
             CourseOfferingsEntity entity = convertToCoursesEntity(dto);
             CourseOfferingsEntity saved = repo.save(entity);
             return convertToCoursesDTO(saved);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Error al registrar el curso: " + e.getMessage());
-            throw new IllegalArgumentException("Error al registrar el curso" + e.getMessage());
+            throw new ExceptionServerError("Error interno al registrar el curso: " + e.getMessage());
         }
     }
 
-    public CourseOfferingsDTO updateCourse(String id, CourseOfferingsDTO json){
-        CourseOfferingsEntity exists = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Curso no encontrado"));
+    // Actualizar
+    public CourseOfferingsDTO updateCourse(String id, CourseOfferingsDTO json) {
+        CourseOfferingsEntity exists = repo.findById(id)
+                .orElseThrow(() -> new ExceptionNotFound("Curso no encontrado con ID: " + id));
 
-        if(json.getSubjectID() != null){
+        if (json.getSubjectID() != null) {
             SubjectDefinitionsEntity subjectDefinitions = subjectDefinitionsRepo.findById(json.getSubjectID())
-                    .orElseThrow(() -> new IllegalArgumentException("Materia no encontrada con ID: " + json.getSubjectID()));
+                    .orElseThrow(() -> new ExceptionNotFound("Materia no encontrada con ID: " + json.getSubjectID()));
             exists.setSubjectDefinitions(subjectDefinitions);
-        }else {
+        } else {
             exists.setSubjectDefinitions(null);
         }
 
-        if(json.getYearCycleID() != null){
+        if (json.getYearCycleID() != null) {
             YearCyclesEntity yearCycles = yearCyclesRepo.findById(json.getYearCycleID())
-                    .orElseThrow(() -> new IllegalArgumentException("año no encontrado con ID: " + json.getYearCycleID()));
+                    .orElseThrow(() -> new ExceptionNotFound("Año no encontrado con ID: " + json.getYearCycleID()));
             exists.setYearCycles(yearCycles);
-        }else {
+        } else {
             exists.setYearCycles(null);
         }
 
-        CourseOfferingsEntity updatedCourse = repo.save(exists);
-        return convertToCoursesDTO(updatedCourse);
+        try {
+            CourseOfferingsEntity updatedCourse = repo.save(exists);
+            return convertToCoursesDTO(updatedCourse);
+        } catch (Exception e) {
+            log.error("Error al actualizar el curso: " + e.getMessage());
+            throw new ExceptionServerError("Error interno al actualizar el curso: " + e.getMessage());
+        }
     }
 
-    public boolean deleteCourse(String id){
-        try{
-            CourseOfferingsEntity exists = repo.findById(id).orElse(null);
-            if(exists != null){
-                repo.deleteById(id);
-                return true;
-            }else{
-                return false;
-            }
-        }catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("No se econtró curso con ID: " + id + " para eliminar", 1);
+    // Eliminar
+    public boolean deleteCourse(String id) {
+        try {
+            CourseOfferingsEntity exists = repo.findById(id)
+                    .orElseThrow(() -> new ExceptionNotFound("Curso no encontrado con ID: " + id));
+
+            repo.deleteById(id);
+            return true;
+
+        } catch (EmptyResultDataAccessException e) {
+            throw new ExceptionNotFound("Curso no encontrado con ID: " + id + " para eliminar");
+        } catch (Exception e) {
+            log.error("Error al eliminar el curso: " + e.getMessage());
+            throw new ExceptionServerError("Error interno al eliminar el curso: " + e.getMessage());
         }
     }
 }

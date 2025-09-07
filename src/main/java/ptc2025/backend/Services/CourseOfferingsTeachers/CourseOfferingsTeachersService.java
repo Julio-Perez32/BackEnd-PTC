@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
 import ptc2025.backend.Entities.CourseOfferingsTeachers.CourseOfferingsTeachersEntity;
 import ptc2025.backend.Entities.employees.EmployeeEntity;
+import ptc2025.backend.Exceptions.ExceptionBadRequest;
+import ptc2025.backend.Exceptions.ExceptionNotFound;
+import ptc2025.backend.Exceptions.ExceptionServerError;
 import ptc2025.backend.Models.DTO.CourseOfferingsTeachers.CourseOfferingsTeachersDTO;
 import ptc2025.backend.Respositories.CourseOfferings.CourseOfferingsRepository;
 import ptc2025.backend.Respositories.CourseOfferingsTeachers.CourseOfferingsTeachersRepository;
@@ -47,10 +50,8 @@ public class CourseOfferingsTeachersService {
     private CourseOfferingsTeachersDTO convertToOfferingsTeachersDTO(CourseOfferingsTeachersEntity entity) {
         CourseOfferingsTeachersDTO dto = new CourseOfferingsTeachersDTO();
 
-        // ID del CourseOfferingTeacher
         dto.setCourseOfferingTeacherID(entity.getCourseOfferingTeacherID());
 
-        // CourseOffering
         if (entity.getCourseOfferings() != null) {
             dto.setCourseOfferingID(entity.getCourseOfferings().getCourseOfferingID());
 
@@ -64,7 +65,6 @@ public class CourseOfferingsTeachersService {
             dto.setCoureOffering("Sin curso asignado");
         }
 
-        // Employee
         if (entity.getEmployee() != null) {
             dto.setEmployeeID(entity.getEmployee().getId());
 
@@ -89,8 +89,8 @@ public class CourseOfferingsTeachersService {
         CourseOfferingsTeachersEntity entity = new CourseOfferingsTeachersEntity();
 
         if(dto.getEmployeeID() != null){
-            EmployeeEntity employee = repoEmployee.findById(dto.getEmployeeID()).orElseThrow(
-                    () -> new IllegalArgumentException("Empleado no encontrado con ID " + dto.getEmployeeID()));
+            EmployeeEntity employee = repoEmployee.findById(dto.getEmployeeID())
+                    .orElseThrow(() -> new ExceptionNotFound("Empleado no encontrado con ID " + dto.getEmployeeID()));
             entity.setEmployee(employee);
         }
         return entity;
@@ -99,7 +99,7 @@ public class CourseOfferingsTeachersService {
     public CourseOfferingsTeachersDTO insertOfferingTeacher(CourseOfferingsTeachersDTO dto){
         if (dto == null || dto.getCourseOfferingID() == null || dto.getCourseOfferingID().isEmpty() ||
                 dto.getEmployeeID() == null || dto.getEmployeeID().isEmpty()){
-            throw new IllegalArgumentException("Los campos deben de estar completos");
+            throw new ExceptionBadRequest("Los campos deben de estar completos");
         }
         try{
             CourseOfferingsTeachersEntity entity = convertToOfferingsTeachersEntity(dto);
@@ -107,29 +107,29 @@ public class CourseOfferingsTeachersService {
             return convertToOfferingsTeachersDTO(savedOfferingTeacher);
         }catch (Exception e){
             log.error("Error al registrar el docente: " + e.getMessage());
-            throw new IllegalArgumentException("Error al registrar el docente");
+            throw new ExceptionServerError("Error al registrar el docente");
         }
     }
 
     public CourseOfferingsTeachersDTO updateCourseTeacher(String ID, CourseOfferingsTeachersDTO json){
-        CourseOfferingsTeachersEntity existsCourseTeacher = repo.findById(ID).orElseThrow(() -> new IllegalArgumentException("Docente no encontrado"));
+        CourseOfferingsTeachersEntity existsCourseTeacher = repo.findById(ID)
+                .orElseThrow(() -> new ExceptionNotFound("Docente no encontrado"));
 
         if(json.getCourseOfferingID() != null){
-            CourseOfferingsEntity courseOfferings = repoCourseOfferings.findById(json.getCourseOfferingID()).orElseThrow(
-                    () -> new IllegalArgumentException("Curso no encontrado con ID " + json.getCourseOfferingID()));
+            CourseOfferingsEntity courseOfferings = repoCourseOfferings.findById(json.getCourseOfferingID())
+                    .orElseThrow(() -> new ExceptionNotFound("Curso no encontrado con ID " + json.getCourseOfferingID()));
             existsCourseTeacher.setCourseOfferings(courseOfferings);
         }
 
         if(json.getEmployeeID() != null){
-            EmployeeEntity employee = repoEmployee.findById(json.getEmployeeID()).orElseThrow(
-                    () -> new IllegalArgumentException("Empleado no encontrado con ID " + json.getEmployeeID()));
+            EmployeeEntity employee = repoEmployee.findById(json.getEmployeeID())
+                    .orElseThrow(() -> new ExceptionNotFound("Empleado no encontrado con ID " + json.getEmployeeID()));
             existsCourseTeacher.setEmployee(employee);
-        }else {
+        } else {
             existsCourseTeacher.setEmployee(null);
         }
 
         CourseOfferingsTeachersEntity savedCourseTeacher = repo.save(existsCourseTeacher);
-
         return convertToOfferingsTeachersDTO(savedCourseTeacher);
     }
 
@@ -139,11 +139,11 @@ public class CourseOfferingsTeachersService {
             if(existsCourseTeacher != null){
                 repo.deleteById(ID);
                 return true;
-            }else{
-                return false;
+            } else {
+                throw new ExceptionNotFound("No se encontró docente con ID: " + ID);
             }
-        }catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("No se encontró docente con ID: " + ID + " para eliminar",1);
+        } catch (EmptyResultDataAccessException e){
+            throw new ExceptionNotFound("No se encontró docente con ID: " + ID + " para eliminar");
         }
     }
 
