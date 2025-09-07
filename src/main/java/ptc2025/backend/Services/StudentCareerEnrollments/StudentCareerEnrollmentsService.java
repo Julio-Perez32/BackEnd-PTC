@@ -12,6 +12,7 @@ import ptc2025.backend.Entities.SocialServiceProjects.SocialServiceProjectsEntit
 import ptc2025.backend.Entities.StudentCareerEnrollments.StudentCareerEnrollmentsEntity;
 import ptc2025.backend.Entities.Students.StudentsEntity;
 import ptc2025.backend.Entities.careerSocialServiceProjects.CareerSocialServiceProjectEntity;
+import ptc2025.backend.Exceptions.ExceptionNoSuchElement;
 import ptc2025.backend.Models.DTO.StudentCareerEnrollments.StudentCareerEnrollmentsDTO;
 import ptc2025.backend.Respositories.SocialService.SocialServiceRespository;
 import ptc2025.backend.Respositories.StudentCareerEnrollments.StudentCareerEnrollmentsRepository;
@@ -57,42 +58,52 @@ public class StudentCareerEnrollmentsService {
 
     // INSERT
     public StudentCareerEnrollmentsDTO insertEnrollment(StudentCareerEnrollmentsDTO dto){
-        StudentCareerEnrollmentsEntity entity = convertToEntity(dto);
-        StudentCareerEnrollmentsEntity saved = repo.save(entity);
-        return convertToDTO(saved);
+        try {
+            StudentCareerEnrollmentsEntity entity = convertToEntity(dto);
+            StudentCareerEnrollmentsEntity saved = repo.save(entity);
+            return convertToDTO(saved);
+        } catch (Exception e) {
+            log.error("Error al insertar inscripción: {}", e.getMessage());
+            throw new IllegalArgumentException("Error al registrar la inscripción: " + e.getMessage());
+        }
     }
 
     // UPDATE
     public StudentCareerEnrollmentsDTO updateEnrollment(String id, StudentCareerEnrollmentsDTO dto){
         StudentCareerEnrollmentsEntity exists = repo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("El ID no fue encontrado"));
+                .orElseThrow(() -> new ExceptionNoSuchElement("El ID no fue encontrado"));
 
-        exists.setStartDate(dto.getStartDate());
-        exists.setEndDate(dto.getEndDate());
-        exists.setStatus(dto.getStatus());
-        exists.setStatusDate(dto.getStatusDate());
-        exists.setServiceStartDate(dto.getServiceStartDate());
-        exists.setServiceEndDate(dto.getServiceEndDate());
-        exists.setServiceStatus(dto.getServiceStatus());
-        exists.setServiceStatusDate(dto.getServiceStatusDate());
+        try {
+            exists.setStartDate(dto.getStartDate());
+            exists.setEndDate(dto.getEndDate());
+            exists.setStatus(dto.getStatus());
+            exists.setStatusDate(dto.getStatusDate());
+            exists.setServiceStartDate(dto.getServiceStartDate());
+            exists.setServiceEndDate(dto.getServiceEndDate());
+            exists.setServiceStatus(dto.getServiceStatus());
+            exists.setServiceStatusDate(dto.getServiceStatusDate());
 
-        if(dto.getCareerID() != null){
-            ptc2025.backend.Entities.careers.CareerEntity career = careerRepo.findById(dto.getCareerID())
-                    .orElseThrow(() -> new IllegalArgumentException("Carrera no encontrada con ID: " + dto.getCareerID()));
-            exists.setCareer(career);
-        }
-        if(dto.getStudentID() != null){
-            StudentsEntity student = studentsRepository.findById(dto.getStudentID())
-                    .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado con ID: " + dto.getStudentID()));
-            exists.setStudent(student);
-        }
-        if(dto.getSocialServiceProjectID() != null){
-            SocialServiceProjectsEntity project = repoSocialService.findById(dto.getSocialServiceProjectID()).orElseThrow(
-                    () -> new IllegalArgumentException("Proyecto no encontrado con ID: " + dto.getSocialServiceProjectID()));
-            exists.setSocialServiceProject(project);
-        }
+            if(dto.getCareerID() != null){
+                ptc2025.backend.Entities.careers.CareerEntity career = careerRepo.findById(dto.getCareerID())
+                        .orElseThrow(() -> new ExceptionNoSuchElement("Carrera no encontrada con ID: " + dto.getCareerID()));
+                exists.setCareer(career);
+            }
+            if(dto.getStudentID() != null){
+                StudentsEntity student = studentsRepository.findById(dto.getStudentID())
+                        .orElseThrow(() -> new ExceptionNoSuchElement("Estudiante no encontrado con ID: " + dto.getStudentID()));
+                exists.setStudent(student);
+            }
+            if(dto.getSocialServiceProjectID() != null){
+                SocialServiceProjectsEntity project = repoSocialService.findById(dto.getSocialServiceProjectID()).orElseThrow(
+                        () -> new ExceptionNoSuchElement("Proyecto no encontrado con ID: " + dto.getSocialServiceProjectID()));
+                exists.setSocialServiceProject(project);
+            }
 
-        return convertToDTO(repo.save(exists));
+            return convertToDTO(repo.save(exists));
+        } catch (Exception e) {
+            log.error("Error al actualizar inscripción con ID {}: {}", id, e.getMessage());
+            throw new IllegalArgumentException("Error al actualizar inscripción: " + e.getMessage());
+        }
     }
 
     // DELETE
@@ -104,7 +115,10 @@ public class StudentCareerEnrollmentsService {
             }
             return false;
         } catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("No se encontró inscripción con ID: " + id, 1);
+            throw new ExceptionNoSuchElement("No se encontró inscripción con ID: " + id);
+        } catch (Exception e){
+            log.error("Error al eliminar inscripción con ID {}: {}", id, e.getMessage());
+            throw new IllegalArgumentException("Error al eliminar inscripción: " + e.getMessage());
         }
     }
 
@@ -149,17 +163,17 @@ public class StudentCareerEnrollmentsService {
 
         if(dto.getCareerID() != null){
             ptc2025.backend.Entities.careers.CareerEntity career = careerRepo.findById(dto.getCareerID())
-                    .orElseThrow(() -> new IllegalArgumentException("Carrera no encontrada con ID: " + dto.getCareerID()));
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Carrera no encontrada con ID: " + dto.getCareerID()));
             entity.setCareer(career);
         }
         if(dto.getStudentID() != null){
             StudentsEntity student = studentsRepository.findById(dto.getStudentID())
-                    .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado con ID: " + dto.getStudentID()));
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Estudiante no encontrado con ID: " + dto.getStudentID()));
             entity.setStudent(student);
         }
         if(dto.getSocialServiceProjectID() != null){
             SocialServiceProjectsEntity project = repoSocialService.findById(dto.getSocialServiceProjectID()).orElseThrow(
-                            () -> new IllegalArgumentException("Proyecto no encontrado con ID: " + dto.getSocialServiceProjectID()));
+                    () -> new ExceptionNoSuchElement("Proyecto no encontrado con ID: " + dto.getSocialServiceProjectID()));
             entity.setSocialServiceProject(project);
         }
 

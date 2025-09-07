@@ -7,11 +7,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ptc2025.backend.Entities.Pensum.PensumEntity;
 import ptc2025.backend.Entities.RequirementConditions.RequirementConditionsEntity;
 import ptc2025.backend.Entities.Requirements.RequirementsEntity;
 import ptc2025.backend.Entities.SubjectDefinitions.SubjectDefinitionsEntity;
-import ptc2025.backend.Models.DTO.Pensum.PensumDTO;
+import ptc2025.backend.Exceptions.ExceptionBadRequest;
+import ptc2025.backend.Exceptions.ExceptionNoSuchElement;
 import ptc2025.backend.Models.DTO.RequirementConditions.RequirementConditionsDTO;
 import ptc2025.backend.Respositories.RequirementConditions.RequirementConditionsRepository;
 import ptc2025.backend.Respositories.Requirements.RequirementsRepository;
@@ -33,42 +33,45 @@ public class RequirementConditionsService {
     @Autowired
     SubjectDefinitionsRepository repoSubjectDefinitions;
 
+    // Convertir a DTO
     public RequirementConditionsDTO convertToRequirementDTO(RequirementConditionsEntity entity){
         RequirementConditionsDTO dto = new RequirementConditionsDTO();
         dto.setConditionID(entity.getConditionID());
 
         if(entity.getRequirements() != null){
             dto.setRequirementID(entity.getRequirements().getId());
-        }else {
+        } else {
             dto.setRequirementID(null);
         }
 
         if(entity.getSubjectDefinitions() != null){
             dto.setConditionID(entity.getSubjectDefinitions().getSubjectID());
-        }else {
+        } else {
             dto.setSubjectID(null);
         }
         return dto;
     }
 
+    // Convertir a Entity
     public RequirementConditionsEntity convertToRequirementEntity(RequirementConditionsDTO dto){
         RequirementConditionsEntity entity = new RequirementConditionsEntity();
         entity.setConditionID(dto.getConditionID());
 
         if(dto.getRequirementID() != null){
-            RequirementsEntity requirements = repoRequirement.findById(dto.getRequirementID()).orElseThrow(
-                    () -> new IllegalArgumentException("Requisito no encontrado con ID " + dto.getRequirementID()));
+            RequirementsEntity requirements = repoRequirement.findById(dto.getRequirementID())
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Requisito no encontrado con ID " + dto.getRequirementID()));
             entity.setRequirements(requirements);
         }
 
         if(dto.getSubjectID() != null){
-            SubjectDefinitionsEntity subjectDefinitions = repoSubjectDefinitions.findById(dto.getSubjectID()).orElseThrow(
-                    () -> new IllegalArgumentException("Materia no encontrada con ID " + dto.getSubjectID()));
+            SubjectDefinitionsEntity subjectDefinitions = repoSubjectDefinitions.findById(dto.getSubjectID())
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Materia no encontrada con ID " + dto.getSubjectID()));
             entity.setSubjectDefinitions(subjectDefinitions);
         }
         return entity;
     }
 
+    // Obtener todos
     public List<RequirementConditionsDTO> getAllRequirements(){
         List<RequirementConditionsEntity> requirementsConditions = repo.findAll();
         return requirementsConditions.stream()
@@ -76,62 +79,66 @@ public class RequirementConditionsService {
                 .collect(Collectors.toList());
     }
 
+    // Paginación
     public Page<RequirementConditionsDTO> getRequirementConditionPagination(int page, int size){
         Pageable pageable = PageRequest.of(page, size);
         Page<RequirementConditionsEntity> pageEntity = repo.findAll(pageable);
         return pageEntity.map(this::convertToRequirementDTO);
     }
 
+    // Insertar
     public RequirementConditionsDTO insertRequirementCondition(RequirementConditionsDTO dto){
         if(dto == null || dto.getRequirementID() == null || dto.getRequirementID().isBlank() ||
                 dto.getSubjectID() == null || dto.getSubjectID().isBlank()){
-            throw new IllegalArgumentException("Los campos deben de estar completos.");
+            throw new ExceptionBadRequest("Los campos deben de estar completos.");
         }
-        try{
+        try {
             RequirementConditionsEntity entity = convertToRequirementEntity(dto);
             RequirementConditionsEntity saved = repo.save(entity);
             return convertToRequirementDTO(saved);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Error al registrar el requisito: " + e.getMessage());
-            throw new IllegalArgumentException("Error al registrar el requisito");
+            throw new RuntimeException("Error interno al registrar el requisito");
         }
     }
 
-    public RequirementConditionsDTO updateRequirementCondition (String id, RequirementConditionsDTO json){
-        RequirementConditionsEntity exists = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Requisito no encontrado"));
+    // Actualizar
+    public RequirementConditionsDTO updateRequirementCondition(String id, RequirementConditionsDTO json){
+        RequirementConditionsEntity exists = repo.findById(id)
+                .orElseThrow(() -> new ExceptionNoSuchElement("Requisito no encontrado con ID " + id));
 
         if(json.getSubjectID() != null){
-            SubjectDefinitionsEntity subjectDefinitions = repoSubjectDefinitions.findById(json.getSubjectID()).orElseThrow(
-                    () -> new IllegalArgumentException("Materia no encontrada con ID " + json.getSubjectID()));
+            SubjectDefinitionsEntity subjectDefinitions = repoSubjectDefinitions.findById(json.getSubjectID())
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Materia no encontrada con ID " + json.getSubjectID()));
             exists.setSubjectDefinitions(subjectDefinitions);
-        }else {
+        } else {
             exists.setSubjectDefinitions(null);
         }
 
         if(json.getRequirementID() != null){
-            RequirementsEntity requirements = repoRequirement.findById(json.getRequirementID()).orElseThrow(
-                    () -> new IllegalArgumentException("Requisito no encontrado con ID " + json.getRequirementID()));
+            RequirementsEntity requirements = repoRequirement.findById(json.getRequirementID())
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Requisito no encontrado con ID " + json.getRequirementID()));
             exists.setRequirements(requirements);
-        }else {
+        } else {
             exists.setRequirements(null);
         }
 
         RequirementConditionsEntity updatedRequirement = repo.save(exists);
-
         return convertToRequirementDTO(updatedRequirement);
     }
 
+    // Eliminar
     public boolean deleteRequirementCondition(String id){
-        try{
+        try {
             RequirementConditionsEntity exists = repo.findById(id).orElse(null);
             if(exists != null){
                 repo.deleteById(id);
                 return true;
-            }else{
+            } else {
                 return false;
             }
-        }catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("No se encontró requisito con ID " + id + " para eliminar",1);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ExceptionNoSuchElement("No se encontró requisito con ID " + id + " para eliminar");
         }
     }
 }

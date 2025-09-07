@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Requirements.RequirementsEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Exceptions.ExceptionNoSuchElement;
 import ptc2025.backend.Models.DTO.Requirements.RequirementsDTO;
 import ptc2025.backend.Respositories.Requirements.RequirementsRepository;
 import ptc2025.backend.Respositories.Universities.UniversityRespository;
@@ -36,6 +37,7 @@ public class RequirementsService {
         Page<RequirementsEntity> pageEntity = repo.findAll(pageable);
         return pageEntity.map(this::convertirRequerimientosADTO);
     }
+
     public RequirementsDTO convertirRequerimientosADTO(RequirementsEntity reque){
         RequirementsDTO dto = new RequirementsDTO();
         dto.setId(reque.getId());
@@ -44,7 +46,7 @@ public class RequirementsService {
         if(reque.getUniversity() != null){
             dto.setUniversityName(reque.getUniversity().getUniversityName());
             dto.setUniversityID(reque.getUniversity().getUniversityID());
-        }else {
+        } else {
             dto.setUniversityName("Sin Universidad Asignada");
             dto.setUniversityID(null);
         }
@@ -59,9 +61,12 @@ public class RequirementsService {
             RequirementsEntity entity = converirAEntity(data);
             RequirementsEntity RegistroGuardado = repo.save(entity);
             return convertirRequerimientosADTO(RegistroGuardado);
-        }catch (Exception e){
-           log.error("Error al ingresar los datos" + e.getMessage());
-           throw new RuntimeException("Error al registrar El nuevo Requirement");
+        } catch (IllegalArgumentException e) {
+            log.error("Error de validación: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Error al ingresar los datos: {}", e.getMessage());
+            throw new RuntimeException("Error al registrar el nuevo requerimiento", e);
         }
     }
 
@@ -71,38 +76,44 @@ public class RequirementsService {
         entity.setDescription(data.getDescription());
         if(data.getUniversityID() != null){
             UniversityEntity university = repoUniversity.findById(data.getUniversityID())
-                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + data.getUniversityID()));
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Universidad no encontrada con ID: " + data.getUniversityID()));
             entity.setUniversity(university);
         }
         return entity;
     }
 
     public RequirementsDTO actualizarRequirements(String id, RequirementsDTO json) {
-        RequirementsEntity existente = repo.findById(id).orElseThrow(() -> new RuntimeException("Requirement no encontrado"));
+        RequirementsEntity existente = repo.findById(id)
+                .orElseThrow(() -> new ExceptionNoSuchElement("Requirement no encontrado con ID: " + id));
         existente.setRequirementName(json.getRequirementName());
         existente.setDescription(json.getDescription());
+
         if(json.getUniversityID() != null){
             UniversityEntity university = repoUniversity.findById(json.getUniversityID())
-                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + json.getUniversityID()));
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Universidad no encontrada con ID: " + json.getUniversityID()));
             existente.setUniversity(university);
-        }else {
+        } else {
             existente.setUniversity(null);
         }
-        RequirementsEntity RequirementActualizado = repo.save(existente);
-        return convertirRequerimientosADTO(RequirementActualizado);
+
+        try {
+            RequirementsEntity RequirementActualizado = repo.save(existente);
+            return convertirRequerimientosADTO(RequirementActualizado);
+        } catch (Exception e) {
+            log.error("Error al actualizar el requerimiento: {}", e.getMessage());
+            throw new RuntimeException("Error al actualizar el Requirement", e);
+        }
     }
 
     public boolean eliminarRequirement(String id) {
-        try{
-            RequirementsEntity existente = repo.findById(id).orElse(null);
-            if (existente != null){
-                repo.deleteById(id);
-                return true;
-            }else {
-                return false;
-            }
-        }catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("No se encontro el registro", 1);
+        try {
+            RequirementsEntity existente = repo.findById(id)
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Requirement no encontrado con ID: " + id));
+            repo.deleteById(id);
+            return true;
+        } catch (EmptyResultDataAccessException e) {
+            log.error("Error al eliminar requerimiento: {}", e.getMessage());
+            throw new EmptyResultDataAccessException("No se encontró el registro para eliminar", 1);
         }
     }
 }

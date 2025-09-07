@@ -17,14 +17,17 @@ public class SecurityQuestionsService {
     @Autowired
     private SecurityQuestionsRepository repo;
 
-    public List<SecurityQuestionsDTO> getAllSecurityQuestions(){
+    public List<SecurityQuestionsDTO> getAllSecurityQuestions() {
         List<SecurityQuestionsEntity> secuQ = repo.findAll();
+        if (secuQ.isEmpty()) {
+            throw new RuntimeException("No existen registros sobre preguntas de seguridad");
+        }
         return secuQ.stream()
                 .map(this::convertirPreguntasDTO)
                 .collect(Collectors.toList());
     }
 
-    public SecurityQuestionsDTO convertirPreguntasDTO(SecurityQuestionsEntity seguridaQ){
+    public SecurityQuestionsDTO convertirPreguntasDTO(SecurityQuestionsEntity seguridaQ) {
         SecurityQuestionsDTO dto = new SecurityQuestionsDTO();
         dto.setId(seguridaQ.getId());
         dto.setUniversityID(seguridaQ.getUniversityID());
@@ -33,15 +36,15 @@ public class SecurityQuestionsService {
     }
 
     public SecurityQuestionsDTO insertarDatos(SecurityQuestionsDTO data) {
-        if (data == null){
+        if (data == null) {
             throw new IllegalArgumentException("Los valores no pueden ser nulos");
         }
         try {
             SecurityQuestionsEntity entity = convertirAEntity(data);
             SecurityQuestionsEntity securityQuestionGuardada = repo.save(entity);
             return convertirPreguntasDTO(securityQuestionGuardada);
-        }catch (Exception e){
-            log.error("Error al registrar el valor" + e.getMessage());
+        } catch (Exception e) {
+            log.error("Error al registrar el valor: " + e.getMessage());
             throw new RuntimeException("Error al hacer el nuevo registro");
         }
     }
@@ -54,24 +57,33 @@ public class SecurityQuestionsService {
     }
 
     public SecurityQuestionsDTO actualizarSecurityQuestion(String id, SecurityQuestionsDTO json) {
-        SecurityQuestionsEntity existente = repo.findById(id).orElseThrow(() -> new RuntimeException("SecurityQuestion no encontrada"));
+        SecurityQuestionsEntity existente = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pregunta de seguridad no encontrada"));
         existente.setUniversityID(json.getUniversityID());
         existente.setQuestion(json.getQuestion());
-        SecurityQuestionsEntity securityQuestionsActualizado = repo.save(existente);
-        return convertirPreguntasDTO(securityQuestionsActualizado);
+        try {
+            SecurityQuestionsEntity securityQuestionsActualizado = repo.save(existente);
+            return convertirPreguntasDTO(securityQuestionsActualizado);
+        } catch (Exception e) {
+            log.error("Error al actualizar la pregunta de seguridad: " + e.getMessage());
+            throw new RuntimeException("Error al actualizar la pregunta de seguridad");
+        }
     }
 
     public boolean eliminarSecurityQuestion(String id) {
         try {
             SecurityQuestionsEntity existente = repo.findById(id).orElse(null);
-            if (existente != null){
+            if (existente != null) {
                 repo.deleteById(id);
                 return true;
-            }else {
+            } else {
                 return false;
             }
-        }catch (EmptyResultDataAccessException e){
+        } catch (EmptyResultDataAccessException e) {
             throw new EmptyResultDataAccessException("No se encontro el registro", 1);
+        } catch (Exception e) {
+            log.error("Error al eliminar la pregunta de seguridad: " + e.getMessage());
+            throw new RuntimeException("Error inesperado al eliminar la pregunta de seguridad");
         }
     }
 }

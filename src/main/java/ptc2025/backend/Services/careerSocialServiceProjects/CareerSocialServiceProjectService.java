@@ -56,25 +56,35 @@ public class CareerSocialServiceProjectService {
     }
 
     public CareerSocialServiceProjectDTO updateProject(String id, CareerSocialServiceProjectDTO dto){
-        CareerSocialServiceProjectEntity exist = repo.findById(id).orElseThrow(() -> new RuntimeException("El dato no pudo ser actualizado. Relacion entre carrera y servicio social no encontrada"));
+        CareerSocialServiceProjectEntity exist = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("El dato no pudo ser actualizado. Relacion entre carrera y servicio social no encontrada"));
+
         if (dto.getCareerId() != null){
             CareerEntity career = careerRepository.findById(dto.getCareerId())
                     .orElseThrow(() -> new IllegalArgumentException("Carrera no encontrada con ID: " + dto.getCareerId()));
             exist.setCareer(career);
-        }else{
+        } else {
             exist.setCareer(null);
         }
+
         if (dto.getSocialServiceProjectId() != null){
             SocialServiceProjectsEntity social = socialServiceRespository.findById(dto.getSocialServiceProjectId())
-                    .orElseThrow(() -> new IllegalArgumentException("Carrera no encontrada con ID: " + dto.getSocialServiceProjectId()));
+                    .orElseThrow(() -> new IllegalArgumentException("Servicio social no encontrado con ID: " + dto.getSocialServiceProjectId()));
             exist.setSocialServiceProject(social);
-        }else{
+        } else {
             exist.setSocialServiceProject(null);
         }
 
-        CareerSocialServiceProjectEntity entity = repo.getById(id);
+        CareerSocialServiceProjectEntity entity;
+        try {
+            entity = repo.getById(id);
+        } catch (Exception e) {
+            throw new RuntimeException("Error: no se encontró el proyecto con id " + id);
+        }
+
         return convertToDTO(repo.save(entity));
     }
+
 
     public boolean deleteProject(String id){
         try{

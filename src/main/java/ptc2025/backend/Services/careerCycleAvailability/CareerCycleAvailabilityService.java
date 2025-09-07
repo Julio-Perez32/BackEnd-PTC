@@ -12,6 +12,9 @@ import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Entities.YearCycles.YearCyclesEntity;
 import ptc2025.backend.Entities.careerCycleAvailability.CareerCycleAvailabilityEntity;
 import ptc2025.backend.Entities.careers.CareerEntity;
+import ptc2025.backend.Exceptions.ExceptionNotFound;
+import ptc2025.backend.Exceptions.ExceptionServerError;
+import ptc2025.backend.Exceptions.ExceptionValidationError;
 import ptc2025.backend.Models.DTO.careerCycleAvailability.CareerCycleAvailabilityDTO;
 import ptc2025.backend.Respositories.YearCycles.YearCyclesRepository;
 import ptc2025.backend.Respositories.careerCycleAvailability.CareerCycleAvailabilityRepository;
@@ -22,7 +25,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-
 public class CareerCycleAvailabilityService {
 
     @Autowired
@@ -48,7 +50,7 @@ public class CareerCycleAvailabilityService {
 
     public CareerCycleAvailabilityDTO insertAvailability(CareerCycleAvailabilityDTO data) {
         if (data == null){
-            throw new IllegalArgumentException("Datos no correctoss");
+            throw new ExceptionValidationError("Los datos proporcionados son inválidos o están incompletos");
         }
         try {
             CareerCycleAvailabilityEntity entity = convertirAEntity(data);
@@ -56,7 +58,7 @@ public class CareerCycleAvailabilityService {
             return convertToDTO(registroGuardado);
         } catch (Exception e) {
             log.error("Error al querer guardar los datos ingresados" + e.getMessage());
-            throw new IllegalArgumentException("Error al registrar el nuevo dato");
+            throw new ExceptionServerError("Error al registrar el nuevo dato");
         }
     }
 
@@ -64,29 +66,31 @@ public class CareerCycleAvailabilityService {
         CareerCycleAvailabilityEntity entity = new CareerCycleAvailabilityEntity();
         if(data.getYearCycleId() != null){
             YearCyclesEntity yearCycles = yearCyclesRepo.findById(data.getYearCycleId())
-                    .orElseThrow(() -> new IllegalArgumentException("ciclo no encontrado con ID: " + data.getYearCycleId()));
+                    .orElseThrow(() -> new ExceptionNotFound("Ciclo no encontrado con ID: " + data.getYearCycleId()));
             entity.setYearCycles(yearCycles);
         }
         if(data.getCareerId() != null){
             CareerEntity career = careerRepository.findById(data.getCareerId())
-                    .orElseThrow(() -> new IllegalArgumentException("Carrera no encontrada con ID: " + data.getCareerId()));
+                    .orElseThrow(() -> new ExceptionNotFound("Carrera no encontrada con ID: " + data.getCareerId()));
             entity.setCareer(career);
         }
         return entity;
     }
 
     public CareerCycleAvailabilityDTO updateAvailability(String id, CareerCycleAvailabilityDTO dto) {
-        CareerCycleAvailabilityEntity entity = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Disponibilidad no encontrada"));
+        CareerCycleAvailabilityEntity entity = repo.findById(id)
+                .orElseThrow(() -> new ExceptionNotFound("Disponibilidad no encontrada con el ID: " + id));
+
         if(dto.getCareerId() != null){
             CareerEntity career = careerRepository.findById(dto.getCareerId())
-                    .orElseThrow(() -> new IllegalArgumentException("carrera no encontrada con ID: " + dto.getCareerId()));
+                    .orElseThrow(() -> new ExceptionNotFound("Carrera no encontrada con ID: " + dto.getCareerId()));
             entity.setCareer(career);
         }else {
             entity.setCareer(null);
         }
         if(dto.getYearCycleId() != null){
             YearCyclesEntity yearCycles = yearCyclesRepo.findById(dto.getYearCycleId())
-                    .orElseThrow(() -> new IllegalArgumentException("ciclo no encontrado con ID: " + dto.getYearCycleId()));
+                    .orElseThrow(() -> new ExceptionNotFound("Ciclo no encontrado con ID: " + dto.getYearCycleId()));
             entity.setYearCycles(yearCycles);
         }else {
             entity.setYearCycles(null);
@@ -96,11 +100,11 @@ public class CareerCycleAvailabilityService {
     }
 
     public boolean deleteAvailability(String id) {
-        if (repo.existsById(id)) {
-            repo.deleteById(id);
-            return true;
+        if (!repo.existsById(id)) {
+            throw new ExceptionNotFound("Disponibilidad no encontrada con el ID: " + id);
         }
-        return false;
+        repo.deleteById(id);
+        return true;
     }
 
     private CareerCycleAvailabilityDTO convertToDTO(CareerCycleAvailabilityEntity entity) {

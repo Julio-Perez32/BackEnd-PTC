@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
 import ptc2025.backend.Entities.EvaluationPlans.EvaluationPlansEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Exceptions.ExceptionNoSuchElement;
 import ptc2025.backend.Models.DTO.EvaluationPlans.EvaluationPlansDTO;
 import ptc2025.backend.Respositories.CourseOfferings.CourseOfferingsRepository;
 import ptc2025.backend.Respositories.EvaluationPlans.EvaluationPlansRepository;
@@ -20,116 +21,121 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class EvaluationPlansService {
-    @Autowired
-    EvaluationPlansRepository repo;
-    @Autowired
-    CourseOfferingsRepository courseOfferingsRepo;
 
-    //Get
-    public List<EvaluationPlansDTO> getEvaluationPlans(){
+    @Autowired
+    private EvaluationPlansRepository repo;
+
+    @Autowired
+    private CourseOfferingsRepository courseOfferingsRepo;
+
+    // GET
+    public List<EvaluationPlansDTO> getEvaluationPlans() {
         List<EvaluationPlansEntity> plan = repo.findAll();
+        if (plan.isEmpty()) {
+            throw new ExceptionNoSuchElement("No existen planes de evaluación registrados");
+        }
         return plan.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
-
     }
 
-    public Page<EvaluationPlansDTO> getEvaluationPlansPagination(int page, int size){
+    public Page<EvaluationPlansDTO> getEvaluationPlansPagination(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<EvaluationPlansEntity> pageEntity = repo.findAll(pageable);
+
+        if (pageEntity.isEmpty()) {
+            throw new ExceptionNoSuchElement("No existen planes de evaluación para mostrar en la página solicitada");
+        }
         return pageEntity.map(this::convertirADTO);
     }
 
-    //POST
-    public EvaluationPlansDTO insertEvaluationPlan(EvaluationPlansDTO dto){
-        if(dto == null){
-            throw new IllegalArgumentException("Plan de evaluación no puede ser nulo o vacio");
+    // POST
+    public EvaluationPlansDTO insertEvaluationPlan(EvaluationPlansDTO dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("El plan de evaluación no puede ser nulo o vacío");
         }
-        try{
+        try {
             EvaluationPlansEntity entity = convertirAEntity(dto);
-            EvaluationPlansEntity save =    repo.save(entity);
+            EvaluationPlansEntity save = repo.save(entity);
             return convertirADTO(save);
-        }
-        catch(Exception e){
-            throw new RuntimeException("No se puede crear plan de evaluacion " + e.getMessage() );
-        }
-    }
-
-    //PUT
-    public EvaluationPlansDTO updateEvaluationPlan(String id, EvaluationPlansDTO dto){
-        try{
-            if(repo.existsById(id)){
-                EvaluationPlansEntity entity = repo.getById(id);
-
-                entity.setPlanName(dto.getPlanName());
-                entity.setDescription(dto.getDescription());
-                entity.setCreatedAt(dto.getCreatedAt());
-                if(dto.getCourseOfferingID() != null){
-                    CourseOfferingsEntity courseOfferings = courseOfferingsRepo.findById(dto.getCourseOfferingID())
-                            .orElseThrow(() -> new IllegalArgumentException("CourseOffering no encontrada con ID: " + dto.getCourseOfferingID()));
-                    entity.setCourseOfferings(courseOfferings);
-                }else {
-                    entity.setCourseOfferings(null);
-                }
-
-
-                EvaluationPlansEntity save = repo.save(entity);
-                return convertirADTO(save);
-            }
-            throw new IllegalArgumentException("El plan de evaluacion con el id" + id + " no pudo ser actualizado");
-        }
-        catch (Exception e){
-            throw new RuntimeException("No se pudop actualizar el plan de evaluacion " + e.getMessage() );
+        } catch (Exception e) {
+            log.error("Error al insertar el plan de evaluación: {}", e.getMessage());
+            throw new RuntimeException("No se puede crear el plan de evaluación: " + e.getMessage());
         }
     }
 
-    //DELETE
+    // PUT
+    public EvaluationPlansDTO updateEvaluationPlan(String id, EvaluationPlansDTO dto) {
+        EvaluationPlansEntity entity = repo.findById(id)
+                .orElseThrow(() -> new ExceptionNoSuchElement("No se encontró un plan de evaluación con el ID: " + id));
 
-    public boolean deleteEvaluationPlan(String id){
-        try{
-            if(repo.existsById(id)){
-                repo.deleteById(id);
-                return true;
+        try {
+            entity.setPlanName(dto.getPlanName());
+            entity.setDescription(dto.getDescription());
+            entity.setCreatedAt(dto.getCreatedAt());
+
+            if (dto.getCourseOfferingID() != null) {
+                CourseOfferingsEntity courseOfferings = courseOfferingsRepo.findById(dto.getCourseOfferingID())
+                        .orElseThrow(() -> new ExceptionNoSuchElement("Oferta de cursos no encontrada con ID: " + dto.getCourseOfferingID()));
+                entity.setCourseOfferings(courseOfferings);
+            } else {
+                entity.setCourseOfferings(null);
             }
-            else{
-                return false;
-            }
-        }
-        catch(EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("El plan de evaluacion con el id " + id + " no existe", 1);
+
+            EvaluationPlansEntity updated = repo.save(entity);
+            return convertirADTO(updated);
+
+        } catch (Exception e) {
+            log.error("Error al actualizar el plan de evaluación con ID {}: {}", id, e.getMessage());
+            throw new RuntimeException("No se pudo actualizar el plan de evaluación: " + e.getMessage());
         }
     }
 
-    //Convertir a DTO
-    private EvaluationPlansDTO convertirADTO(EvaluationPlansEntity entity){
+    // DELETE
+
+    public boolean deleteEvaluationPlan(String id) {
+        try {
+            if (!repo.existsById(id)) {
+                throw new ExceptionNoSuchElement("No se encontró un plan de evaluación con el ID: " + id);
+            }
+            repo.deleteById(id);
+            return true;
+        } catch (EmptyResultDataAccessException e) {
+            throw new ExceptionNoSuchElement("Error al intentar eliminar. El plan de evaluación con ID " + id + " no existe.");
+        }
+    }
+
+    // Convertir a DTO
+    private EvaluationPlansDTO convertirADTO(EvaluationPlansEntity entity) {
         EvaluationPlansDTO dto = new EvaluationPlansDTO();
         dto.setEvaluationPlanID(entity.getEvaluationPlanID());
         dto.setPlanName(entity.getPlanName());
         dto.setDescription(entity.getDescription());
         dto.setCreatedAt(entity.getCreatedAt());
-        if(entity.getEvaluationPlanID() != null){
+
+        if (entity.getCourseOfferings() != null) {
             dto.setCourseOfferingID(entity.getCourseOfferings().getCourseOfferingID());
-        }else {
-            dto.setCourseoffering("Sin CourseOffering Asignada");
+        } else {
+            dto.setCourseoffering("Sin oferta de cursos Asignada");
             dto.setCourseOfferingID(null);
         }
         return dto;
     }
 
-    private EvaluationPlansEntity convertirAEntity(EvaluationPlansDTO dto){
+    private EvaluationPlansEntity convertirAEntity(EvaluationPlansDTO dto) {
         EvaluationPlansEntity entity = new EvaluationPlansEntity();
         entity.setEvaluationPlanID(dto.getEvaluationPlanID());
         entity.setPlanName(dto.getPlanName());
         entity.setDescription(dto.getDescription());
         entity.setCreatedAt(dto.getCreatedAt());
-        if(dto.getCourseOfferingID() != null){
+
+        if (dto.getCourseOfferingID() != null) {
             CourseOfferingsEntity courseOfferings = courseOfferingsRepo.findById(dto.getCourseOfferingID())
-                    .orElseThrow(() -> new IllegalArgumentException("CourseOffering no encontrada con ID: " + dto.getCourseOfferingID()));
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Oferta de cursos no encontrada con ID: " + dto.getCourseOfferingID()));
             entity.setCourseOfferings(courseOfferings);
         }
         return entity;
     }
-
 }
 
 /**EVALUATIONPLANID

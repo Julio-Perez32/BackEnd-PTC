@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Modalities.ModalitiesEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
+import ptc2025.backend.Exceptions.ExceptionBadRequest;
+import ptc2025.backend.Exceptions.ExceptionNoSuchElement;
 import ptc2025.backend.Models.DTO.Modalities.ModalitiesDTO;
 import ptc2025.backend.Respositories.Modalities.ModalityRepository;
 import ptc2025.backend.Respositories.Universities.UniversityRespository;
@@ -46,7 +48,7 @@ public class ModalityService {
         if(modalida.getUniversity() != null){
             dto.setUniversityName(modalida.getUniversity().getUniversityName());
             dto.setUniversityID(modalida.getUniversity().getUniversityID());
-        }else {
+        } else {
             dto.setUniversityName("Sin Universidad Asignada");
             dto.setUniversityID(null);
         }
@@ -54,15 +56,15 @@ public class ModalityService {
     }
 
     public ModalitiesDTO insertarDatos(ModalitiesDTO data) {
-        if (data == null){
-            throw new IllegalArgumentException("Datos invalidos");
+        if (data == null) {
+            throw new ExceptionBadRequest("Datos inválidos: el objeto no puede ser nulo.");
         }
         try {
             ModalitiesEntity entity = convertirAEntity(data);
             ModalitiesEntity ModalityGuardado = repo.save(entity);
             return convertirModalidadesADTO(ModalityGuardado);
-        }catch (Exception e){
-            log.error("Error al insertar el nuevo registro" + e.getMessage());
+        } catch (Exception e) {
+            log.error("Error al insertar el nuevo registro: " + e.getMessage());
             throw new RuntimeException("Error al ingresar el nuevo registro");
         }
     }
@@ -70,24 +72,28 @@ public class ModalityService {
     private ModalitiesEntity convertirAEntity(ModalitiesDTO data) {
         ModalitiesEntity entity = new ModalitiesEntity();
         entity.setModalityName(data.getModalityName());
-        if(data.getUniversityID() != null){
+        if (data.getUniversityID() != null) {
             UniversityEntity university = repoUniversity.findById(data.getUniversityID())
-                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + data.getUniversityID()));
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Universidad no encontrada con ID: " + data.getUniversityID()));
             entity.setUniversity(university);
         }
         return entity;
     }
 
     public ModalitiesDTO actualizarDatos(String id, ModalitiesDTO json) {
-        ModalitiesEntity existente = repo.findById(id).orElseThrow(() -> new RuntimeException("Registro no encontrado"));
+        ModalitiesEntity existente = repo.findById(id)
+                .orElseThrow(() -> new ExceptionNoSuchElement("Registro no encontrado con ID: " + id));
+
         existente.setModalityName(json.getModalityName());
-        if(json.getUniversityID() != null){
+
+        if (json.getUniversityID() != null) {
             UniversityEntity university = repoUniversity.findById(json.getUniversityID())
-                    .orElseThrow(() -> new IllegalArgumentException("Universidad no encontrada con ID: " + json.getUniversityID()));
+                    .orElseThrow(() -> new ExceptionNoSuchElement("Universidad no encontrada con ID: " + json.getUniversityID()));
             existente.setUniversity(university);
-        }else {
+        } else {
             existente.setUniversity(null);
         }
+
         ModalitiesEntity ModalityActualizada = repo.save(existente);
         return convertirModalidadesADTO(ModalityActualizada);
     }
@@ -95,14 +101,14 @@ public class ModalityService {
     public boolean eliminarModality(String id) {
         try {
             ModalitiesEntity existente = repo.findById(id).orElse(null);
-            if (existente != null){
+            if (existente != null) {
                 repo.deleteById(id);
                 return true;
-            }else {
+            } else {
                 return false;
             }
-        }catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("No se encontro la modalidad", 1);
+        } catch (EmptyResultDataAccessException e) {
+            throw new EmptyResultDataAccessException("No se encontró la modalidad con el ID: " + id, 1);
         }
     }
 }

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
 import ptc2025.backend.Entities.StudentCareerEnrollments.StudentCareerEnrollmentsEntity;
 import ptc2025.backend.Entities.courseEnrollments.CourseEnrollmentEntity;
+import ptc2025.backend.Exceptions.ExceptionNotFound;
+import ptc2025.backend.Exceptions.ExceptionServerError;
 import ptc2025.backend.Models.DTO.courseEnrollments.CourseEnrollmentDTO;
 import ptc2025.backend.Respositories.CourseOfferings.CourseOfferingsRepository;
 import ptc2025.backend.Respositories.StudentCareerEnrollments.StudentCareerEnrollmentsRepository;
@@ -47,56 +49,83 @@ public class CourseEnrollmentService {
 
     // POST
     public CourseEnrollmentDTO insertEnrollment(CourseEnrollmentDTO dto) {
-        if (dto == null) throw new IllegalArgumentException("Inscripción no puede ser nula");
-        if (repo.existsById(dto.getId())) throw new IllegalArgumentException("La inscripción ya existe");
+        if (dto == null) {
+            throw new IllegalArgumentException("Inscripción no puede ser nula");
+        }
 
-        CourseEnrollmentEntity entity = convertToEntity(dto);
-        CourseEnrollmentEntity saved = repo.save(entity);
-        return convertToDTO(saved);
+        if (repo.existsById(dto.getId())) {
+            throw new IllegalArgumentException("La inscripción ya existe");
+        }
+
+        try {
+            CourseEnrollmentEntity entity = convertToEntity(dto);
+            CourseEnrollmentEntity saved = repo.save(entity);
+            return convertToDTO(saved);
+        } catch (IllegalArgumentException e) {
+            throw e; // Propagamos validaciones
+        } catch (Exception e) {
+            log.error("Error al registrar la inscripción: " + e.getMessage());
+            throw new ExceptionServerError("Error interno al guardar la inscripción" + e.getMessage());
+        }
     }
 
-    // PUT
+
     public CourseEnrollmentDTO updateEnrollment(String id, CourseEnrollmentDTO dto) {
         CourseEnrollmentEntity exist = repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("El dato no pudo ser actualizado. Inscripción no encontrada"));
+                .orElseThrow(() -> new ExceptionNotFound("No se encontró CourseOffering con ID: " + dto.getCourseOfferingId()));
 
-        exist.setEnrollmentStatus(dto.getEnrollmentStatus());
-        exist.setFinalGrade(dto.getFinalGrade());
-        exist.setEnrollmentDate(dto.getEnrollmentDate());
-        exist.setMeritUnit(dto.getMeritUnit());
 
-        if (dto.getCourseOfferingId() != null) {
-            CourseOfferingsEntity co = courseOfferingsRepository.findById(dto.getCourseOfferingId())
-                    .orElseThrow(() -> new IllegalArgumentException("No se encontró CourseOffering con ID: " + dto.getCourseOfferingId()));
-            exist.setCourseOfferings(co);
-        } else {
-            exist.setCourseOfferings(null);
+        try {
+            exist.setEnrollmentStatus(dto.getEnrollmentStatus());
+            exist.setFinalGrade(dto.getFinalGrade());
+            exist.setEnrollmentDate(dto.getEnrollmentDate());
+            exist.setMeritUnit(dto.getMeritUnit());
+
+            if (dto.getCourseOfferingId() != null) {
+                CourseOfferingsEntity co = courseOfferingsRepository.findById(dto.getCourseOfferingId())
+                        .orElseThrow(() -> new ExceptionNotFound("No se encontró CourseOffering con ID: " + dto.getCourseOfferingId()));
+                exist.setCourseOfferings(co);
+            } else {
+                exist.setCourseOfferings(null);
+            }
+
+            if (dto.getStudentCareerEnrollmentId() != null) {
+                StudentCareerEnrollmentsEntity sce = studentCareerEnrollmentsRepository.findById(dto.getStudentCareerEnrollmentId())
+                        .orElseThrow(() -> new ExceptionNotFound("No se encontró CourseOffering con ID: " + dto.getCourseOfferingId()));
+                exist.setStudentCareerEnrollments(sce);
+            } else {
+                exist.setStudentCareerEnrollments(null);
+            }
+
+            CourseEnrollmentEntity actualizado = repo.save(exist);
+            return convertToDTO(actualizado);
+
+        } catch (ExceptionNotFound e) {
+            throw e; // Se propaga sin modificar
+        } catch (Exception e) {
+            log.error("Error al actualizar la inscripción: " + e.getMessage());
+            throw new ExceptionServerError("Error interno al actualizar la inscripción" + e.getMessage());
         }
-
-        if (dto.getStudentCareerEnrollmentId() != null) {
-            StudentCareerEnrollmentsEntity sce = studentCareerEnrollmentsRepository.findById(dto.getStudentCareerEnrollmentId())
-                    .orElseThrow(() -> new IllegalArgumentException("No se encontró StudentCareerEnrollment con ID: " + dto.getStudentCareerEnrollmentId()));
-            exist.setStudentCareerEnrollments(sce);
-        } else {
-            exist.setStudentCareerEnrollments(null);
-        }
-
-        CourseEnrollmentEntity actualizado = repo.save(exist);
-        return convertToDTO(actualizado);
     }
 
-    // DELETE
+
+
     public boolean deleteEnrollment(String id) {
         try {
             if (repo.existsById(id)) {
                 repo.deleteById(id);
                 return true;
+            } else {
+                throw new ExceptionNotFound("La inscripción con ID " + id + " no existe");
             }
-            return false;
         } catch (EmptyResultDataAccessException e) {
-            throw new EmptyResultDataAccessException("La inscripción con ID " + id + " no existe", 1);
+            throw new ExceptionNotFound("La inscripción con ID " + id + " no existe");
+        } catch (Exception e) {
+            log.error("Error al eliminar la inscripción: " + e.getMessage());
+            throw new ExceptionServerError("Error interno al eliminar la inscripción" + e.getMessage());
         }
     }
+
 
     // CONVERSIONES
     private CourseEnrollmentDTO convertToDTO(CourseEnrollmentEntity entity) {

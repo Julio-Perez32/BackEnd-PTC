@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.People.PeopleEntity;
 import ptc2025.backend.Entities.Students.StudentsEntity;
+import ptc2025.backend.Exceptions.ExceptionNotFound;
 import ptc2025.backend.Models.DTO.Students.StudentsDTO;
 import ptc2025.backend.Respositories.People.PeopleRepository;
 import ptc2025.backend.Respositories.Students.StudentsRepository;
@@ -28,14 +29,20 @@ public class StudentsService {
 
     public List<StudentsDTO> getAllStudents() {
         List<StudentsEntity> students = repo.findAll();
+        if (students.isEmpty()) {
+            throw new ExceptionNotFound("No se encontraron registros de estudiantes.");
+        }
         return students.stream()
                 .map(this::convertToStudentsDTO)
                 .collect(Collectors.toList());
     }
 
-    public Page<StudentsDTO> getStudentsPagination(int page, int size){
+    public Page<StudentsDTO> getStudentsPagination(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<StudentsEntity> pageEntity = repo.findAll(pageable);
+        if (pageEntity.isEmpty()) {
+            throw new ExceptionNotFound("No se encontraron estudiantes en la paginación.");
+        }
         return pageEntity.map(this::convertToStudentsDTO);
     }
 
@@ -43,11 +50,12 @@ public class StudentsService {
         StudentsDTO dto = new StudentsDTO();
         dto.setStudentID(students.getStudentID());
         dto.setStudentCode(students.getStudentCode());
-        if(students.getPeople() != null){
+
+        if (students.getPeople() != null) {
             dto.setPersonName(students.getPeople().getFirstName());
             dto.setPersonLastName(students.getPeople().getLastName());
             dto.setPersonID(students.getPeople().getPersonID());
-        }else {
+        } else {
             dto.setPersonName("Sin Persona Asignada");
             dto.setPersonID(null);
         }
@@ -58,9 +66,10 @@ public class StudentsService {
         StudentsEntity entity = new StudentsEntity();
         entity.setStudentID(dto.getStudentID());
         entity.setStudentCode(dto.getStudentCode());
-        if(dto.getPersonID() != null){
+
+        if (dto.getPersonID() != null) {
             PeopleEntity people = repoPeople.findById(dto.getPersonID())
-                    .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada con ID: " + dto.getPersonID()));
+                    .orElseThrow(() -> new ExceptionNotFound("Persona no encontrada con ID: " + dto.getPersonID()));
             entity.setPeople(people);
         }
         return entity;
@@ -77,37 +86,39 @@ public class StudentsService {
             return convertToStudentsDTO(studentSaved);
         } catch (Exception e) {
             log.error("Error al registrar el estudiante: " + e.getMessage());
-            throw new IllegalArgumentException("Error al registrar el estudiante");
+            throw new RuntimeException("Error interno al registrar el estudiante.");
         }
     }
 
-    public StudentsDTO updateStudent(String id, StudentsDTO json){
-        StudentsEntity existsStudent = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado."));
+    public StudentsDTO updateStudent(String id, StudentsDTO json) {
+        StudentsEntity existsStudent = repo.findById(id)
+                .orElseThrow(() -> new ExceptionNotFound("Estudiante no encontrado con ID: " + id));
 
         existsStudent.setStudentCode(json.getStudentCode());
-        if (json.getPersonID() != null){
+
+        if (json.getPersonID() != null) {
             PeopleEntity person = repoPeople.findById(json.getPersonID())
-                    .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada con ID proporcionado: " + json.getPersonID()));
+                    .orElseThrow(() -> new ExceptionNotFound("Persona no encontrada con ID proporcionado: " + json.getPersonID()));
             existsStudent.setPeople(person);
-        }else {
+        } else {
             existsStudent.setPeople(null);
         }
-        StudentsEntity updatedStudent = repo.save(existsStudent);
 
+        StudentsEntity updatedStudent = repo.save(existsStudent);
         return convertToStudentsDTO(updatedStudent);
     }
 
-    public boolean deleteStudent(String id){
-        try{
+    public boolean deleteStudent(String id) {
+        try {
             StudentsEntity existsStudent = repo.findById(id).orElse(null);
-            if(existsStudent != null){
+            if (existsStudent != null) {
                 repo.deleteById(id);
                 return true;
-            }else{
+            } else {
                 return false;
             }
-        } catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("No se encontró estudiante con ID: " + id + " para eliminar",1);
+        } catch (EmptyResultDataAccessException e) {
+            throw new EmptyResultDataAccessException("No se encontró estudiante con ID: " + id + " para eliminar", 1);
         }
     }
 }

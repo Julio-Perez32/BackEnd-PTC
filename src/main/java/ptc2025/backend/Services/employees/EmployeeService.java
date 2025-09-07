@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Departments.DepartmentsEntity;
 import ptc2025.backend.Entities.People.PeopleEntity;
 import ptc2025.backend.Entities.employees.EmployeeEntity;
+import ptc2025.backend.Exceptions.ExceptionNoSuchElement;
 import ptc2025.backend.Models.DTO.employees.EmployeeDTO;
 import ptc2025.backend.Respositories.Departments.DepartmentsRepository;
 import ptc2025.backend.Respositories.People.PeopleRepository;
@@ -25,7 +26,7 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository repo;
 
-    @Autowired//inyectando repositorio
+    @Autowired
     private PeopleRepository repoPeople;
 
     @Autowired
@@ -33,16 +34,33 @@ public class EmployeeService {
 
     // GET
     public List<EmployeeDTO> getEmployees() {
-        List<EmployeeEntity> employees = repo.findAll();
-        return employees.stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
+        try {
+            List<EmployeeEntity> employees = repo.findAll();
+            if (employees.isEmpty()) {
+                throw new ExceptionNoSuchElement("No existen empleados registrados.");
+            }
+            return employees.stream()
+                    .map(this::convertirADTO)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error al obtener la lista de empleados: {}", e.getMessage());
+            throw new RuntimeException("No se pudo obtener la lista de empleados: " + e.getMessage());
+        }
     }
 
-    public Page<EmployeeDTO> getEmployeePagination(int page, int size){
-        Pageable pageable = PageRequest.of(page, size);
-        Page<EmployeeEntity> pageEntity = repo.findAll(pageable);
-        return pageEntity.map(this::convertirADTO);
+    public Page<EmployeeDTO> getEmployeePagination(int page, int size) {
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<EmployeeEntity> pageEntity = repo.findAll(pageable);
+
+            if (pageEntity.isEmpty()) {
+                throw new ExceptionNoSuchElement("No existen empleados en la página solicitada.");
+            }
+            return pageEntity.map(this::convertirADTO);
+        } catch (Exception e) {
+            log.error("Error al obtener la paginación de empleados: {}", e.getMessage());
+            throw new RuntimeException("No se pudo obtener la paginación de empleados: " + e.getMessage());
+        }
     }
 
     // POST
@@ -53,15 +71,17 @@ public class EmployeeService {
         if (repo.existsById(dto.getId())) {
             throw new IllegalArgumentException("El empleado ya existe");
         }
-        try{
+        try {
             EmployeeEntity entity = convertirAEntity(dto);
             EmployeeEntity saved = repo.save(entity);
             return convertirADTO(saved);
-        }catch (Exception e){
-            log.error("Error al registrar al empleado" + e.getMessage());
-            throw new RuntimeException("Error interno a la hora de registrar al empleado");
+        } catch (IllegalArgumentException e) {
+            log.error("Error de validación al registrar empleado: {}", e.getMessage());
+            throw e; // No reemplazamos, solo dejamos que se propague
+        } catch (Exception e) {
+            log.error("Error interno al registrar al empleado: {}", e.getMessage());
+            throw new RuntimeException("Error interno a la hora de registrar al empleado: " + e.getMessage());
         }
-
     }
 
     // PUT
@@ -71,29 +91,34 @@ public class EmployeeService {
                 EmployeeEntity entity = repo.getById(id);
                 entity.setEmployeeCode(dto.getEmployeeCode());
                 entity.setEmployeeDetail(dto.getEmployeeDetail());
-                if (dto.getPersonID() != null){
+
+                if (dto.getPersonID() != null) {
                     PeopleEntity person = repoPeople.findById(dto.getPersonID())
-                            .orElseThrow(() -> new IllegalArgumentException("Cargo no encontrado con ID proporcionado: " + dto.getPersonID()));
+                            .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada con ID proporcionado: " + dto.getPersonID()));
                     entity.setPeople(person);
-                }else {
+                } else {
                     entity.setPeople(null);
                 }
-                if (dto.getDeparmentID() != null){
+
+                if (dto.getDeparmentID() != null) {
                     DepartmentsEntity departments = departmentsRepo.findById(dto.getDeparmentID())
                             .orElseThrow(() -> new IllegalArgumentException("Departamento no encontrado con ID proporcionado: " + dto.getDeparmentID()));
                     entity.setDepartments(departments);
-                }else {
-                    entity.setPeople(null);
+                } else {
+                    entity.setDepartments(null);
                 }
+
                 EmployeeEntity saved = repo.save(entity);
                 return convertirADTO(saved);
             }
             throw new IllegalArgumentException("El empleado con ID " + id + " no pudo ser actualizado");
+        } catch (IllegalArgumentException e) {
+            log.error("Error de validación al actualizar empleado: {}", e.getMessage());
+            throw e;
         } catch (Exception e) {
+            log.error("Error interno al actualizar empleado: {}", e.getMessage());
             throw new RuntimeException("No se pudo actualizar el empleado: " + e.getMessage());
-        } //se le puso un catch para que funcione
-
-
+        }
     }
 
     // DELETE
@@ -106,7 +131,11 @@ public class EmployeeService {
                 return false;
             }
         } catch (EmptyResultDataAccessException e) {
+            log.error("Intento de eliminación fallido, empleado no encontrado: {}", e.getMessage());
             throw new EmptyResultDataAccessException("El empleado con ID " + id + " no existe", 1);
+        } catch (Exception e) {
+            log.error("Error interno al eliminar empleado: {}", e.getMessage());
+            throw new RuntimeException("Error interno al eliminar el empleado: " + e.getMessage());
         }
     }
 
@@ -116,22 +145,22 @@ public class EmployeeService {
         dto.setId(entity.getId());
         dto.setEmployeeCode(entity.getEmployeeCode());
         dto.setEmployeeDetail(entity.getEmployeeDetail());
-        if(entity.getPeople() != null){
+
+        if (entity.getPeople() != null) {
             dto.setPersonName(entity.getPeople().getFirstName());
             dto.setPersonLastName(entity.getPeople().getLastName());
             dto.setPersonID(entity.getPeople().getPersonID());
-        }else {
+        } else {
             dto.setPersonName("Sin Persona Asignada");
             dto.setPersonID(null);
         }
-        if(entity.getDepartments() != null){
-            dto.setDeparmentID(entity.getDepartments().getDepartmentName());
-            dto.setDeparmentID(entity.getDepartments().getDepartmentType());
+
+        if (entity.getDepartments() != null) {
             dto.setDeparmentID(entity.getDepartments().getDepartmentID());
-        }else {
-            dto.setPersonName("Sin departamento Asignado");
-            dto.setPersonID(null);
+        } else {
+            dto.setDeparmentID(null);
         }
+
         return dto;
     }
 
@@ -139,14 +168,16 @@ public class EmployeeService {
         EmployeeEntity entity = new EmployeeEntity();
         entity.setEmployeeCode(dto.getEmployeeCode());
         entity.setEmployeeDetail(dto.getEmployeeDetail());
-        if(dto.getPersonID() != null){
+
+        if (dto.getPersonID() != null) {
             PeopleEntity people = repoPeople.findById(dto.getPersonID())
                     .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada con ID: " + dto.getPersonID()));
             entity.setPeople(people);
         }
-        if(dto.getDeparmentID() != null){
+
+        if (dto.getDeparmentID() != null) {
             DepartmentsEntity departments = departmentsRepo.findById(dto.getDeparmentID())
-                    .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada con ID: " + dto.getDeparmentID()));
+                    .orElseThrow(() -> new IllegalArgumentException("Departamento no encontrado con ID: " + dto.getDeparmentID()));
             entity.setDepartments(departments);
         }
         return entity;

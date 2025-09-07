@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.SubjectDefinitions.SubjectDefinitionsEntity;
 import ptc2025.backend.Entities.SubjectTeachers.SubjectTeachersEntity;
 import ptc2025.backend.Entities.employees.EmployeeEntity;
+import ptc2025.backend.Exceptions.ExceptionBadRequest;
+import ptc2025.backend.Exceptions.ExceptionNotFound;
+import ptc2025.backend.Exceptions.ExceptionServerError;
 import ptc2025.backend.Models.DTO.SubjectTeachers.SubjectTeachersDTO;
 import ptc2025.backend.Respositories.SubjectDefinitions.SubjectDefinitionsRepository;
 import ptc2025.backend.Respositories.SubjectTeachers.SubjectTeachersRepository;
@@ -28,100 +31,113 @@ public class SubjectTeachersService {
     @Autowired
     EmployeeRepository repoEmployee;
 
-    public SubjectTeachersDTO convertToSubjectTeachersDTO(SubjectTeachersEntity entity){
+    public SubjectTeachersDTO convertToSubjectTeachersDTO(SubjectTeachersEntity entity) {
         SubjectTeachersDTO dto = new SubjectTeachersDTO();
         dto.setSubjectTeacherID(entity.getSubjectTeacherID());
 
-        if(entity.getEmployee() != null){
+        if (entity.getEmployee() != null) {
             dto.setEmployeeID(entity.getEmployee().getId());
-        }else{
+        } else {
             dto.setEmployeeID(null);
         }
 
-        if(entity.getSubjectDefinitions() != null){
+        if (entity.getSubjectDefinitions() != null) {
             dto.setSubjectID(entity.getSubjectDefinitions().getSubjectID());
-        }else{
+        } else {
             dto.setSubjectID(null);
         }
 
         return dto;
     }
 
-    public SubjectTeachersEntity convertToSubjectEntity(SubjectTeachersDTO dto){
+    public SubjectTeachersEntity convertToSubjectEntity(SubjectTeachersDTO dto) {
         SubjectTeachersEntity entity = new SubjectTeachersEntity();
         entity.setSubjectTeacherID(dto.getSubjectTeacherID());
 
-        if(dto.getSubjectID() != null){
-            SubjectDefinitionsEntity subjectDefinitions = repoSubjectDefinitions.findById(dto.getSubjectID()).orElseThrow(
-                    () -> new IllegalArgumentException("Materia no encontrada on ID " + dto.getSubjectID()));
+        if (dto.getSubjectID() != null) {
+            SubjectDefinitionsEntity subjectDefinitions = repoSubjectDefinitions.findById(dto.getSubjectID())
+                    .orElseThrow(() -> new ExceptionNotFound("Materia no encontrada con ID " + dto.getSubjectID()));
             entity.setSubjectDefinitions(subjectDefinitions);
         }
 
-        if(dto.getEmployeeID() != null){
-            EmployeeEntity employee = repoEmployee.findById(dto.getSubjectID()).orElseThrow(
-                    () -> new IllegalArgumentException("Empleado no encontrado con ID " + dto.getEmployeeID()));
+        if (dto.getEmployeeID() != null) {
+            EmployeeEntity employee = repoEmployee.findById(dto.getEmployeeID())
+                    .orElseThrow(() -> new ExceptionNotFound("Empleado no encontrado con ID " + dto.getEmployeeID()));
             entity.setEmployee(employee);
         }
         return entity;
     }
 
-    public List<SubjectTeachersDTO> getAllSubjectTeachers(){
-        List<SubjectTeachersEntity> subTeachers = repo.findAll();
-        return subTeachers.stream()
-                .map(this::convertToSubjectTeachersDTO)
-                .collect(Collectors.toList());
+    public List<SubjectTeachersDTO> getAllSubjectTeachers() {
+        try {
+            List<SubjectTeachersEntity> subTeachers = repo.findAll();
+            return subTeachers.stream()
+                    .map(this::convertToSubjectTeachersDTO)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error al obtener la lista de docentes", e);
+            throw new ExceptionServerError("Error interno al obtener la lista de docentes");
+        }
     }
 
-    public SubjectTeachersDTO insertSubjectTeacher(SubjectTeachersDTO dto){
-        if(dto == null || dto.getSubjectID() == null || dto.getSubjectID().isBlank() ||
-                dto.getEmployeeID() == null || dto.getEmployeeID().isBlank()){
-            throw new IllegalArgumentException("Los campos no pueden ser nulos");
+    public SubjectTeachersDTO insertSubjectTeacher(SubjectTeachersDTO dto) {
+        if (dto == null || dto.getSubjectID() == null || dto.getSubjectID().isBlank() ||
+                dto.getEmployeeID() == null || dto.getEmployeeID().isBlank()) {
+            throw new ExceptionBadRequest("Los campos no pueden ser nulos o vacíos");
         }
-        try{
+        try {
             SubjectTeachersEntity entity = convertToSubjectEntity(dto);
             SubjectTeachersEntity saved = repo.save(entity);
             return convertToSubjectTeachersDTO(saved);
-        }catch (Exception e){
-            log.error("Error al registrar al profesor de la materia " + e.getMessage());
-            throw new IllegalArgumentException("Error al registrar al maestro");
+        } catch (Exception e) {
+            log.error("Error al registrar al profesor de la materia: " + e.getMessage());
+            throw new ExceptionServerError("Error interno al registrar al maestro");
         }
     }
 
-    public SubjectTeachersDTO updateSubjectTeacher(String id, SubjectTeachersDTO json){
-        SubjectTeachersEntity exists = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Maestro no encontrado"));
+    public SubjectTeachersDTO updateSubjectTeacher(String id, SubjectTeachersDTO json) {
+        SubjectTeachersEntity exists = repo.findById(id)
+                .orElseThrow(() -> new ExceptionNotFound("Maestro no encontrado"));
 
-        if(json.getSubjectID() != null){
-            SubjectDefinitionsEntity subjectDefinitions = repoSubjectDefinitions.findById(json.getSubjectID()).orElseThrow(
-                    () -> new IllegalArgumentException("Materia no encontrada con ID " + json.getSubjectID()));
+        if (json.getSubjectID() != null) {
+            SubjectDefinitionsEntity subjectDefinitions = repoSubjectDefinitions.findById(json.getSubjectID())
+                    .orElseThrow(() -> new ExceptionNotFound("Materia no encontrada con ID " + json.getSubjectID()));
             exists.setSubjectDefinitions(subjectDefinitions);
-        }else {
+        } else {
             exists.setSubjectDefinitions(null);
         }
 
         if (json.getEmployeeID() != null) {
-            EmployeeEntity employee = repoEmployee.findById(json.getEmployeeID()).orElseThrow(
-                    () -> new IllegalArgumentException("Empleado no encontrado con ID" + json.getEmployeeID()));
+            EmployeeEntity employee = repoEmployee.findById(json.getEmployeeID())
+                    .orElseThrow(() -> new ExceptionNotFound("Empleado no encontrado con ID " + json.getEmployeeID()));
             exists.setEmployee(employee);
-        }else {
+        } else {
             exists.setEmployee(null);
         }
 
-        SubjectTeachersEntity updateSubTeacher = repo.save(exists);
-
-        return convertToSubjectTeachersDTO(updateSubTeacher);
+        try {
+            SubjectTeachersEntity updateSubTeacher = repo.save(exists);
+            return convertToSubjectTeachersDTO(updateSubTeacher);
+        } catch (Exception e) {
+            log.error("Error al actualizar el docente con ID " + id, e);
+            throw new ExceptionServerError("Error interno al actualizar el docente");
+        }
     }
 
-    public boolean deleteSubjectTeacher(String id){
-        try{
+    public boolean deleteSubjectTeacher(String id) {
+        try {
             SubjectTeachersEntity exists = repo.findById(id).orElse(null);
-            if(exists != null){
+            if (exists != null) {
                 repo.deleteById(id);
                 return true;
-            }else{
-                return false;
+            } else {
+                throw new ExceptionNotFound("No se encontró maestro con ID " + id + " para eliminar");
             }
-        }catch (EmptyResultDataAccessException e){
-            throw new EmptyResultDataAccessException("No se encontró maestro con ID " + id + " para eliminar",1);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ExceptionNotFound("No se encontró maestro con ID " + id + " para eliminar");
+        } catch (Exception e) {
+            log.error("Error al intentar eliminar el docente con ID " + id, e);
+            throw new ExceptionServerError("Error interno al intentar eliminar el docente");
         }
     }
 }
