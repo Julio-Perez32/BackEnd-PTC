@@ -1,15 +1,20 @@
 package ptc2025.backend.Controller.Auth;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ptc2025.backend.Entities.Users.UsersEntity;
+import ptc2025.backend.Models.DTO.UserProfile.UserProfileDTO;
 import ptc2025.backend.Models.DTO.Users.UsersDTO;
 import ptc2025.backend.Services.Auth.AuthService;
 import ptc2025.backend.Utils.JWTUtils;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.Optional;
 
 @RestController
@@ -52,6 +57,46 @@ public class AuthController {
             response.addCookie(cookie);
         }
     }
+
+
+    @GetMapping("/me")
+    public ResponseEntity<?> me(@CookieValue(value = "authToken", required = false) String token) {
+        if (token == null || token.isEmpty()) {
+            return ResponseEntity.status(401).body("No hay token en la cookie");
+        }
+
+        try {
+            // validacion de la firma del token
+            if (!jwtUtils.validate(token)) {
+                return ResponseEntity.status(401).body("Token inválido");
+            }
+
+            // verificacion si está expirado
+            Claims claims = jwtUtils.parseToken(token); // parseToken lanza ExpiredJwtException si ya expiró
+            if (claims.getExpiration() != null && claims.getExpiration().before(new Date())) {
+                return ResponseEntity.status(401).body("Token expirado");
+            }
+
+            // Extrae el email del subject
+            String email = jwtUtils.getValue(token);
+
+            Optional<UserProfileDTO> userProfile = service.getUserProfile(email);
+            if (userProfile.isPresent()) {
+                return ResponseEntity.ok(userProfile.get());
+            } else {
+                return ResponseEntity.status(404).body("Usuario no encontrado");
+            }
+
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(401).body("Token expirado");
+        } catch (JwtException e) {
+            return ResponseEntity.status(401).body("Token inválido");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error interno del servidor");
+        }
+    }
+
+
 
 
 }
