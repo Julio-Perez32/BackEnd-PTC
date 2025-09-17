@@ -18,4 +18,12 @@ public class StudentsDTO {
 
     private String personName;
     private String personLastName;
+
+
+    // Nuevos campos para cascada
+    private String careerId;        // carrera en la que se inscribe
+    private String yearCycleId;     // ciclo académico
+    private String careerEnrollmentID;
+    private String cycleEnrollmentID;
+    private String performanceID;
 }

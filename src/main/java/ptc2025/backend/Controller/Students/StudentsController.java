@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ptc2025.backend.Models.DTO.Students.StudentsDTO;
+import ptc2025.backend.Services.Students.StudentCascadeService;
 import ptc2025.backend.Services.Students.StudentsService;
 
 import java.time.Instant;
@@ -23,6 +24,9 @@ public class StudentsController {
 
     @Autowired
     private StudentsService service;
+
+    @Autowired
+    private StudentCascadeService cascadeService;
 
     @GetMapping("/getStudents")
     public List<StudentsDTO> getStudents(){return service.getAllStudents();}
@@ -105,6 +109,45 @@ public class StudentsController {
             return ResponseEntity.internalServerError().body(Map.of(
                     "status", "Error",
                     "message", "Error al eliminar el estudiante",
+                    "detail", e.getMessage()
+            ));
+        }
+    }
+
+
+    @PostMapping("/insertIntoCascade")
+    public ResponseEntity<Map<String, Object>> registerCascade(
+            @Valid @RequestBody StudentsDTO dto,
+            HttpServletRequest request) {
+        try {
+            StudentsDTO respuesta = cascadeService.registerStudentCascade(dto);
+
+            if (respuesta == null) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "status", "Inserción fallida",
+                        "errorType", "VALIDATION_ERROR",
+                        "message", "Datos del estudiante inválidos"
+                ));
+            }
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                    "status", "success",
+                    "data", respuesta
+            ));
+
+        } catch (IllegalArgumentException e) {
+            // Errores de validación
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "status", "error",
+                    "errorType", "VALIDATION_ERROR",
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            // Errores inesperados
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "status", "error",
+                    "errorType", "SERVER_ERROR",
+                    "message", "Error al registrar el estudiante",
                     "detail", e.getMessage()
             ));
         }
