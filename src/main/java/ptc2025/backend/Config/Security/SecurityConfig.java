@@ -10,20 +10,24 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 import ptc2025.backend.Utils.JwtCookieAuthFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     private final JwtCookieAuthFilter jwtCookieAuthFilter;
+    private final CorsConfigurationSource corsConfigurationSource;
 
-    public SecurityConfig(JwtCookieAuthFilter jwtCookieAuthFilter){
+    public SecurityConfig(JwtCookieAuthFilter jwtCookieAuthFilter, CorsConfigurationSource corsConfigurationSource){
         this.jwtCookieAuthFilter = jwtCookieAuthFilter;
+        this.corsConfigurationSource = corsConfigurationSource;
     }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
-                .csrf(csrf -> csrf.disable())  // Nuevo estilo lambda
+                .csrf(csrf -> csrf.disable())// Nuevo estilo lambda
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(auth -> auth  // Cambia authorizeRequests por authorizeHttpRequests
                         .requestMatchers(HttpMethod.POST,
                                 "/api/Auth/login",
