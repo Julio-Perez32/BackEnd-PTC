@@ -77,8 +77,8 @@ public class PensumController {
             return ResponseEntity.notFound().build();
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
-                    "Error", "Datos duplicados",
-                    "Campo", e.getMessage()
+                    "error", "Datos duplicados",
+                    "detail", e.getMessage()
             ));
         }
     }
