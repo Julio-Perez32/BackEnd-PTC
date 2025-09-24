@@ -15,6 +15,7 @@ import ptc2025.backend.Services.Auth.AuthService;
 import ptc2025.backend.Utils.JWTUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:5173")
@@ -27,19 +28,31 @@ public class AuthController {
     private JWTUtils jwtUtils;
 
     @PostMapping("/login")
-    private ResponseEntity<?> login(@Valid @RequestBody UsersDTO dto, HttpServletResponse response){
+    private ResponseEntity<?> login(@Valid @RequestBody UsersDTO dto, HttpServletResponse response) {
         System.out.println(dto);
-        if(dto.getEmail() == null || dto.getEmail().isBlank() ||
-                dto.getContrasena() == null || dto.getContrasena().isBlank()){
-            return ResponseEntity.status(401).body("Error: Las credenciales no estan completas");
-        }
-        addTokenCookie(response, dto.getEmail());
-        if (service.Login(dto.getEmail(), dto.getContrasena())){
-            return ResponseEntity.ok("Inicio de sesión exitoso");
-        }
-        return ResponseEntity.status(401).body("Credenciales incorrectas");
 
+        if (dto.getEmail() == null || dto.getEmail().isBlank() ||
+                dto.getContrasena() == null || dto.getContrasena().isBlank()) {
+            return ResponseEntity.status(401).body(Map.of(
+                    "status", "error",
+                    "message", "Las credenciales no están completas"
+            ));
+        }
+
+        if (service.Login(dto.getEmail(), dto.getContrasena())) {
+            addTokenCookie(response, dto.getEmail());
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Inicio de sesión exitoso"
+            ));
+        }
+
+        return ResponseEntity.status(401).body(Map.of(
+                "status", "error",
+                "message", "Credenciales incorrectas"
+        ));
     }
+
 
     private void addTokenCookie(HttpServletResponse response, String email) {
         Optional<UsersEntity> usersOpt = service.getUser(email);
@@ -68,8 +81,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletResponse response){
-
+    public ResponseEntity<?> logout(HttpServletResponse response) {
         Cookie cookie = new Cookie("authToken", null);
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
@@ -77,26 +89,39 @@ public class AuthController {
         cookie.setMaxAge(0);
         response.addCookie(cookie);
 
-        return ResponseEntity.ok("Sesion cerrada y cookie eliminada");
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "message", "Sesión cerrada y cookie eliminada"
+        ));
     }
+
 
 
     @GetMapping("/me")
     public ResponseEntity<?> me(@CookieValue(value = "authToken", required = false) String token) {
         if (token == null || token.isEmpty()) {
-            return ResponseEntity.status(401).body("No hay token en la cookie");
+            return ResponseEntity.status(401).body(Map.of(
+                    "status", "error",
+                    "message", "No hay token en la cookie"
+            ));
         }
 
         try {
-            // validacion de la firma del token
+            // validación de la firma del token
             if (!jwtUtils.validate(token)) {
-                return ResponseEntity.status(401).body("Token inválido");
+                return ResponseEntity.status(401).body(Map.of(
+                        "status", "error",
+                        "message", "Token inválido"
+                ));
             }
 
-            // verificacion si está expirado
-            Claims claims = jwtUtils.parseToken(token); // parseToken lanza ExpiredJwtException si ya expiró
+            // verificación si está expirado
+            Claims claims = jwtUtils.parseToken(token);
             if (claims.getExpiration() != null && claims.getExpiration().before(new Date())) {
-                return ResponseEntity.status(401).body("Token expirado");
+                return ResponseEntity.status(401).body(Map.of(
+                        "status", "error",
+                        "message", "Token expirado"
+                ));
             }
 
             // Extrae el email del subject
@@ -104,19 +129,35 @@ public class AuthController {
 
             Optional<UserProfileDTO> userProfile = service.getUserProfile(email);
             if (userProfile.isPresent()) {
-                return ResponseEntity.ok(userProfile.get());
+                return ResponseEntity.ok(Map.of(
+                        "status", "success",
+                        "user", userProfile.get()
+                ));
             } else {
-                return ResponseEntity.status(404).body("Usuario no encontrado");
+                return ResponseEntity.status(404).body(Map.of(
+                        "status", "error",
+                        "message", "Usuario no encontrado"
+                ));
             }
 
         } catch (ExpiredJwtException e) {
-            return ResponseEntity.status(401).body("Token expirado");
+            return ResponseEntity.status(401).body(Map.of(
+                    "status", "error",
+                    "message", "Token expirado"
+            ));
         } catch (JwtException e) {
-            return ResponseEntity.status(401).body("Token inválido");
+            return ResponseEntity.status(401).body(Map.of(
+                    "status", "error",
+                    "message", "Token inválido"
+            ));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error interno del servidor");
+            return ResponseEntity.status(500).body(Map.of(
+                    "status", "error",
+                    "message", "Error interno del servidor"
+            ));
         }
     }
+
 
 
 
