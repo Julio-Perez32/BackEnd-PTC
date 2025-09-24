@@ -27,7 +27,8 @@ public class AuthController {
     private JWTUtils jwtUtils;
 
     @PostMapping("/login")
-    private ResponseEntity<String> login(@Valid @RequestBody UsersDTO dto, HttpServletResponse response){
+    private ResponseEntity<?> login(@Valid @RequestBody UsersDTO dto, HttpServletResponse response){
+        System.out.println(dto);
         if(dto.getEmail() == null || dto.getEmail().isBlank() ||
                 dto.getContrasena() == null || dto.getContrasena().isBlank()){
             return ResponseEntity.status(401).body("Error: Las credenciales no estan completas");
@@ -50,12 +51,19 @@ public class AuthController {
               user.getSystemRoles().getRoleName()
             );
 
-            Cookie cookie = new Cookie("authToken", token);
-            cookie.setHttpOnly(true);
-            cookie.setSecure(true);
-            cookie.setPath("/");
-            cookie.setMaxAge(86400);
-            response.addCookie(cookie);
+            String cookieValue = String.format(
+                    "authToken=%s; "+
+                            "Path=/;" +
+                            "HttpOnly;"+
+                            "Secure"+
+                            "SameSite=None"+
+                            "Max-Age=86400",
+                    token
+
+            );
+
+            response.addHeader("Set-Cookie", cookieValue);
+            response.addHeader("Access-Control-Expose-Headers", "Set-Cookie");
         }
     }
 

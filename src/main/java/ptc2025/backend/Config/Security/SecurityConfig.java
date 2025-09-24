@@ -29,9 +29,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())// Nuevo estilo lambda
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(auth -> auth  // Cambia authorizeRequests por authorizeHttpRequests
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/Auth/login",
-                                "/api/Auth/logout")
+                        .requestMatchers(HttpMethod.POST
+                                )
                         .permitAll()
                         .requestMatchers("/api/Auth/me").authenticated()
                         .requestMatchers("/api/Admin-only").hasRole("administrador")
