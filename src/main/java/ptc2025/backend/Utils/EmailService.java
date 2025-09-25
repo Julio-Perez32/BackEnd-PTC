@@ -13,9 +13,9 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void sendWelcomeEmail(String to, String username, String tempPassword) {
+    public void sendWelcomeEmail(String to, String email, String tempPassword) {
         String subject = "Bienvenido a Sapientiae";
-        String body = "Hola " + username + ",\n\n" +
+        String body = "Hola " + email + ",\n\n" +
                 "Tu cuenta ha sido creada exitosamente.\n" +
                 "Tus credenciales son:\n" +
                 "Correo: " + to + "\n" +
