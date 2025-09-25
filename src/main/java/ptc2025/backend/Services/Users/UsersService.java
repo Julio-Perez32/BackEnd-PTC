@@ -6,6 +6,8 @@ import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ptc2025.backend.Config.Argon2.Argon2Password;
 import ptc2025.backend.Entities.People.PeopleEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Entities.Users.UsersEntity;
@@ -17,7 +19,10 @@ import ptc2025.backend.Respositories.People.PeopleRepository;
 import ptc2025.backend.Respositories.Universities.UniversityRespository;
 import ptc2025.backend.Respositories.Users.UsersRespository;
 import ptc2025.backend.Respositories.systemRoles.systemRolesRespository;
+import ptc2025.backend.Utils.EmailService;
+import ptc2025.backend.Utils.PasswordGenerator;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,6 +41,16 @@ public class UsersService {
 
     @Autowired
     PeopleRepository repoPeople;
+
+    //Metodos para poder encriptar la contra y enviar el correo
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private Argon2Password passwordHasher;
+    @Autowired
+    private PasswordGenerator passwordGenerator;
+
 
     public List<UsersDTO> getAllUsers() {
         try {
@@ -86,7 +101,7 @@ public class UsersService {
         return dto;
     }
 
-    public UsersDTO insertarDatos(UsersDTO data) {
+    /**public UsersDTO insertarDatos(UsersDTO data) {
         if (data == null || data.getContrasena() == null || data.getContrasena().isEmpty()) {
             throw new IllegalArgumentException("Usuario o contraseña no pueden ser nulos");
         }
@@ -100,7 +115,49 @@ public class UsersService {
             log.error("Error al registrar el usuario: " + e.getMessage(), e);
             throw new ExceptionServerError("Error interno al registrar el usuario");
         }
+    }*/
+    @Transactional
+    public UsersDTO insertarDatos(UsersDTO data){
+        try {
+            if (data == null) {
+                throw new IllegalArgumentException("El objeto usuario no puede ser nulo.");
+            }
+            if (data.getEmail() == null || data.getEmail().isEmpty()) {
+                throw new IllegalArgumentException("El correo electrónico no puede ser nulo.");
+            }
+            if (data.getContrasena() == null || data.getContrasena().isEmpty()) {
+                throw new IllegalArgumentException("La contraseña no puede ser nula o vacía.");
+            }
+            repo.findByEmail(data.getEmail()).ifPresent(user -> {
+                throw new IllegalArgumentException("El correo electrónico ya está registrado.");
+            });
+            // Siempre generamos una contraseña aleatoria
+            String tempPassword = generatedRandomPassword();
+            String passwordEncriptada = passwordHasher.EncryptPassword(tempPassword);
+
+            // Crear la entidad
+
+            UsersEntity entity = convertirAEntity(data);
+
+            UsersEntity saved = repo.save(entity);
+
+            UsersDTO response = convertirUsuarioADTO(saved);
+
+
+            // Enviar correo con la contraseña temporal
+            emailService.sendWelcomeEmail(response.getEmail(), response.getPersonName(), tempPassword);
+
+
+            return response;
+        }catch (Exception e){
+            log.error("Error al registrar el usuario: " + e.getMessage(), e);
+            throw new ExceptionServerError("Error interno al registrar el usuario");
+        }
+
+
+
     }
+
 
     private UsersEntity convertirAEntity(UsersDTO data) {
         UsersEntity entity = new UsersEntity();
@@ -138,7 +195,11 @@ public class UsersService {
 
         try {
             existente.setEmail(json.getEmail());
-            existente.setContrasena(json.getContrasena());
+
+            //si  la contra viene en el DTO, se encripta; si no, se deja igual
+            if (json.getContrasena() != null && !json.getContrasena().isEmpty()) {
+                existente.setContrasena(passwordHasher.EncryptPassword(json.getContrasena()));
+            }
 
             // Universidad
             if (json.getUniversityID() != null) {
@@ -168,7 +229,9 @@ public class UsersService {
             }
 
             UsersEntity usuarioActualizado = repo.save(existente);
-            return convertirUsuarioADTO(usuarioActualizado);
+            UsersDTO dto = convertirUsuarioADTO(usuarioActualizado);
+            dto.setContrasena(null); // no devolver hash
+            return dto;
 
         } catch (IllegalArgumentException e) {
             throw e;
@@ -204,5 +267,16 @@ public class UsersService {
             throw new ExceptionServerError("Error interno al buscar usuario por ID");
         }
     }
+    private String generatedRandomPassword(){
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
+        SecureRandom random = new SecureRandom();
+        StringBuilder sb = new StringBuilder(12); //Longitud de 12 caracteres
+
+        for (int i = 0; i<12; i++){
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
+    }
+
 }
 
