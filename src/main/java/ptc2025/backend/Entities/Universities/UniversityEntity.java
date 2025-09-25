@@ -32,15 +32,14 @@ public class UniversityEntity {
     @GeneratedValue(generator = "idUniversity")
     @Column(name = "UNIVERSITYID")
     private String universityID;
-
     @Column(name = "UNIVERSITYNAME")
     private String universityName;
-
     @Column(name = "RECTOR")
     private String rector;
-
     @Column(name = "WEBPAGE")
     private String webPage;
+    @Column(name = "IMAGENURLUNIVERSITIES")
+    private String imageUrlUniversities;
 
     //1 Universidad -> muchos Academic Levels
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)

@@ -16,4 +16,5 @@ public class UniversityDTO {
     private String rector;
     @NotBlank @Pattern(regexp = "^https?://.+", message = "La página web debe empezar con http:// o https://")
     private String webPage;
+    private String imageUrlUniversities;
 }
