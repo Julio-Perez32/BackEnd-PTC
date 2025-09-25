@@ -70,6 +70,7 @@ public class UniversityServices {
             universidadExistente.setUniversityName(dto.getUniversityName());
             universidadExistente.setRector(dto.getRector());
             universidadExistente.setWebPage(dto.getWebPage());
+            universidadExistente.setImageUrlUniversities(dto.getImageUrlUniversities());
 
             UniversityEntity actualizado = repo.save(universidadExistente);
             return convertirAUniversityDTO(actualizado);
@@ -105,6 +106,7 @@ public class UniversityServices {
         DTO.setUniversityName(university.getUniversityName());
         DTO.setRector(university.getRector());
         DTO.setWebPage(university.getWebPage());
+        DTO.setImageUrlUniversities(university.getImageUrlUniversities());
         return DTO;
     }
 
@@ -114,6 +116,7 @@ public class UniversityServices {
         entity.setUniversityName(dto.getUniversityName());
         entity.setRector(dto.getRector());
         entity.setWebPage(dto.getWebPage());
+        entity.setImageUrlUniversities(dto.getImageUrlUniversities());
         return entity;
     }
 }
