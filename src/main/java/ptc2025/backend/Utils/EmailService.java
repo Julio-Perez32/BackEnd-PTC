@@ -18,9 +18,8 @@ public class EmailService {
         String body = "Hola " + username + ",\n\n" +
                 "Tu cuenta ha sido creada exitosamente.\n" +
                 "Tus credenciales son:\n" +
-                "Usuario: " + to + "\n" +
-                "Contraseña temporal: " + tempPassword + "\n\n" +
-                "⚠️ Por seguridad, cambia tu contraseña en el primer inicio de sesión.\n\n" +
+                "Correo: " + to + "\n" +
+                "Contraseña: " + tempPassword + "\n\n" +
                 "Saludos,\nEquipo de Sapientiae.";
 
         try {
