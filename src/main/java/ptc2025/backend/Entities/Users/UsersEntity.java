@@ -30,6 +30,8 @@ public class UsersEntity {
     private String email;
     @Column(name = "PASSWORD")
     private String contrasena;
+    @Column(name = "IMAGENURLUSERS")
+    private String imageUrlUser;
 
 
     @ManyToOne

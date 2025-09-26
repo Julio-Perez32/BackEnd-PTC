@@ -62,6 +62,7 @@ public class UniversityServices {
             if(file != null && !file.isEmpty()){
                 Map uploadResult = cloudinary.uploader().upload(file.getBytes(), Map.of());
                 imageUrl = (String) uploadResult.get("secure_url");
+                dto.setImageUrlUniversities(imageUrl);
             }
         }catch (IOException e){
             throw new IllegalArgumentException(e.getMessage());
