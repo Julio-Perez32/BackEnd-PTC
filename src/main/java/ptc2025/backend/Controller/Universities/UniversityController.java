@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ptc2025.backend.Models.DTO.Universities.UniversityDTO;
 import ptc2025.backend.Services.Universities.UniversityServices;
 
@@ -32,9 +33,10 @@ public class UniversityController {
     @PostMapping("/newUniversity")
     public ResponseEntity<Map<String, Object>> registrarUniversidad(
             @Valid @RequestBody UniversityDTO dtoUni,
+            @RequestPart(value = "file", required = false) MultipartFile file,
             HttpServletRequest request){
         try {
-            UniversityDTO respuesta = services.insertarUniversidad(dtoUni);
+            UniversityDTO respuesta = services.insertarUniversidad(dtoUni, file);
             if (respuesta ==null){
                 return ResponseEntity.badRequest().body(Map.of(
                         "status", "Inserción fallida",
