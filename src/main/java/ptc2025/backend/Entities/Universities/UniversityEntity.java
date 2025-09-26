@@ -1,5 +1,6 @@
 package ptc2025.backend.Entities.Universities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -24,7 +25,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "UNIVERSITIES")
-@Getter @Setter @ToString
+@Getter @Setter
 @EqualsAndHashCode
 public class UniversityEntity {
     @Id
@@ -55,35 +56,52 @@ public class UniversityEntity {
 
     //1 Universidad -> muchos degreeTypes
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<DegreeTypesEntity> degreeTypes = new ArrayList<>();
 
     //1 Univesidad -> muuchos DocumenteCategories
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<DocumentCategoriesEntity> documentCategories = new ArrayList<>();
 
     //1 Universidad -> muchos EntityTypes
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<EntityTypesEntity> entityTypes = new ArrayList<>();
 
     //1 Universoidad -> muchos Localities
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<LocalitiesEntity> entities = new ArrayList<>();
 
     //1 Universidad -> muchos Modalities
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<ModalitiesEntity> modalities = new ArrayList<>();
 
     //1 Universidad -> muchos Requirements
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<RequirementsEntity> requirements = new ArrayList<>();
 
     //1 Universidad -> muchos SocialServiceProjects
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<SocialServiceProjectsEntity> socialService = new ArrayList<>();
 
     //1 Universidad -> muchos Users
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<UsersEntity> users = new ArrayList<>();
 
-
+    @Override
+    public String toString() {
+        return "UniversityEntity{" +
+                "universityID='" + universityID + '\'' +
+                ", universityName='" + universityName + '\'' +
+                ", rector='" + rector + '\'' +
+                ", webPage='" + webPage + '\'' +
+                ", imageUrlUniversities='" + imageUrlUniversities + '\'' +
+                '}';
+    }
 }
