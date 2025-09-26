@@ -1,17 +1,21 @@
 package ptc2025.backend.Services.Universities;
 
+import com.cloudinary.Cloudinary;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Exceptions.ExceptionNotFound;
 import ptc2025.backend.Exceptions.ExceptionServerError;
 import ptc2025.backend.Models.DTO.Universities.UniversityDTO;
 import ptc2025.backend.Respositories.Universities.UniversityRespository;
 
+import java.io.IOException;
 import java.sql.SQLOutput;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j /** Es una anotacion de loombook que sirve para mostrar mensajes en consola
@@ -23,6 +27,8 @@ public class UniversityServices {
 
     @Autowired
     UniversityRespository repo;
+
+    public Cloudinary cloudinary;
 
     // Obtener todas las universidades
     public List<UniversityDTO> getUniversityService() {
@@ -38,7 +44,7 @@ public class UniversityServices {
     }
 
     // Insertar nueva universidad
-    public UniversityDTO insertarUniversidad(UniversityDTO dto) {
+    public UniversityDTO insertarUniversidad(UniversityDTO dto, MultipartFile file) {
         // Validaciones combinadas
         if (dto.getUniversityName() == null || dto.getUniversityName().isBlank() ||
                 dto.getRector() == null || dto.getRector().isBlank() ||
@@ -49,6 +55,16 @@ public class UniversityServices {
         // Validación de URL
         if (!dto.getWebPage().matches("^https?://.+")) {
             throw new IllegalArgumentException("La página web debe iniciar con http:// o https://");
+        }
+
+        try{
+            String imageUrl = null;
+            if(file != null && !file.isEmpty()){
+                Map uploadResult = cloudinary.uploader().upload(file.getBytes(), Map.of());
+                imageUrl = (String) uploadResult.get("url");
+            }
+        }catch (IOException e){
+            throw new IllegalArgumentException(e.getMessage());
         }
 
         try {
