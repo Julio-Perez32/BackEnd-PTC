@@ -10,7 +10,7 @@ import ptc2025.backend.Entities.Universities.UniversityEntity;
 
 @Entity
 @Table(name = "ACADEMICLEVELS")
-@Getter @Setter @EqualsAndHashCode @ToString
+@Getter @Setter @EqualsAndHashCode
 public class AcademicLevelsEntity {
 
     @Id
@@ -28,4 +28,13 @@ public class AcademicLevelsEntity {
     @ManyToOne
     @JoinColumn(name = "UNIVERSITYID", referencedColumnName = "UNIVERSITYID")
     private UniversityEntity university;
+
+    @Override
+    public String toString() {
+        return "AcademicLevelsEntity{" +
+                "academicLevelID='" + academicLevelID + '\'' +
+                ", academicLevelName='" + academicLevelName + '\'' +
+                ", university=" + university +
+                '}';
+    }
 }
