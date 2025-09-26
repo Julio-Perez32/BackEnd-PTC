@@ -25,6 +25,7 @@ public class UsersDTO {
 
     @NotNull @Size(min = 8, message = "La contraseña debe de tener 8 caracteres")
     private String contrasena;
+    private String imageUrlUser;
 
 
     private String rolesName;

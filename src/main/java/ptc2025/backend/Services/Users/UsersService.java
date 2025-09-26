@@ -1,12 +1,14 @@
 package ptc2025.backend.Services.Users;
 
 
+import com.cloudinary.Cloudinary;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ptc2025.backend.Config.Argon2.Argon2Password;
 import ptc2025.backend.Entities.People.PeopleEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
@@ -22,8 +24,10 @@ import ptc2025.backend.Respositories.systemRoles.systemRolesRespository;
 import ptc2025.backend.Utils.EmailService;
 import ptc2025.backend.Utils.PasswordGenerator;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 @Slf4j
@@ -41,6 +45,8 @@ public class UsersService {
 
     @Autowired
     PeopleRepository repoPeople;
+
+    public Cloudinary cloudinary;
 
     //Metodos para poder encriptar la contra y enviar el correo
     @Autowired
@@ -69,6 +75,7 @@ public class UsersService {
         dto.setId(usuario.getId());
         dto.setEmail(usuario.getEmail());
         dto.setContrasena(usuario.getContrasena());
+        dto.setImageUrlUser(usuario.getImageUrlUser());
 
         // Universidad
         if (usuario.getUniversity() != null) {
@@ -117,7 +124,7 @@ public class UsersService {
         }
     }*/
     @Transactional
-    public UsersDTO insertarDatos(UsersDTO data){
+    public UsersDTO insertarDatos(UsersDTO data, MultipartFile file){
         try {
             if (data == null) {
                 throw new IllegalArgumentException("El objeto usuario no puede ser nulo.");
@@ -131,6 +138,18 @@ public class UsersService {
             repo.findByEmail(data.getEmail()).ifPresent(user -> {
                 throw new IllegalArgumentException("El correo electrónico ya está registrado.");
             });
+
+            try{
+                String imageUrl = null;
+                if(file != null && !file.isEmpty()){
+                    Map uploadResult = cloudinary.uploader().upload(file.getBytes(), Map.of());
+                    imageUrl = (String) uploadResult.get("secure_url");
+                    data.setImageUrlUser(imageUrl);
+                }
+            }catch (IOException e){
+                throw new IllegalArgumentException(e.getMessage());
+            }
+
             // Siempre generamos una contraseña aleatoria
             String tempPassword = generatedRandomPassword();
             String passwordEncriptada = passwordHasher.EncryptPassword(tempPassword);
@@ -163,6 +182,7 @@ public class UsersService {
         UsersEntity entity = new UsersEntity();
         entity.setEmail(data.getEmail());
         entity.setContrasena(data.getContrasena());
+        entity.setImageUrlUser(data.getImageUrlUser());
 
         // Universidad
         if (data.getUniversityID() != null) {

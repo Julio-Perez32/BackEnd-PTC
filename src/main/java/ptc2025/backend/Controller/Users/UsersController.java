@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ptc2025.backend.Entities.Users.UsersEntity;
 import ptc2025.backend.Models.DTO.Users.UsersDTO;
 import ptc2025.backend.Services.Users.UsersService;
@@ -32,9 +33,9 @@ public class UsersController {
     }
 
     @PostMapping("/AddUser")
-    public ResponseEntity<?> nuevoUsuario(@Valid @RequestBody UsersDTO json, HttpServletRequest request){
+    public ResponseEntity<?> nuevoUsuario(@Valid @RequestBody UsersDTO json, @RequestPart(value = "file", required = false) MultipartFile file, HttpServletRequest request){
         try {
-            UsersDTO respuesta = services.insertarDatos(json);
+            UsersDTO respuesta = services.insertarDatos(json, file);
             if (respuesta == null){
                 return ResponseEntity.badRequest().body(Map.of(
                     "status", "insercion fallida",
