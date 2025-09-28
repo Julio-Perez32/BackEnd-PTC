@@ -65,15 +65,20 @@ public class AuthController {
                     user.getSystemRoles().getRoleName()
             );
 
-            ResponseCookie cookie = ResponseCookie.from("authToken", token)
-                    .httpOnly(true)
-                    .secure(true)
-                    .path("/")
-                    .maxAge(86400)
-                    //.domain("sapientiae-api-bd9a54b3d7a1.herokuapp.com")
-                    .build();
+            String cookieValue = String.format(
+                    "authToken=%s; "+
+                            "Path=/;" +
+                            "HttpOnly;"+
+                            "Secure;"+
+                            "SameSite=None;"+
+                            "Max-Age=86400;"+
+                            "Domain = sapientiae-api-bd9a54b3d7a1.herokuapp.com/",
+                    token
 
-            response.addHeader("Set-Cookie", cookie.toString());
+            );
+
+            response.addHeader("Set-Cookie", cookieValue);
+            response.addHeader("Access-Control-Expose-Headers", "Set-Cookie");
         }
     }
 
