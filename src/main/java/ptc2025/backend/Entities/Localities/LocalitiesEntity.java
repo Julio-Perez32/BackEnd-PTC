@@ -48,4 +48,5 @@ public class LocalitiesEntity {
                 ", address='" + address + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'';
     }
+    //se me cerro el push bro
 }

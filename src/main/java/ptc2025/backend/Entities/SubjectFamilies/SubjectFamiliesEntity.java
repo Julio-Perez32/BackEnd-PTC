@@ -51,4 +51,5 @@ public class SubjectFamiliesEntity {
                 ", reservedSlots=" + reservedSlots +
                 ", startingNumber=" + startingNumber;
     }
+    //se me cerro el push bro
 }

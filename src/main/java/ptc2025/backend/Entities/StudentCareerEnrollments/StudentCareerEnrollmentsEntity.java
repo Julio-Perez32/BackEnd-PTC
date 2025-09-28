@@ -75,4 +75,5 @@ public class StudentCareerEnrollmentsEntity {
                 ", serviceStatusDate=" + serviceStatusDate +
                 '}';
     }
+    //se me cerro el push bro
 }

@@ -67,4 +67,5 @@ public class PeopleEntity {
                 ", contactEmail='" + contactEmail + '\'' +
                 ", phone='" + phone + '\'' ;
     }
+    //se me cerro el push bro
 }

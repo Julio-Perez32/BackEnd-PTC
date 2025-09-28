@@ -38,4 +38,5 @@ public class SubjectTeachersEntity {
         return "SubjectTeachersEntity{" +
                 "SubjectTeacherID='" + SubjectTeacherID;
     }
+    //se me cerro el push bro
 }

@@ -41,6 +41,7 @@ public class NotificationEntity {
                 ", body='" + body + '\'' +
                 ", sentAt=" + sentAt ;
     }
+    //se me cerro el push bro
 }
 /**NOTIFICATIONID
  USERID

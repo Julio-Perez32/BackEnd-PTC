@@ -39,4 +39,5 @@ public class personTypesEntity {
                 "personTypeID='" + personTypeID + '\'' +
                 ", personType='" + personType + '\'' ;
     }
+    //se me cerro el push bro
 }

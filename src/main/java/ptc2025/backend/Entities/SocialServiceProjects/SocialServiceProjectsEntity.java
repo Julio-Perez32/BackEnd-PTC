@@ -52,4 +52,5 @@ public class SocialServiceProjectsEntity
                 ", socialServiceProjectName='" + socialServiceProjectName + '\'' +
                 ", description='" + description ;
     }
+    //se me cerro el push bro
 }

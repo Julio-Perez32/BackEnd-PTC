@@ -37,4 +37,5 @@ public class RequirementConditionsEntity {
         return "RequirementConditionsEntity{" +
                 "ConditionID='" + ConditionID + '\'';
     }
+    //se me cerro el push bro
 }

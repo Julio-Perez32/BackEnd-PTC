@@ -56,4 +56,5 @@ public class PlanComponentsEntity {
                 ", weightPercentage=" + weightPercentage +
                 ", orderIndex=" + orderIndex;
     }
+    //se me cerro el push bro
 }

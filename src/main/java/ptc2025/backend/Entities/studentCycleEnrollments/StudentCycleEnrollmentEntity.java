@@ -48,4 +48,5 @@ public class StudentCycleEnrollmentEntity {
                 ", registeredAt=" + registeredAt +
                 ", completedAt=" + completedAt;
     }
+    //se me cerro el push bro
 }

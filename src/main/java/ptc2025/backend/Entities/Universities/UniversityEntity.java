@@ -44,14 +44,17 @@ public class UniversityEntity {
 
     //1 Universidad -> muchos Academic Levels
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<AcademicLevelsEntity> academicLevels = new ArrayList<>();
 
     //1 Universidad -> muchos AcademicYears
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<AcademicYearEntity> academicYear = new ArrayList<>();
 
     //1 Universidad -> muchos CycleTypes
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<CycleTypesEntity> cycleTypes = new ArrayList<>();//me quede hasta aca
 
     //1 Universidad -> muchos degreeTypes

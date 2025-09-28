@@ -48,6 +48,7 @@ public class UsersEntity {
     private SystemRolesEntity systemRoles;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<NotificationEntity> notification = new ArrayList<>();
 
     @OneToMany(mappedBy = "userID", cascade = CascadeType.ALL)

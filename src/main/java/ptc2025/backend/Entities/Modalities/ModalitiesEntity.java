@@ -31,4 +31,5 @@ public class ModalitiesEntity {
                 "id='" + id + '\'' +
                 ", modalityName='" + modalityName + '\'' ;
     }
+    //se me cerro el push bro
 }

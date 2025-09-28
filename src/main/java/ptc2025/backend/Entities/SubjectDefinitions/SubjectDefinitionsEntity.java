@@ -52,4 +52,5 @@ public class SubjectDefinitionsEntity {
                 ", SubjectName='" + SubjectName + '\'' +
                 ", SubjectCode='" + SubjectCode;
     }
+    //se me cerro el push bro
 }

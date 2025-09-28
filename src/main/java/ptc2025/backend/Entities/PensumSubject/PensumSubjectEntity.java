@@ -40,4 +40,5 @@ public class PensumSubjectEntity {
                 ", ValueUnits=" + ValueUnits +
                 ", IsRequired=" + IsRequired ;
     }
+    //se me cerro el push bro
 }

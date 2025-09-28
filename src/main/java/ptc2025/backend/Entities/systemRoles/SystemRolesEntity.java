@@ -36,4 +36,5 @@ public class SystemRolesEntity {
                 "roleId='" + roleId + '\'' +
                 ", roleName='" + roleName ;
     }
+    //se me cerro el push bro
 }

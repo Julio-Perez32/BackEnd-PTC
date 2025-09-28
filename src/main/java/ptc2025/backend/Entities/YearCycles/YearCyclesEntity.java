@@ -44,6 +44,7 @@ public class YearCyclesEntity {
     private List<StudentCycleEnrollmentEntity> studentCycleEnrollment = new ArrayList<>();
 
     @OneToMany(mappedBy = "yearCycles", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<CourseOfferingsEntity> courseOfferings = new ArrayList<>();
 
     @ManyToOne
