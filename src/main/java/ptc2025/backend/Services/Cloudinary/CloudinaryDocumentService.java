@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.UUID;
 @Service
 public class CloudinaryDocumentService {
 
-    private static final long MAX_DOC_SIZE = 2000 * 1024 * 1024;
+    private static final long MAX_DOC_SIZE = 2000 * 1024 * 1024; // 2GB
     private static final String[] ALLOWED_DOCS = {".pdf", ".doc", ".docx"};
 
     private final Cloudinary cloudinary;
@@ -22,20 +23,31 @@ public class CloudinaryDocumentService {
     public CloudinaryDocumentService(@Qualifier("cloudinaryDocs") Cloudinary cloudinary) {
         this.cloudinary = cloudinary;
     }
-    public String uploadDocument(MultipartFile file)throws IOException {
+
+    // Subir documento simple
+    public String uploadDocument(MultipartFile file) throws IOException {
         validateDocument(file);
+
+        File tempFile = File.createTempFile("upload_", file.getOriginalFilename());
+        file.transferTo(tempFile);
+
         Map<?, ?> uploadResult = cloudinary.uploader()
-                .upload(file.getBytes(), ObjectUtils.asMap(
+                .upload(tempFile, ObjectUtils.asMap(
                         "resource_type", "raw"
                 ));
+
+        tempFile.delete();
+
         return (String) uploadResult.get("secure_url");
     }
 
-    public String UploadDocument(MultipartFile file, String folder)throws IOException{
+    // Subir documento a folder con nombre único
+    public String UploadDocument(MultipartFile file, String folder) throws IOException {
         validateDocument(file);
+
         String originalFileName = file.getOriginalFilename();
-        String fileExtension = originalFileName.substring(originalFileName.lastIndexOf(".")).toLowerCase();
-        String uniqueFileName = "doc_" + UUID.randomUUID() + fileExtension;
+        String extension = originalFileName.substring(originalFileName.lastIndexOf(".")).toLowerCase();
+        String uniqueFileName = "doc_" + UUID.randomUUID() + extension;
 
         Map<String, Object> options = ObjectUtils.asMap(
                 "folder", folder,
@@ -45,10 +57,18 @@ public class CloudinaryDocumentService {
                 "overwrite", false,
                 "resource_type", "raw"
         );
-        Map<?,?> uploadResult = cloudinary.uploader().upload(file.getBytes(),options);
+
+        File tempFile = File.createTempFile("upload_", originalFileName);
+        file.transferTo(tempFile);
+
+        Map<?, ?> uploadResult = cloudinary.uploader().upload(tempFile, options);
+
+        tempFile.delete();
+
         return (String) uploadResult.get("secure_url");
     }
 
+    // Validación de documento
     private void validateDocument(MultipartFile file) {
         if (file.isEmpty())
             throw new IllegalArgumentException("El documento no puede estar vacío");
@@ -64,7 +84,6 @@ public class CloudinaryDocumentService {
         if (!Arrays.asList(ALLOWED_DOCS).contains(extension))
             throw new IllegalArgumentException("Solo se permiten documentos .pdf, .doc, .docx");
 
-        // Validación MIME corregida:
         String contentType = file.getContentType();
         if (contentType == null ||
                 (!contentType.equals("application/pdf") &&
@@ -73,7 +92,4 @@ public class CloudinaryDocumentService {
             throw new IllegalArgumentException("El archivo debe ser un documento válido");
         }
     }
-
-
 }
-
