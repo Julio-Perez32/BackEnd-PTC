@@ -1,5 +1,6 @@
 package ptc2025.backend.Entities.employees;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -22,7 +23,6 @@ import java.util.List;
 @Table(name = "EMPLOYEES")
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 public class EmployeeEntity {
 
@@ -40,20 +40,32 @@ public class EmployeeEntity {
 
     @OneToOne
     @JoinColumn(name = "PERSONID", referencedColumnName = "PERSONID")
+    @JsonIgnore
     private PeopleEntity people;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<FacultyDeansEntity> facultyDeans = new ArrayList<>();
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<CourseOfferingsTeachersEntity> courseOfferingsTeachers = new ArrayList<>();
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<SubjectTeachersEntity> subjectTeachers = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "DEPARTMENTID", referencedColumnName = "DEPARTMENTID")
     private DepartmentsEntity departments;
 
-
+    @Override
+    public String toString() {
+        return "EmployeeEntity{" +
+                "id='" + id + '\'' +
+                ", employeeCode='" + employeeCode + '\'' +
+                ", EmployeeDetail='" + EmployeeDetail + '\'' +
+                ", departments=" + departments +
+                '}';
+    }
 }

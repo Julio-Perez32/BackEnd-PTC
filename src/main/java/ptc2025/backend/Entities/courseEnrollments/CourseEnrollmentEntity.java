@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.GenericGenerator;
 import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
 import ptc2025.backend.Entities.StudentCareerEnrollments.StudentCareerEnrollmentsEntity;
 
@@ -14,11 +15,12 @@ import java.time.LocalDate;
 @Table(name = "COURSEENROLLMENTS")
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 public class CourseEnrollmentEntity {
 
     @Id
+    @GenericGenerator(name = "acourseenrollmentid", strategy = "guid")
+    @GeneratedValue(generator = "acourseenrollmentid")
     @Column(name = "COURSEENROLLMENTID")
     private String id;
 
@@ -41,4 +43,17 @@ public class CourseEnrollmentEntity {
 
     @Column(name = "MERITUNIT")
     private Double meritUnit;
+
+    @Override
+    public String toString() {
+        return "CourseEnrollmentEntity{" +
+                "id='" + id + '\'' +
+                ", courseOfferings=" + courseOfferings +
+                ", studentCareerEnrollments=" + studentCareerEnrollments +
+                ", enrollmentStatus='" + enrollmentStatus + '\'' +
+                ", finalGrade=" + finalGrade +
+                ", enrollmentDate=" + enrollmentDate +
+                ", meritUnit=" + meritUnit +
+                '}';
+    }
 }

@@ -1,5 +1,6 @@
 package ptc2025.backend.Entities.Documents;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,7 +19,7 @@ import java.util.List;
 @Entity
 @Table(name = "DOCUMENTS")
 @Getter @Setter
-@ToString @EqualsAndHashCode
+@EqualsAndHashCode
 public class DocumentEntity {
 
     @Id
@@ -30,10 +31,19 @@ public class DocumentEntity {
     private String name;
 
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<StudentDocumentsEntity> studentDocuments = new ArrayList<>();
 
     @OneToOne
+    @JsonIgnore
     @JoinColumn(name = "DOCUMENTCATEGORYID", referencedColumnName = "DOCUMENTCATEGORYID")
     private DocumentCategoriesEntity documentCategory;
 
+    @Override
+    public String toString() {
+        return "DocumentEntity{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

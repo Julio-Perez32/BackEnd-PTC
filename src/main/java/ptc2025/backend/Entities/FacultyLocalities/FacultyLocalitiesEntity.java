@@ -12,7 +12,7 @@ import ptc2025.backend.Entities.Universities.UniversityEntity;
 
 @Entity
 @Table(name = "FACULTYLOCALITIES")
-@Getter @Setter @ToString @EqualsAndHashCode
+@Getter @Setter @EqualsAndHashCode
 public class FacultyLocalitiesEntity {
     @Id
     @GenericGenerator(name = "idfacultylocalities", strategy = "guid")
@@ -28,4 +28,13 @@ public class FacultyLocalitiesEntity {
     @ManyToOne
     @JoinColumn(name = "LOCALITYID", referencedColumnName = "LOCALITYID")
     private LocalitiesEntity localities;
+
+    @Override
+    public String toString() {
+        return "FacultyLocalitiesEntity{" +
+                "id='" + id + '\'' +
+                ", faculty=" + faculty +
+                ", localities=" + localities +
+                '}';
+    }
 }

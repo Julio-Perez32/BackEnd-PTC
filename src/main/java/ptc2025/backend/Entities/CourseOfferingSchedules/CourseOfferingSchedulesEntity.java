@@ -11,7 +11,7 @@ import ptc2025.backend.Entities.YearCycles.YearCyclesEntity;
 
 @Entity
 @Table(name = "COURSEOFFERINGSCHEDULES")
-@Getter @Setter @ToString @EqualsAndHashCode
+@Getter @Setter @EqualsAndHashCode
 public class CourseOfferingSchedulesEntity {
     @Id
     @GenericGenerator(name = "IDcourseOfferingSchedules", strategy = "guid")
@@ -30,4 +30,16 @@ public class CourseOfferingSchedulesEntity {
     @ManyToOne
     @JoinColumn(name = "COURSEOFFERINGID", referencedColumnName = "COURSEOFFERINGID")
     private CourseOfferingsEntity courseOfferings;
+
+    @Override
+    public String toString() {
+        return "CourseOfferingSchedulesEntity{" +
+                "id='" + id + '\'' +
+                ", weekday='" + weekday + '\'' +
+                ", startTime='" + startTime + '\'' +
+                ", endTime='" + endTime + '\'' +
+                ", classroom='" + classroom + '\'' +
+                ", courseOfferings=" + courseOfferings +
+                '}';
+    }
 }

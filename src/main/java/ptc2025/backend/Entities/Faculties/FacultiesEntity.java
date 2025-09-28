@@ -1,5 +1,6 @@
 package ptc2025.backend.Entities.Faculties;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -21,7 +22,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "FACULTIES")
-@Getter @Setter @EqualsAndHashCode @ToString
+@Getter @Setter @EqualsAndHashCode
 public class FacultiesEntity {
 
     @Id
@@ -39,17 +40,33 @@ public class FacultiesEntity {
     private String correlativeCode;
 
     @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<facultyCorrelativesEntity> academicLevels = new ArrayList<>();
 
     @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<SubjectFamiliesEntity> academicYear = new ArrayList<>();
 
     @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<FacultyDeansEntity> cycleTypes = new ArrayList<>();
 
     @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<DepartmentsEntity> degreeTypes = new ArrayList<>();
 
     @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<DocumentCategoriesEntity> documentCategories = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "FacultiesEntity{" +
+                "facultyID='" + facultyID + '\'' +
+                ", facultyName='" + facultyName + '\'' +
+                ", facultyCode='" + facultyCode + '\'' +
+                ", contactPhone='" + contactPhone + '\'' +
+                ", correlativeCode='" + correlativeCode + '\'' +
+                '}';
+    }
 }

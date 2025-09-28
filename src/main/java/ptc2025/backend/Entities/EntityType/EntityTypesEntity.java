@@ -1,5 +1,6 @@
 package ptc2025.backend.Entities.EntityType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,7 +19,6 @@ import java.util.List;
 @Table(name = "ENTITYTYPES")
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 public class EntityTypesEntity {
     @Id
@@ -35,6 +35,16 @@ public class EntityTypesEntity {
     private UniversityEntity university;
 
     @OneToMany(mappedBy = "entityType", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<CodeGeneratorsEntity> codeGenerators = new ArrayList<>();
 
+    @Override
+    public String toString() {
+        return "EntityTypesEntity{" +
+                "entityTypeID='" + entityTypeID + '\'' +
+                ", entityType='" + entityType + '\'' +
+                ", university=" + university +
+                ", codeGenerators=" + codeGenerators +
+                '}';
+    }
 }

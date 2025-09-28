@@ -1,10 +1,12 @@
 package ptc2025.backend.Entities.careers;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.GenericGenerator;
 import ptc2025.backend.Entities.AcademicLevel.AcademicLevelsEntity;
 import ptc2025.backend.Entities.DegreeTypes.DegreeTypesEntity;
 import ptc2025.backend.Entities.Departments.DepartmentsEntity;
@@ -21,11 +23,12 @@ import java.util.List;
 @Table(name = "CAREERS")
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 public class CareerEntity {
 
     @Id
+    @GenericGenerator(name = "careerGenerator", strategy = "guid")
+    @GeneratedValue(generator = "careerGenerator")
     @Column(name = "CAREERID")
     private String id;
 
@@ -67,11 +70,32 @@ public class CareerEntity {
     private Integer totalValueUnits;
 
     @OneToMany(mappedBy = "career", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<CareerCycleAvailabilityEntity> careerCycleAvailability = new ArrayList<>();
 
     @OneToMany(mappedBy = "career", cascade = CascadeType.ALL)
+    @JsonIgnore
     private  List<PensumEntity> pensum = new ArrayList<>();
 
     @OneToMany(mappedBy = "career", cascade = CascadeType.ALL)
+    @JsonIgnore
     private  List<CareerSocialServiceProjectEntity> socialServiceProjects = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "CareerEntity{" +
+                "id='" + id + '\'' +
+                ", academicLevels=" + academicLevels +
+                ", degreeTypes=" + degreeTypes +
+                ", modalities=" + modalities +
+                ", departments=" + departments +
+                ", nameCareer='" + nameCareer + '\'' +
+                ", careerCode='" + careerCode + '\'' +
+                ", description='" + description + '\'' +
+                ", minPassingScore=" + minPassingScore +
+                ", minMUC=" + minMUC +
+                ", compulsorySubjects=" + compulsorySubjects +
+                ", totalValueUnits=" + totalValueUnits +
+                '}';
+    }
 }

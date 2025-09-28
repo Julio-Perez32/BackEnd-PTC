@@ -10,7 +10,7 @@ import ptc2025.backend.Entities.Universities.UniversityEntity;
 
 @Entity
 @Table(name = "CYCLETYPES")
-@Getter @Setter @ToString @EqualsAndHashCode
+@Getter @Setter @EqualsAndHashCode
 public class CycleTypesEntity {
     @Id
     @GenericGenerator(name = "IDCycleTypes", strategy = "guid")
@@ -24,4 +24,12 @@ public class CycleTypesEntity {
     @JoinColumn(name = "UNIVERSITYID", referencedColumnName = "UNIVERSITYID")
     private UniversityEntity university;
 
+    @Override
+    public String toString() {
+        return "CycleTypesEntity{" +
+                "id='" + id + '\'' +
+                ", cycleLabel='" + cycleLabel + '\'' +
+                ", university=" + university +
+                '}';
+    }
 }
