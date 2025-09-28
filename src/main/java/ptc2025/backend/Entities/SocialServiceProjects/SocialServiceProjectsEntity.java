@@ -1,5 +1,6 @@
 package ptc2025.backend.Entities.SocialServiceProjects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import java.util.List;
 //SocialServiceProjects
 @Entity
 @Table(name = "SOCIALSERVICEPROJECTS")
-@Getter @Setter @ToString
+@Getter @Setter
 @EqualsAndHashCode
 public class SocialServiceProjectsEntity
 {
@@ -37,9 +38,18 @@ public class SocialServiceProjectsEntity
 
     //Dando sus llaves
     @OneToMany(mappedBy = "SocialServiceProject", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<CareerSocialServiceProjectEntity> careerSocialService = new ArrayList<>();
 
     @OneToMany(mappedBy = "socialServiceProject", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<StudentCareerEnrollmentsEntity> studentCareerEnrollments = new ArrayList<>();
 
+    @Override
+    public String toString() {
+        return "SocialServiceProjectsEntity{" +
+                "socialServiceProjectID='" + socialServiceProjectID + '\'' +
+                ", socialServiceProjectName='" + socialServiceProjectName + '\'' +
+                ", description='" + description ;
+    }
 }

@@ -1,5 +1,6 @@
 package ptc2025.backend.Entities.StudentEvaluations;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -35,6 +36,7 @@ public class StudentEvaluationsEntity {
     private LocalDate submittedAt;
 
     @OneToMany(mappedBy = "studentEvaluationID", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<EvaluationValidationsEntity> evaluationValidations = new ArrayList<>();
 
     @ManyToOne
@@ -48,4 +50,14 @@ public class StudentEvaluationsEntity {
     @ManyToOne
     @JoinColumn(name = "CREATEDBY", referencedColumnName = "USERID")
     private UsersEntity userID;
+
+
+    @Override
+    public String toString() {
+        return "StudentEvaluationsEntity{" +
+                "id='" + id + '\'' +
+                ", score=" + score +
+                ", feedback='" + feedback + '\'' +
+                ", submittedAt=" + submittedAt ;
+    }
 }

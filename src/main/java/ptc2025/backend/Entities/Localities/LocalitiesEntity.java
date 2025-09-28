@@ -1,5 +1,6 @@
 package ptc2025.backend.Entities.Localities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "LOCALITIES")
-@Getter @Setter @ToString
+@Getter @Setter
 @EqualsAndHashCode
 public class LocalitiesEntity {
 
@@ -36,6 +37,15 @@ public class LocalitiesEntity {
     private UniversityEntity university;
 
     @OneToMany(mappedBy = "localities", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<FacultyLocalitiesEntity> facultyLocalities = new ArrayList<>();
 
+    @Override
+    public String toString() {
+        return "LocalitiesEntity{" +
+                "localityID='" + localityID + '\'' +
+                ", isMainLocality=" + isMainLocality +
+                ", address='" + address + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'';
+    }
 }

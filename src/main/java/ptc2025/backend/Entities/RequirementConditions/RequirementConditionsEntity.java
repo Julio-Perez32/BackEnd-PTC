@@ -15,7 +15,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "REQUIREMENTCONDITIONS")
-@Getter @Setter @EqualsAndHashCode @ToString
+@Getter @Setter @EqualsAndHashCode
 public class RequirementConditionsEntity {
 
     @Id
@@ -31,4 +31,10 @@ public class RequirementConditionsEntity {
     @ManyToOne
     @JoinColumn(name = "REQUIREMENTID", referencedColumnName = "REQUIREMENTID")
     private RequirementsEntity requirements;
+
+    @Override
+    public String toString() {
+        return "RequirementConditionsEntity{" +
+                "ConditionID='" + ConditionID + '\'';
+    }
 }

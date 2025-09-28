@@ -10,7 +10,7 @@ import ptc2025.backend.Entities.Universities.UniversityEntity;
 
 @Entity
 @Table(name = "MODALITIES")
-@Getter @Setter @ToString @EqualsAndHashCode
+@Getter @Setter @EqualsAndHashCode
 public class ModalitiesEntity {
 
     @Id
@@ -24,4 +24,11 @@ public class ModalitiesEntity {
     @ManyToOne
     @JoinColumn(name = "UNIVERSITYID", referencedColumnName = "UNIVERSITYID")
     private UniversityEntity university;
+
+    @Override
+    public String toString() {
+        return "ModalitiesEntity{" +
+                "id='" + id + '\'' +
+                ", modalityName='" + modalityName + '\'' ;
+    }
 }

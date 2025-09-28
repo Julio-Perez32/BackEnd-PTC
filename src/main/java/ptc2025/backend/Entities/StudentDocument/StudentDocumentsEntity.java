@@ -17,7 +17,6 @@ import java.time.LocalDate;
 @Table(name = "STUDENTDOCUMENTS")
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 public class StudentDocumentsEntity {
     @Id
@@ -42,4 +41,14 @@ public class StudentDocumentsEntity {
     @ManyToOne
     @JoinColumn(name = "DOCUMENTID", referencedColumnName = "DOCUMENTID")
     private DocumentEntity document;
+
+    @Override
+    public String toString() {
+        return "StudentDocumentsEntity{" +
+                "studentDocumentID='" + studentDocumentID + '\'' +
+                ", submitted=" + submitted +
+                ", submissionDate=" + submissionDate +
+                ", verified=" + verified +
+                ", students=" + students ;
+    }
 }

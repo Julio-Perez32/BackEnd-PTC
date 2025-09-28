@@ -1,5 +1,6 @@
 package ptc2025.backend.Entities.systemRoles;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,7 +16,6 @@ import java.util.List;
 @Table(name = "SYSTEMROLES")
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 public class SystemRolesEntity {
     @Id
@@ -27,5 +27,13 @@ public class SystemRolesEntity {
     private String roleName;
 
     @OneToMany(mappedBy = "systemRoles", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<UsersEntity> systemRoles = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "SystemRolesEntity{" +
+                "roleId='" + roleId + '\'' +
+                ", roleName='" + roleName ;
+    }
 }

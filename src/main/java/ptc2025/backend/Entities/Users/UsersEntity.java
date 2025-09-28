@@ -1,5 +1,6 @@
 package ptc2025.backend.Entities.Users;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,7 +19,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "USERS")
-@Getter @Setter @ToString @EqualsAndHashCode
+@Getter @Setter @EqualsAndHashCode
 public class UsersEntity {
 
     @Id
@@ -50,5 +51,15 @@ public class UsersEntity {
     private List<NotificationEntity> notification = new ArrayList<>();
 
     @OneToMany(mappedBy = "userID", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<StudentEvaluationsEntity> studentEvaluations = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "UsersEntity{" +
+                "id='" + id + '\'' +
+                ", email='" + email + '\'' +
+                ", contrasena='" + contrasena + '\'' +
+                ", imageUrlUser='" + imageUrlUser;
+    }
 }

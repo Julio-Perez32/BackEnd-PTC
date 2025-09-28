@@ -15,7 +15,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "STUDENTCAREERENROLLMENTS")
-@Getter @Setter @EqualsAndHashCode @ToString
+@Getter @Setter @EqualsAndHashCode
 public class StudentCareerEnrollmentsEntity {
 
     @Id
@@ -60,4 +60,19 @@ public class StudentCareerEnrollmentsEntity {
 
     @Column(name = "SERVICESTATUSDATE")
     private LocalDate serviceStatusDate;
+
+    @Override
+    public String toString() {
+        return "StudentCareerEnrollmentsEntity{" +
+                "studentCareerEnrollmentID='" + studentCareerEnrollmentID + '\'' +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", status='" + status + '\'' +
+                ", statusDate=" + statusDate +
+                ", serviceStartDate=" + serviceStartDate +
+                ", serviceEndDate=" + serviceEndDate +
+                ", serviceStatus='" + serviceStatus + '\'' +
+                ", serviceStatusDate=" + serviceStatusDate +
+                '}';
+    }
 }

@@ -23,4 +23,5 @@ public class StudentEvaluationsDTO {
     private String component;
     private String courseEnrollment;
     private String user;
+    private String planComponents;
 }

@@ -1,5 +1,6 @@
 package ptc2025.backend.Entities.personTypes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jdk.dynalink.linker.LinkerServices;
 import lombok.EqualsAndHashCode;
@@ -16,7 +17,6 @@ import java.util.List;
 @Table(name = "PERSONTYPES")
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 public class personTypesEntity {
     @Id
@@ -30,6 +30,13 @@ public class personTypesEntity {
 
     //La llave de personType para people
     @OneToMany(mappedBy = "personTypes", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<PeopleEntity> people = new ArrayList<>();
 
+    @Override
+    public String toString() {
+        return "personTypesEntity{" +
+                "personTypeID='" + personTypeID + '\'' +
+                ", personType='" + personType + '\'' ;
+    }
 }

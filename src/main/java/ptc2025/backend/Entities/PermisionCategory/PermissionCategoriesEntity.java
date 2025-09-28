@@ -9,7 +9,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "PERMISSIONCATEGORIES")
-@Getter @Setter @EqualsAndHashCode @ToString
+@Getter @Setter @EqualsAndHashCode
 public class PermissionCategoriesEntity {
 
     @Id
@@ -19,4 +19,5 @@ public class PermissionCategoriesEntity {
     private String categoryID;
     @Column(name = "CATEGORYNAME")
     private String categoryName;
+
 }

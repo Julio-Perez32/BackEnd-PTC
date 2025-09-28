@@ -15,7 +15,6 @@ import java.time.LocalDate;
 @Table(name = "NOTIFICATIONS")
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 public class NotificationEntity {
     @Id
@@ -33,6 +32,15 @@ public class NotificationEntity {
     @ManyToOne
     @JoinColumn(name = "USERID", referencedColumnName = "USERID")
     private UsersEntity user;
+
+    @Override
+    public String toString() {
+        return "NotificationEntity{" +
+                "notificationID='" + notificationID + '\'' +
+                ", title='" + title + '\'' +
+                ", body='" + body + '\'' +
+                ", sentAt=" + sentAt ;
+    }
 }
 /**NOTIFICATIONID
  USERID

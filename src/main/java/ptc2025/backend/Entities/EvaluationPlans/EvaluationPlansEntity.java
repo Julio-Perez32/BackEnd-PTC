@@ -1,5 +1,6 @@
 package ptc2025.backend.Entities.EvaluationPlans;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -7,9 +8,13 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
+import ptc2025.backend.Entities.People.PeopleEntity;
+import ptc2025.backend.Entities.PlanComponents.PlanComponentsEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "EVALUATIONPLANS")
@@ -30,11 +35,15 @@ public class EvaluationPlansEntity {
     @Column(name = "CREATEDAT")
     private LocalDate createdAt;
 
-
+    @OneToMany
+    @JsonIgnore
+    private List<PlanComponentsEntity> evaluationPlans = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "COURSEOFFERINGID", referencedColumnName = "COURSEOFFERINGID")
     private CourseOfferingsEntity courseOfferings;
+    @OneToMany
+
 
 
     @Override

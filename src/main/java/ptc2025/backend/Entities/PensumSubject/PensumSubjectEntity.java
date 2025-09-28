@@ -12,7 +12,7 @@ import ptc2025.backend.Entities.careers.CareerEntity;
 
 @Entity
 @Table(name = "PENSUMSUBJECTS")
-@Getter @Setter @EqualsAndHashCode @ToString
+@Getter @Setter @EqualsAndHashCode
 public class PensumSubjectEntity {
 
     @Id
@@ -32,4 +32,12 @@ public class PensumSubjectEntity {
     @ManyToOne
     @JoinColumn(name = "SUBJECTID", referencedColumnName = "SUBJECTID")
     private SubjectDefinitionsEntity subjectDefinitions;
+
+    @Override
+    public String toString() {
+        return "PensumSubjectEntity{" +
+                "PensumSubjectID='" + PensumSubjectID + '\'' +
+                ", ValueUnits=" + ValueUnits +
+                ", IsRequired=" + IsRequired ;
+    }
 }

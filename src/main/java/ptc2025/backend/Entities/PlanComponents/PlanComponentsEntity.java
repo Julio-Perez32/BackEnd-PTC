@@ -1,5 +1,6 @@
 package ptc2025.backend.Entities.PlanComponents;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -7,13 +8,17 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 import ptc2025.backend.Entities.EvaluationPlans.EvaluationPlansEntity;
+import ptc2025.backend.Entities.People.PeopleEntity;
+import ptc2025.backend.Entities.StudentEvaluations.StudentEvaluationsEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "EVALUATIONPLANCOMPONENTS")
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 public class PlanComponentsEntity {
     @Id
@@ -37,4 +42,18 @@ public class PlanComponentsEntity {
     @ManyToOne
     @JoinColumn(name = "EVALUATIONPLANID", referencedColumnName = "EVALUATIONPLANID")
     private EvaluationPlansEntity evaluationPlans;
+
+    @OneToMany(mappedBy = "planComponents", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<StudentEvaluationsEntity> PlanComponents = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "PlanComponentsEntity{" +
+                "componentID='" + componentID + '\'' +
+                ", rubric='" + rubric + '\'' +
+                ", componentName='" + componentName + '\'' +
+                ", weightPercentage=" + weightPercentage +
+                ", orderIndex=" + orderIndex;
+    }
 }

@@ -1,5 +1,6 @@
 package ptc2025.backend.Entities.SubjectFamilies;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "SUBJECTFAMILIES")
-@Getter @Setter @EqualsAndHashCode @ToString
+@Getter @Setter @EqualsAndHashCode
 public class SubjectFamiliesEntity {
     @Id
     @GenericGenerator(name = "subjectID", strategy = "guid")
@@ -34,10 +35,20 @@ public class SubjectFamiliesEntity {
 
     //SubjectFamilies le da la llave a
     @OneToMany(mappedBy = "subjectFamilies", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<SubjectDefinitionsEntity> SubjectDefinitions = new ArrayList<>();
 
     //Faculties le da la llave a SubjectTeachers
     @ManyToOne
     @JoinColumn(name = "FACULTYID", referencedColumnName = "FACULTYID")
     private FacultiesEntity faculty;
+
+    @Override
+    public String toString() {
+        return "SubjectFamiliesEntity{" +
+                "subjectFamilyID='" + subjectFamilyID + '\'' +
+                ", subjectPrefix='" + subjectPrefix + '\'' +
+                ", reservedSlots=" + reservedSlots +
+                ", startingNumber=" + startingNumber;
+    }
 }

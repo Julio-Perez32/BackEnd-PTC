@@ -16,7 +16,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "SUBJECTTEACHERS")
-@Getter @Setter @EqualsAndHashCode @ToString
+@Getter @Setter @EqualsAndHashCode
 public class SubjectTeachersEntity {
 
     @Id
@@ -32,4 +32,10 @@ public class SubjectTeachersEntity {
     @ManyToOne
     @JoinColumn(name = "SUBJECTID", referencedColumnName = "SUBJECTID")
     private SubjectDefinitionsEntity subjectDefinitions;
+
+    @Override
+    public String toString() {
+        return "SubjectTeachersEntity{" +
+                "SubjectTeacherID='" + SubjectTeacherID;
+    }
 }
