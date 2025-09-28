@@ -68,10 +68,10 @@ public class AuthController {
                     "authToken=%s; "+
                             "Path=/;" +
                             "HttpOnly;"+
-                            "Secure"+
-                            "SameSite=None"+
-                            "Max-Age=86400"+
-                            "Domain = https://sapientiae-api-bd9a54b3d7a1.herokuapp.com/",
+                            "Secure;"+
+                            "SameSite=None;"+
+                            "Max-Age=86400;"+
+                            "Domain = sapientiae-api-bd9a54b3d7a1.herokuapp.com/",
                     token
 
             );
