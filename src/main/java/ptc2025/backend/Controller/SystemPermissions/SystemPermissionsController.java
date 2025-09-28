@@ -3,11 +3,13 @@ package ptc2025.backend.Controller.SystemPermissions;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ptc2025.backend.Exceptions.ExcepcionDatosDuplicados;
+import ptc2025.backend.Models.DTO.SubjectTeachers.SubjectTeachersDTO;
 import ptc2025.backend.Models.DTO.SystemPermissions.SystemPermissionsDTO;
 import ptc2025.backend.Services.SystemPermissions.SystemPermissionsService;
 
@@ -25,7 +27,20 @@ public class SystemPermissionsController {
     private SystemPermissionsService service;
 
     @GetMapping("/getSystemPermissions")
-    List<SystemPermissionsDTO> getData(){ return service.GetsystemPermissions();}
+    List<SystemPermissionsDTO> getSystemPermissions(){ return service.GetsystemPermissions();}
+
+    @GetMapping("/getSystemPermissionsPagination")
+    public ResponseEntity<Page<SystemPermissionsDTO>> getSystemPermissions(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<SystemPermissionsDTO> levels = service.getSystemPermissionsPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
 
     @PostMapping("/AddSystemPermission")
     public ResponseEntity<?> nuevoResgistro(@Valid @RequestBody SystemPermissionsDTO json, HttpServletRequest request){

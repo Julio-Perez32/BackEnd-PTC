@@ -3,15 +3,19 @@ package ptc2025.backend.Controller.SubjectTeachers;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ptc2025.backend.Entities.SubjectTeachers.SubjectTeachersEntity;
+import ptc2025.backend.Models.DTO.SubjectFamilies.SubjectFamiliesDTO;
 import ptc2025.backend.Models.DTO.SubjectTeachers.SubjectTeachersDTO;
 import ptc2025.backend.Services.SubjectTeachers.SubjectTeachersService;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -21,6 +25,21 @@ public class SubjectTeachersController {
 
     @Autowired
     SubjectTeachersService service;
+    @GetMapping("/getSubjectTeachers")
+    public List<SubjectTeachersDTO> getSubjectTeachers(){return service.getAllSubjectTeachers();}
+
+    @GetMapping("/getSubjectTeachersPagination")
+    public ResponseEntity<Page<SubjectTeachersDTO>> getSubjectTeachersPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<SubjectTeachersDTO> levels = service.getAllSubjectTeachersPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
 
     @PostMapping("/newSubjectTeacher")
     public ResponseEntity<?> newSubjectTeacher(@Valid @RequestBody SubjectTeachersDTO json, HttpServletRequest request){

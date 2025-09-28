@@ -8,10 +8,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Faculties.FacultiesEntity;
+import ptc2025.backend.Entities.SubjectDefinitions.SubjectDefinitionsEntity;
 import ptc2025.backend.Entities.SubjectFamilies.SubjectFamiliesEntity;
 import ptc2025.backend.Exceptions.ExceptionBadRequest;
 import ptc2025.backend.Exceptions.ExceptionInternalError;
 import ptc2025.backend.Exceptions.ExceptionNoSuchElement;
+import ptc2025.backend.Exceptions.ExceptionNotFound;
+import ptc2025.backend.Models.DTO.SubjectDefinitions.SubjectDefinitionsDTO;
 import ptc2025.backend.Models.DTO.SubjectFamilies.SubjectFamiliesDTO;
 import ptc2025.backend.Respositories.Faculties.FacultiesRepository;
 import ptc2025.backend.Respositories.SubjectFamilies.SubjectFamiliesRepository;
@@ -35,6 +38,7 @@ public class SubjectFamiliesService {
                 .map(this::convertToSubjectFamDTO)
                 .collect(Collectors.toList());
     }
+
 
     public Page<SubjectFamiliesDTO> getSubjectFamPagination(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);

@@ -6,6 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +19,7 @@ import ptc2025.backend.Entities.Users.UsersEntity;
 import ptc2025.backend.Entities.systemRoles.SystemRolesEntity;
 import ptc2025.backend.Exceptions.ExceptionNotFound;
 import ptc2025.backend.Exceptions.ExceptionServerError;
+import ptc2025.backend.Models.DTO.Universities.UniversityDTO;
 import ptc2025.backend.Models.DTO.Users.UsersDTO;
 import ptc2025.backend.Respositories.People.PeopleRepository;
 import ptc2025.backend.Respositories.Universities.UniversityRespository;
@@ -68,6 +72,16 @@ public class UsersService {
             log.error("Error al obtener la lista de usuarios", e);
             throw new ExceptionServerError("Error interno al obtener la lista de usuarios");
         }
+    }
+    public Page<UsersDTO> getUsersPagination(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<UsersEntity> pageEntity = repo.findAll(pageable);
+
+        if (pageEntity.isEmpty()) {
+            throw new ExceptionNotFound("No se encontraron definiciones de materias para la página solicitada.");
+        }
+
+        return pageEntity.map(this::convertirUsuarioADTO);
     }
 
     public UsersDTO convertirUsuarioADTO(UsersEntity usuario) {

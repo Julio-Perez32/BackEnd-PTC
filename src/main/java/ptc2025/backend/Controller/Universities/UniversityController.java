@@ -3,12 +3,14 @@ package ptc2025.backend.Controller.Universities;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ptc2025.backend.Models.DTO.Universities.UniversityDTO;
+import ptc2025.backend.Models.DTO.systemRoles.systemRolesDTO;
 import ptc2025.backend.Services.Universities.UniversityServices;
 
 import java.time.Instant;
@@ -28,6 +30,18 @@ public class UniversityController {
     @GetMapping("/getDataUniversity")
     public List<UniversityDTO> getUniversity() {
         return services.getUniversityService();
+    }
+    @GetMapping("/getUniversityPagination")
+        public ResponseEntity<Page<UniversityDTO>> getUniversityPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<UniversityDTO> levels = services.getUniversityPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
     }
     //Post
     @PostMapping("/newUniversity")

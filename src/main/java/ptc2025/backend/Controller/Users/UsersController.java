@@ -4,12 +4,14 @@ package ptc2025.backend.Controller.Users;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ptc2025.backend.Entities.Users.UsersEntity;
+import ptc2025.backend.Models.DTO.Universities.UniversityDTO;
 import ptc2025.backend.Models.DTO.Users.UsersDTO;
 import ptc2025.backend.Services.Users.UsersService;
 
@@ -28,8 +30,21 @@ public class UsersController {
     private UsersService services;
 
     @GetMapping("/getAllUsers")
-    public List<UsersDTO> getdata() {
+    public List<UsersDTO> getALlUsers() {
         return services.getAllUsers();
+    }
+
+    @GetMapping("/getUsersPagination")
+    public ResponseEntity<Page<UsersDTO>> getUsersPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<UsersDTO> levels = services.getUsersPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
     }
 
     @PostMapping("/AddUser")

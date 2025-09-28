@@ -3,6 +3,9 @@ package ptc2025.backend.Services.SubjectTeachers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.SubjectDefinitions.SubjectDefinitionsEntity;
 import ptc2025.backend.Entities.SubjectTeachers.SubjectTeachersEntity;
@@ -10,6 +13,7 @@ import ptc2025.backend.Entities.employees.EmployeeEntity;
 import ptc2025.backend.Exceptions.ExceptionBadRequest;
 import ptc2025.backend.Exceptions.ExceptionNotFound;
 import ptc2025.backend.Exceptions.ExceptionServerError;
+import ptc2025.backend.Models.DTO.SubjectDefinitions.SubjectDefinitionsDTO;
 import ptc2025.backend.Models.DTO.SubjectTeachers.SubjectTeachersDTO;
 import ptc2025.backend.Respositories.SubjectDefinitions.SubjectDefinitionsRepository;
 import ptc2025.backend.Respositories.SubjectTeachers.SubjectTeachersRepository;
@@ -79,6 +83,17 @@ public class SubjectTeachersService {
             throw new ExceptionServerError("Error interno al obtener la lista de docentes");
         }
     }
+    public Page<SubjectTeachersDTO> getAllSubjectTeachersPagination(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<SubjectTeachersEntity> pageEntity = repo.findAll(pageable);
+
+        if (pageEntity.isEmpty()) {
+            throw new ExceptionNotFound("No se encontraron definiciones de materias para la página solicitada.");
+        }
+
+        return pageEntity.map(this::convertToSubjectTeachersDTO);
+    }
+
 
     public SubjectTeachersDTO insertSubjectTeacher(SubjectTeachersDTO dto) {
         if (dto == null || dto.getSubjectID() == null || dto.getSubjectID().isBlank() ||

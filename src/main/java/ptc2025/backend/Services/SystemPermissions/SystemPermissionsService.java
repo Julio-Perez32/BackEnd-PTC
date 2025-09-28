@@ -3,11 +3,16 @@ package ptc2025.backend.Services.SystemPermissions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.SubjectTeachers.SubjectTeachersEntity;
 import ptc2025.backend.Entities.SystemPermissions.SystemPermissionsEntity;
 import ptc2025.backend.Exceptions.ExceptionBadRequest;
 import ptc2025.backend.Exceptions.ExceptionNotFound;
 import ptc2025.backend.Exceptions.ExceptionServerError;
+import ptc2025.backend.Models.DTO.SubjectTeachers.SubjectTeachersDTO;
 import ptc2025.backend.Models.DTO.SystemPermissions.SystemPermissionsDTO;
 import ptc2025.backend.Respositories.SystemPermissions.SystemPermissionsRepository;
 
@@ -31,6 +36,16 @@ public class SystemPermissionsService {
             log.error("Error al obtener la lista de permisos del sistema", e);
             throw new ExceptionServerError("Error interno al obtener la lista de permisos");
         }
+    }
+    public Page<SystemPermissionsDTO> getSystemPermissionsPagination(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<SystemPermissionsEntity> pageEntity = repo.findAll(pageable);
+
+        if (pageEntity.isEmpty()) {
+            throw new ExceptionNotFound("No se encontraron definiciones de materias para la página solicitada.");
+        }
+
+        return pageEntity.map(this::convertirADTO);
     }
 
     private SystemPermissionsDTO convertirADTO(SystemPermissionsEntity systemPermissions){

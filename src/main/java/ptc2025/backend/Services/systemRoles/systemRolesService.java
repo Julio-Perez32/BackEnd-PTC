@@ -3,11 +3,16 @@ package ptc2025.backend.Services.systemRoles;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ptc2025.backend.Entities.SystemPermissions.SystemPermissionsEntity;
 import ptc2025.backend.Entities.systemRoles.SystemRolesEntity;
 import ptc2025.backend.Exceptions.ExceptionBadRequest;
 import ptc2025.backend.Exceptions.ExceptionNotFound;
 import ptc2025.backend.Exceptions.ExceptionServerError;
+import ptc2025.backend.Models.DTO.SystemPermissions.SystemPermissionsDTO;
 import ptc2025.backend.Models.DTO.systemRoles.systemRolesDTO;
 import ptc2025.backend.Respositories.systemRoles.systemRolesRespository;
 
@@ -20,14 +25,24 @@ public class systemRolesService {
     systemRolesRespository repo;
     public List<systemRolesDTO> getSystemRoles() {
         try {
-            List<SystemRolesEntity> universidad = repo.findAll();
-            return universidad.stream()
+            List<SystemRolesEntity> systemRole = repo.findAll();
+            return systemRole.stream()
                     .map(this::convertirADTO)
                     .collect(Collectors.toList());
         } catch (Exception e) {
             log.error("Error al obtener los roles del sistema", e);
             throw new ExceptionServerError("Error interno al obtener los roles del sistema");
         }
+    }
+    public Page<systemRolesDTO> getSystemRolesPagination(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<SystemRolesEntity> pageEntity = repo.findAll(pageable);
+
+        if (pageEntity.isEmpty()) {
+            throw new ExceptionNotFound("No se encontraron definiciones de materias para la página solicitada.");
+        }
+
+        return pageEntity.map(this::convertirADTO);
     }
     // Insertar nuevo rol
     public systemRolesDTO insertSystemRoles(systemRolesDTO dto) {

@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -11,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.SimpleErrors;
 import org.springframework.web.bind.annotation.*;
 import ptc2025.backend.Exceptions.ExcepcionDatosDuplicados;
+import ptc2025.backend.Models.DTO.Users.UsersDTO;
 import ptc2025.backend.Models.DTO.YearCycles.YearCyclesDTO;
 import ptc2025.backend.Services.YearCycles.YearCyclesService;
 
@@ -27,8 +29,22 @@ public class YearCyclesController {
     @Autowired
     YearCyclesService service;
 
-    @GetMapping("/GetAllYearCycles")
+    @GetMapping("/getAllYearCycles")
     public List<YearCyclesDTO> obtenerDatos() { return service.obtenerRegistros();}
+
+    @GetMapping("/getYearCyclesPagination")
+    public ResponseEntity<Page<YearCyclesDTO>> getYearCyclesPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<YearCyclesDTO> levels = service.getYearCyclesPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
+
 
     @PostMapping("/addYearCyle")
     public ResponseEntity<?> nuevoRegistro(@Valid @RequestBody YearCyclesDTO json, HttpServletRequest request){

@@ -3,10 +3,12 @@ package ptc2025.backend.Controller.systemRoles;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ptc2025.backend.Models.DTO.SystemPermissions.SystemPermissionsDTO;
 import ptc2025.backend.Models.DTO.Universities.UniversityDTO;
 import ptc2025.backend.Models.DTO.systemRoles.systemRolesDTO;
 import ptc2025.backend.Services.systemRoles.systemRolesService;
@@ -24,10 +26,22 @@ public class systemRolesController {
     private systemRolesService services;
 
     @GetMapping("/getSystemRol")
-    public List<systemRolesDTO> getUniversity() {
+    public List<systemRolesDTO> getSystemRol() {
         return services.getSystemRoles();
     }
 
+    @GetMapping("/getSystemRolPagination")
+    public ResponseEntity<Page<systemRolesDTO>> getSystemRolPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<systemRolesDTO> levels = services.getSystemRolesPagination(page, size);
+
+        if(levels.isEmpty()){
+            return ResponseEntity.badRequest().body(Page.empty());
+        }
+        return ResponseEntity.ok(levels);
+    }
     @PostMapping("/newSystemaRol")
     public ResponseEntity<Map<String, Object>> registrarSystemRole(
             @Valid @RequestBody systemRolesDTO dto,

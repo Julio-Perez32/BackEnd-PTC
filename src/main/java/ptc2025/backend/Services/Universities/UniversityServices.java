@@ -4,11 +4,16 @@ import com.cloudinary.Cloudinary;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ptc2025.backend.Entities.SystemPermissions.SystemPermissionsEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Exceptions.ExceptionNotFound;
 import ptc2025.backend.Exceptions.ExceptionServerError;
+import ptc2025.backend.Models.DTO.SystemPermissions.SystemPermissionsDTO;
 import ptc2025.backend.Models.DTO.Universities.UniversityDTO;
 import ptc2025.backend.Respositories.Universities.UniversityRespository;
 
@@ -41,6 +46,16 @@ public class UniversityServices {
             log.error("Error al obtener las universidades", e);
             throw new ExceptionServerError("Error interno al obtener las universidades");
         }
+    }
+    public Page<UniversityDTO> getUniversityPagination(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<UniversityEntity> pageEntity = repo.findAll(pageable);
+
+        if (pageEntity.isEmpty()) {
+            throw new ExceptionNotFound("No se encontraron definiciones de materias para la página solicitada.");
+        }
+
+        return pageEntity.map(this::convertirAUniversityDTO);
     }
 
     // Insertar nueva universidad

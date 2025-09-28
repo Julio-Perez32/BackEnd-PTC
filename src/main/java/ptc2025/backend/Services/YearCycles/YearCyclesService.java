@@ -10,8 +10,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.AcademicYear.AcademicYearEntity;
 import ptc2025.backend.Entities.CycleTypes.CycleTypesEntity;
+import ptc2025.backend.Entities.Users.UsersEntity;
 import ptc2025.backend.Entities.YearCycles.YearCyclesEntity;
 import ptc2025.backend.Exceptions.ExceptionNoSuchElement;
+import ptc2025.backend.Exceptions.ExceptionNotFound;
+import ptc2025.backend.Models.DTO.Users.UsersDTO;
 import ptc2025.backend.Models.DTO.YearCycles.YearCyclesDTO;
 import ptc2025.backend.Respositories.AcademicYear.AcademicYearRepository;
 import ptc2025.backend.Respositories.CycleTypes.CycleTypesRepository;
@@ -41,6 +44,16 @@ public class YearCyclesService {
         return Lista.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
+    }
+    public Page<YearCyclesDTO> getYearCyclesPagination(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<YearCyclesEntity> pageEntity = repo.findAll(pageable);
+
+        if (pageEntity.isEmpty()) {
+            throw new ExceptionNotFound("No se encontraron definiciones de materias para la página solicitada.");
+        }
+
+        return pageEntity.map(this::convertirADTO);
     }
 
     private YearCyclesDTO convertirADTO(YearCyclesEntity yearCyclesEntity) {
