@@ -25,6 +25,7 @@ import ptc2025.backend.Respositories.People.PeopleRepository;
 import ptc2025.backend.Respositories.Universities.UniversityRespository;
 import ptc2025.backend.Respositories.Users.UsersRespository;
 import ptc2025.backend.Respositories.systemRoles.systemRolesRespository;
+import ptc2025.backend.Services.Cloudinary.CloudinaryService;
 import ptc2025.backend.Utils.EmailService;
 import ptc2025.backend.Utils.PasswordGenerator;
 
@@ -60,6 +61,8 @@ public class UsersService {
     private Argon2Password passwordHasher;
     @Autowired
     private PasswordGenerator passwordGenerator;
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
 
     public List<UsersDTO> getAllUsers() {
