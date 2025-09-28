@@ -6,6 +6,7 @@ import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ptc2025.backend.Entities.Users.UsersEntity;
@@ -54,30 +55,26 @@ public class AuthController {
     }
 
 
+
     private void addTokenCookie(HttpServletResponse response, String email) {
         Optional<UsersEntity> usersOpt = service.getUser(email);
-        if(usersOpt.isPresent()){
+        if (usersOpt.isPresent()) {
             UsersEntity user = usersOpt.get();
             String token = jwtUtils.create(
-              String.valueOf(user.getId()),
-              user.getEmail(),
-              user.getSystemRoles().getRoleName()
+                    String.valueOf(user.getId()),
+                    user.getEmail(),
+                    user.getSystemRoles().getRoleName()
             );
 
-            String cookieValue = String.format(
-                    "authToken=%s; "+
-                            "Path=/;" +
-                            "HttpOnly;"+
-                            "Secure"+
-                            "SameSite=None"+
-                            "Max-Age=86400"+
-                            "Domain = https://sapientiae-api-bd9a54b3d7a1.herokuapp.com/",
-                    token
+            ResponseCookie cookie = ResponseCookie.from("authToken", token)
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/")
+                    .maxAge(86400)
+                    .domain("sapientiae-api-bd9a54b3d7a1.herokuapp.com")
+                    .build();
 
-            );
-
-            response.addHeader("Set-Cookie", cookieValue);
-            response.addHeader("Access-Control-Expose-Headers", "Set-Cookie");
+            response.addHeader("Set-Cookie", cookie.toString());
         }
     }
 
