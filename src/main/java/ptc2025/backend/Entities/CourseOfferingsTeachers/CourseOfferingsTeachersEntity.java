@@ -13,7 +13,7 @@ import ptc2025.backend.Entities.employees.EmployeeEntity;
 
 @Entity
 @Table(name = "COURSEOFFERINGTEACHERS")
-@Getter @Setter @EqualsAndHashCode @ToString
+@Getter @Setter @EqualsAndHashCode
 public class CourseOfferingsTeachersEntity {
 
     @Id
@@ -29,4 +29,13 @@ public class CourseOfferingsTeachersEntity {
     @ManyToOne
     @JoinColumn(name = "EMPLOYEEID", referencedColumnName = "EMPLOYEEID")
     private EmployeeEntity employee;
+
+    @Override
+    public String toString() {
+        return "CourseOfferingsTeachersEntity{" +
+                "CourseOfferingTeacherID='" + CourseOfferingTeacherID + '\'' +
+                ", courseOfferings=" + courseOfferings +
+                ", employee=" + employee +
+                '}';
+    }
 }

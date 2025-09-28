@@ -15,7 +15,6 @@ import ptc2025.backend.Entities.facultyCorrelatives.facultyCorrelativesEntity;
 @Table(name = "CODEGENERATORS")
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 public class CodeGeneratorsEntity {
     @Id
@@ -40,6 +39,17 @@ public class CodeGeneratorsEntity {
     @JoinColumn(name = "CORRELATIVEID", referencedColumnName = "CORRELATIVEID")
     private facultyCorrelativesEntity facultyCorrelative;
 
+    @Override
+    public String toString() {
+        return "CodeGeneratorsEntity{" +
+                "generatorID='" + generatorID + '\'' +
+                ", prefix='" + prefix + '\'' +
+                ", suffixLength=" + suffixLength +
+                ", lastAssignedNumber=" + lastAssignedNumber +
+                ", entityType=" + entityType +
+                ", facultyCorrelative=" + facultyCorrelative +
+                '}';
+    }
 }
 /**
  * generatorID

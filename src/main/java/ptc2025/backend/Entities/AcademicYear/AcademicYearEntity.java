@@ -1,5 +1,6 @@
 package ptc2025.backend.Entities.AcademicYear;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,7 +20,7 @@ import java.util.List;
 @Entity
 @Table(name = "ACADEMICYEARS")
 @Getter @Setter
-@ToString @EqualsAndHashCode
+@EqualsAndHashCode
 public class AcademicYearEntity {
     @Id
     @GenericGenerator(name = "idAcademicYear", strategy = "guid")
@@ -48,10 +49,24 @@ public class AcademicYearEntity {
     private Integer defaultCycleDuration;
 
     @OneToMany(mappedBy = "ACADEMICYEAR", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<YearCyclesEntity> yearCycles = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "UNIVERSITYID", referencedColumnName = "UNIVERSITYID")
     private UniversityEntity university;
 
+    @Override
+    public String toString() {
+        return "AcademicYearEntity{" +
+                "academicYearId='" + academicYearId + '\'' +
+                ", year=" + year +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", cycleCount=" + cycleCount +
+                ", alowInterCycle='" + alowInterCycle + '\'' +
+                ", defaultCycleDuration=" + defaultCycleDuration +
+                ", university=" + university +
+                '}';
+    }
 }

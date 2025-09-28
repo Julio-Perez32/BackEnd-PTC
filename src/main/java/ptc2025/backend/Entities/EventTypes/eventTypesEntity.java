@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
-
+//sregun yo ya no esta
 @Entity
 @Table(name = "EVENTTYPES")
 @Getter

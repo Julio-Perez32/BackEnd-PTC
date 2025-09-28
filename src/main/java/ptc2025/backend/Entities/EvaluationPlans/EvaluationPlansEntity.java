@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Table(name = "EVALUATIONPLANS")
 @Getter
 @Setter
-@ToString
+
 @EqualsAndHashCode
 public class EvaluationPlansEntity {
     @Id
@@ -36,6 +36,17 @@ public class EvaluationPlansEntity {
     @JoinColumn(name = "COURSEOFFERINGID", referencedColumnName = "COURSEOFFERINGID")
     private CourseOfferingsEntity courseOfferings;
 
+
+    @Override
+    public String toString() {
+        return "EvaluationPlansEntity{" +
+                "evaluationPlanID='" + evaluationPlanID + '\'' +
+                ", planName='" + planName + '\'' +
+                ", description='" + description + '\'' +
+                ", createdAt=" + createdAt +
+                ", courseOfferings=" + courseOfferings +
+                '}';
+    }
 }
 /**EVALUATIONPLANID
  COURSEOFFERINGID

@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @Table(name = "DATAAUDITLOG")
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 public class DataAuditLogEntity {
     @Id
@@ -43,5 +42,17 @@ public class DataAuditLogEntity {
     @Column(name = "NEWVALUES", columnDefinition = "CLOB")
     private String newValues;
 
-
+    @Override
+    public String toString() {
+        return "DataAuditLogEntity{" +
+                "auditLogID='" + auditLogID + '\'' +
+                ", userID='" + userID + '\'' +
+                ", affectedTable='" + affectedTable + '\'' +
+                ", recordID='" + recordID + '\'' +
+                ", operationType='" + operationType + '\'' +
+                ", operationAt=" + operationAt +
+                ", oldValues='" + oldValues + '\'' +
+                ", newValues='" + newValues + '\'' +
+                '}';
+    }
 }

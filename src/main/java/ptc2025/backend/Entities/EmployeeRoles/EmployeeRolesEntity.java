@@ -7,9 +7,11 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
+
+//se borro lo mas probable
 @Entity
 @Table(name = "EMPLOYEEROLES")
-@Getter @Setter @ToString @EqualsAndHashCode
+@Getter @Setter @EqualsAndHashCode
 public class EmployeeRolesEntity {
     @Id
     @GenericGenerator(name = "IDemployeeRoles", strategy = "guid")
@@ -23,4 +25,13 @@ public class EmployeeRolesEntity {
     @Column(name = "ROLETYPE")
     private String roleType;
 
+    @Override
+    public String toString() {
+        return "EmployeeRolesEntity{" +
+                "id='" + id + '\'' +
+                ", universityID='" + universityID + '\'' +
+                ", roleName='" + roleName + '\'' +
+                ", roleType='" + roleType + '\'' +
+                '}';
+    }
 }

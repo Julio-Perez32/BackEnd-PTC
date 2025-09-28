@@ -13,7 +13,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "EVALUATIONVALIDATIONS")
-@Getter @Setter @EqualsAndHashCode @ToString
+@Getter @Setter @EqualsAndHashCode
 public class EvaluationValidationsEntity {
 
     @Id
@@ -40,4 +40,17 @@ public class EvaluationValidationsEntity {
     @ManyToOne
     @JoinColumn(name = "REVIEWEDBY", referencedColumnName = "STUDENTEVALUATIONID")
     private StudentEvaluationsEntity reviewedBy;
+
+    @Override
+    public String toString() {
+        return "EvaluationValidationsEntity{" +
+                "validationID='" + validationID + '\'' +
+                ", status='" + status + '\'' +
+                ", reviewedAt=" + reviewedAt +
+                ", comments='" + comments + '\'' +
+                ", studentEvaluationID=" + studentEvaluationID +
+                ", createdBy=" + createdBy +
+                ", reviewedBy=" + reviewedBy +
+                '}';
+    }
 }

@@ -16,7 +16,7 @@ import java.util.List;
 //careerSocialServiceProjects
 @Entity
 @Table(name = "CAREERSOCIALSERVICEPROJECTS")
-@Getter @Setter @EqualsAndHashCode @ToString
+@Getter @Setter @EqualsAndHashCode
 public class CareerSocialServiceProjectEntity {
 
     @Id
@@ -36,7 +36,12 @@ public class CareerSocialServiceProjectEntity {
     @JoinColumn(name = "SOCIALSERVICEPROJECTID", referencedColumnName = "SOCIALSERVICEPROJECTID")
     private SocialServiceProjectsEntity SocialServiceProject;
 
-
-
-
+    @Override
+    public String toString() {
+        return "CareerSocialServiceProjectEntity{" +
+                "id='" + id + '\'' +
+                ", career=" + career +
+                ", SocialServiceProject=" + SocialServiceProject +
+                '}';
+    }
 }

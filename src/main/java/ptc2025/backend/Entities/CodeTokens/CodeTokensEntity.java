@@ -11,7 +11,6 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name = "CODETOKENS")
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 public class CodeTokensEntity {
     @Id
@@ -25,6 +24,16 @@ public class CodeTokensEntity {
     private  String tokenKey;
     @Column(name = "DESCRIPTION")
     private String description;
+
+    @Override
+    public String toString() {
+        return "CodeTokensEntity{" +
+                "codeTokenID='" + codeTokenID + '\'' +
+                ", universityID='" + universityID + '\'' +
+                ", tokenKey='" + tokenKey + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
     /**
      CODETOKENID
      UNIVERSITYID

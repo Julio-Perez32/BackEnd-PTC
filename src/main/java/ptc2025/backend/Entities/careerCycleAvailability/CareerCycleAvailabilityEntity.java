@@ -3,6 +3,7 @@ package ptc2025.backend.Entities.careerCycleAvailability;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 import ptc2025.backend.Entities.CourseOfferings.CourseOfferingsEntity;
 import ptc2025.backend.Entities.StudentCareerEnrollments.StudentCareerEnrollmentsEntity;
 import ptc2025.backend.Entities.YearCycles.YearCyclesEntity;
@@ -15,6 +16,8 @@ import ptc2025.backend.Entities.careers.CareerEntity;
 public class CareerCycleAvailabilityEntity {
 
     @Id
+    @GenericGenerator(name = "idcareercycleAvailaability", strategy = "guid")
+    @GeneratedValue(generator = "idcareercycleAvailaability")
     @Column(name = "CAREERCYCLEAVAILABILITYID")
     private String id;
 
@@ -25,4 +28,13 @@ public class CareerCycleAvailabilityEntity {
     @ManyToOne
     @JoinColumn(name = "YEARCYCLEID", referencedColumnName = "YEARCYCLEID")
     private YearCyclesEntity yearCycles;
+
+    @Override
+    public String toString() {
+        return "CareerCycleAvailabilityEntity{" +
+                "id='" + id + '\'' +
+                ", career=" + career +
+                ", yearCycles=" + yearCycles +
+                '}';
+    }
 }

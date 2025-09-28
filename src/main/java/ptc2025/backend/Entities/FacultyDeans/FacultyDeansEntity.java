@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.cglib.core.Local;
-import org.springframework.stereotype.Service;
 import ptc2025.backend.Entities.Faculties.FacultiesEntity;
 import ptc2025.backend.Entities.employees.EmployeeEntity;
 
@@ -15,7 +13,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "FACULTYDEANS")
-@Getter @Setter @ToString @EqualsAndHashCode
+@Getter @Setter @EqualsAndHashCode
 public class FacultyDeansEntity {
     @Id
     @GenericGenerator(name = "idfacultydeans", strategy = "guid")
@@ -34,4 +32,16 @@ public class FacultyDeansEntity {
     @ManyToOne
     @JoinColumn(name = "EMPLOYEEID", referencedColumnName = "EMPLOYEEID")
     private EmployeeEntity employee;
+
+
+    @Override
+    public String toString() {
+        return "FacultyDeansEntity{" +
+                "id='" + id + '\'' +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", faculty=" + faculty +
+                ", employee=" + employee +
+                '}';
+    }
 }

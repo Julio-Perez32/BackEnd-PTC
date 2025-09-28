@@ -3,6 +3,7 @@ package ptc2025.backend.Entities.cyclicStudentPerformances;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Entities.studentCycleEnrollments.StudentCycleEnrollmentEntity;
 
@@ -15,6 +16,8 @@ import java.time.LocalDate;
 public class CyclicStudentPerformanceEntity {
 
     @Id
+    @GenericGenerator(name = "studenperformanceid", strategy = "guid")
+    @GeneratedValue(generator = "studenperformanceid")
     @Column(name = "PERFORMANCEID")
     private String performanceID;
 
@@ -35,4 +38,16 @@ public class CyclicStudentPerformanceEntity {
     @ManyToOne
     @JoinColumn(name = "STUDENTCYCLEENROLLMENTID", referencedColumnName = "STUDENTCYCLEENROLLMENTID")
     private StudentCycleEnrollmentEntity studentCycleEnrollment;
+
+    @Override
+    public String toString() {
+        return "CyclicStudentPerformanceEntity{" +
+                "performanceID='" + performanceID + '\'' +
+                ", totalValueUnits=" + totalValueUnits +
+                ", totalMeritUnit=" + totalMeritUnit +
+                ", meritUnitCoefficient=" + meritUnitCoefficient +
+                ", computedAt=" + computedAt +
+                ", studentCycleEnrollment=" + studentCycleEnrollment +
+                '}';
+    }
 }

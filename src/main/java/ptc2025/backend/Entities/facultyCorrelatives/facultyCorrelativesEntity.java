@@ -1,5 +1,6 @@
 package ptc2025.backend.Entities.facultyCorrelatives;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -16,7 +17,6 @@ import java.util.List;
 @Table(name = "FACULTYCORRELATIVES")
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode
 public class facultyCorrelativesEntity {
     @Id
@@ -29,9 +29,19 @@ public class facultyCorrelativesEntity {
     private Integer correlativeNumber;
 
     @OneToMany(mappedBy = "facultyCorrelative", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<CodeGeneratorsEntity> codeGenerators = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "FACULTYID", referencedColumnName = "FACULTYID")
     private FacultiesEntity faculty;
+
+    @Override
+    public String toString() {
+        return "facultyCorrelativesEntity{" +
+                "correlativeID='" + correlativeID + '\'' +
+                ", correlativeNumber=" + correlativeNumber +
+                ", faculty=" + faculty +
+                '}';
+    }
 }
