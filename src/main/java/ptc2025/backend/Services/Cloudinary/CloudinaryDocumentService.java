@@ -50,14 +50,30 @@ public class CloudinaryDocumentService {
     }
 
     private void validateDocument(MultipartFile file) {
-        if(file.isEmpty()) throw new IllegalArgumentException("El documento no puede estar vacío");
-        if(file.getSize() > MAX_DOC_SIZE) throw new IllegalArgumentException("el tamaño del archivo no puede exceder los ");
+        if (file.isEmpty())
+            throw new IllegalArgumentException("El documento no puede estar vacío");
+
+        if (file.getSize() > MAX_DOC_SIZE)
+            throw new IllegalArgumentException("El tamaño del archivo no puede exceder los 2GB");
+
         String originalFileName = file.getOriginalFilename();
-        if(originalFileName == null) throw new IllegalArgumentException("Nombre de documento no valido");
+        if (originalFileName == null)
+            throw new IllegalArgumentException("Nombre de documento no válido");
+
         String extension = originalFileName.substring(originalFileName.lastIndexOf(".")).toLowerCase();
-        if(!Arrays.asList(ALLOWED_DOCS).contains(extension)) throw new IllegalArgumentException("Solo se permiten documentos .pdf, .doc, .docx");
-        if(!file.getContentType().startsWith("document/")) throw new IllegalArgumentException("El archivo debe ser un documento valido");
+        if (!Arrays.asList(ALLOWED_DOCS).contains(extension))
+            throw new IllegalArgumentException("Solo se permiten documentos .pdf, .doc, .docx");
+
+        // Validación MIME corregida:
+        String contentType = file.getContentType();
+        if (contentType == null ||
+                (!contentType.equals("application/pdf") &&
+                        !contentType.equals("application/msword") &&
+                        !contentType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))) {
+            throw new IllegalArgumentException("El archivo debe ser un documento válido");
+        }
     }
+
 
 }
 
