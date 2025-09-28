@@ -3,7 +3,6 @@ package ptc2025.backend.Services.Users;
 
 import com.cloudinary.Cloudinary;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -19,13 +18,12 @@ import ptc2025.backend.Entities.Users.UsersEntity;
 import ptc2025.backend.Entities.systemRoles.SystemRolesEntity;
 import ptc2025.backend.Exceptions.ExceptionNotFound;
 import ptc2025.backend.Exceptions.ExceptionServerError;
-import ptc2025.backend.Models.DTO.Universities.UniversityDTO;
 import ptc2025.backend.Models.DTO.Users.UsersDTO;
 import ptc2025.backend.Respositories.People.PeopleRepository;
 import ptc2025.backend.Respositories.Universities.UniversityRespository;
 import ptc2025.backend.Respositories.Users.UsersRespository;
 import ptc2025.backend.Respositories.systemRoles.systemRolesRespository;
-import ptc2025.backend.Services.Cloudinary.CloudinaryService;
+import ptc2025.backend.Services.Cloudinary.CloudinaryImageService;
 import ptc2025.backend.Utils.EmailService;
 import ptc2025.backend.Utils.PasswordGenerator;
 
@@ -62,7 +60,7 @@ public class UsersService {
     @Autowired
     private PasswordGenerator passwordGenerator;
     @Autowired
-    private CloudinaryService cloudinaryService;
+    private CloudinaryImageService cloudinaryImageService;
 
 
     public List<UsersDTO> getAllUsers() {
