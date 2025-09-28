@@ -58,6 +58,7 @@ public class AuthController {
     private void addTokenCookie(HttpServletResponse response, String email) {
         Optional<UsersEntity> usersOpt = service.getUser(email);
         if (usersOpt.isPresent()) {
+            System.out.println("hola si es verdadero");
             UsersEntity user = usersOpt.get();
             String token = jwtUtils.create(
                     String.valueOf(user.getId()),
