@@ -55,7 +55,6 @@ public class AuthController {
     }
 
 
-
     private void addTokenCookie(HttpServletResponse response, String email) {
         Optional<UsersEntity> usersOpt = service.getUser(email);
         if (usersOpt.isPresent()) {
@@ -71,7 +70,7 @@ public class AuthController {
                     .secure(true)
                     .path("/")
                     .maxAge(86400)
-                    .domain("sapientiae-api-bd9a54b3d7a1.herokuapp.com")
+                    //.domain("sapientiae-api-bd9a54b3d7a1.herokuapp.com")
                     .build();
 
             response.addHeader("Set-Cookie", cookie.toString());
