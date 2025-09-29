@@ -6,6 +6,7 @@ import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -66,20 +67,16 @@ public class AuthController {
                     user.getSystemRoles().getRoleName()
             );
 
-            String cookieValue = String.format(
-                    "authToken=%s; "+
-                            "Path=/;" +
-                            "HttpOnly;"+
-                            "Secure;"+
-                            "SameSite=None;"+
-                            "Max-Age=86400;"+
-                            "Domain=sapientiae-api-bd9a54b3d7a1.herokuapp.com/",
-                    token
+            ResponseCookie cookie = ResponseCookie.from("authToken", token) // ← mismo nombre que @CookieValue
+                    .httpOnly(true)           // que no sea accesible por JS
+                    .secure(true)             // OBLIGATORIO en cross-site (y Heroku va por HTTPS)
+                    .sameSite("None")         // OBLIGATORIO para que viaje desde Vercel → Heroku
+                    .path("/")                // que aplique a todo tu /api
+                    //.domain("sapientiae-api-bd9a54b3d7a1.herokuapp.com") // NORMALMENTE OMITE ESTO
+                    .maxAge(60 * 60 * 24)     // opcional: 1 día
+                    .build();
 
-            );
-
-            response.addHeader("Set-Cookie", cookieValue);
-            response.addHeader("Access-Control-Expose-Headers", "Set-Cookie");
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         }
     }
 

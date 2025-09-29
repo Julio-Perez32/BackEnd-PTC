@@ -11,68 +11,22 @@ import java.util.Arrays;
 
 @Configuration
 public class CorsConfig {
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-
-
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost");
-        config.addAllowedOrigin("https://localhost");
-        config.addAllowedOrigin("http://localhost:5173");
-        config.addAllowedOrigin("https://sapientiae-web.vercel.app"); // ✅ PROD
-
-
-        config.addAllowedMethod("GET");
-        config.addAllowedMethod("POST");
-        config.addAllowedMethod("PUT");
-        config.addAllowedMethod("DELETE");
-        config.addAllowedMethod("OPTIONS");
-        config.addAllowedMethod("PATCH");
-
-
-        config.addAllowedHeader("Origin");
-        config.addAllowedHeader("Content-Type");
-        config.addAllowedHeader("Accept");
-        config.addAllowedHeader("Authorization");
-        config.addAllowedHeader("X-Requested-With");
-        config.addAllowedHeader("Access-Control-Request-Method");
-        config.addAllowedHeader("Access-Control-Request-Headers");
-        config.addAllowedHeader("Cookie");
-        config.addAllowedHeader("Set-Cookie");
-
-        config.setExposedHeaders(Arrays.asList(
-                "Set-Cookie", "Cookie", "Authorization", "Content-Disposition"
-        ));
-
-
-        config.setMaxAge(3600L);
-
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowCredentials(true);
-        configuration.addAllowedOrigin("http://localhost:3000");
-        configuration.addAllowedOrigin("http://localhost:8080");
-        configuration.addAllowedOrigin("http://localhost:4200");
-        configuration.addAllowedOrigin("https://localhost");
-        configuration.addAllowedOrigin("http://localhost:5173");
-        configuration.addAllowedOrigin("http://localhost");
-        configuration.addAllowedOrigin("https://sapientiae-web.vercel.app"); // ✅ PROD
-        configuration.addAllowedMethod("*");
-        configuration.addAllowedHeader("*");
-
-        configuration.addExposedHeader("Set-Cookie");
-        configuration.addExposedHeader("Cookie");
-        configuration.addExposedHeader("Authorization");
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        // Origins exactos (no "*")
+        config.setAllowedOrigins(Arrays.asList(
+                "https://sapientiae-web.vercel.app",
+                "http://localhost:5173"
+        ));
+        config.setAllowedMethods(Arrays.asList("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
+        // No necesitas listar Cookie/Set-Cookie
+        config.setAllowedHeaders(Arrays.asList("Origin","Content-Type","Accept","Authorization","X-Requested-With"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 }
