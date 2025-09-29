@@ -58,6 +58,7 @@ public class AuthController {
     private void addTokenCookie(HttpServletResponse response, String email) {
         Optional<UsersEntity> usersOpt = service.getUser(email);
         if (usersOpt.isPresent()) {
+            System.out.println("hola si es verdadero");
             UsersEntity user = usersOpt.get();
             String token = jwtUtils.create(
                     String.valueOf(user.getId()),
@@ -72,7 +73,7 @@ public class AuthController {
                             "Secure;"+
                             "SameSite=None;"+
                             "Max-Age=86400;"+
-                            "Domain = sapientiae-api-bd9a54b3d7a1.herokuapp.com/",
+                            "Domain=sapientiae-api-bd9a54b3d7a1.herokuapp.com/",
                     token
 
             );

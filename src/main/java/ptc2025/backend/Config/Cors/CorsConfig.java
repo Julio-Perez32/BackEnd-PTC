@@ -10,19 +10,20 @@ import org.springframework.web.filter.CorsFilter;
 import java.util.Arrays;
 
 @Configuration
-public class  CorsConfig {
+public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
 
-        // Configuración esencial
+
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://localhost");
         config.addAllowedOrigin("https://localhost");
         config.addAllowedOrigin("http://localhost:5173");
+        config.addAllowedOrigin("https://sapientiae-web.vercel.app"); // ✅ PROD
 
-        /// Métodos HTTP permitidos
+
         config.addAllowedMethod("GET");
         config.addAllowedMethod("POST");
         config.addAllowedMethod("PUT");
@@ -30,7 +31,7 @@ public class  CorsConfig {
         config.addAllowedMethod("OPTIONS");
         config.addAllowedMethod("PATCH");
 
-        /// Cabeceras permitidas
+
         config.addAllowedHeader("Origin");
         config.addAllowedHeader("Content-Type");
         config.addAllowedHeader("Accept");
@@ -45,14 +46,13 @@ public class  CorsConfig {
                 "Set-Cookie", "Cookie", "Authorization", "Content-Disposition"
         ));
 
-        /// Tiempo de cache para preflight requests
+
         config.setMaxAge(3600L);
 
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
 
-    /// CORS PARA EL SECCONFIGGGGGGG
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -63,6 +63,7 @@ public class  CorsConfig {
         configuration.addAllowedOrigin("https://localhost");
         configuration.addAllowedOrigin("http://localhost:5173");
         configuration.addAllowedOrigin("http://localhost");
+        configuration.addAllowedOrigin("https://sapientiae-web.vercel.app"); // ✅ PROD
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
 
@@ -75,3 +76,4 @@ public class  CorsConfig {
         return source;
     }
 }
+
