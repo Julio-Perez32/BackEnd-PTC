@@ -2,10 +2,10 @@ package ptc2025.backend.Controller.Cloudinary;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ptc2025.backend.Services.Cloudinary.CloudinaryService;
+import ptc2025.backend.Services.Cloudinary.CloudinaryDocumentService;
+import ptc2025.backend.Services.Cloudinary.CloudinaryImageService;
 
 import java.io.IOException;
 import java.util.Map;
@@ -16,9 +16,14 @@ import java.util.Map;
 public class CloudinaryController {
 
     @Autowired
-    private final CloudinaryService service;
+    private final CloudinaryImageService service;
 
-    public CloudinaryController(CloudinaryService service){this.service = service;}
+    @Autowired
+    private final CloudinaryDocumentService documentService;
+
+    public CloudinaryController(CloudinaryImageService service, CloudinaryDocumentService documentService){this.service = service;
+        this.documentService = documentService;
+    }
 
     @PostMapping("/uploadImage")
     public ResponseEntity<?> uploadImage(@RequestParam("image")MultipartFile file){
@@ -49,7 +54,7 @@ public class CloudinaryController {
     @PostMapping("/uploadDocument")
     public ResponseEntity<?> uploadDocument(@RequestParam("document")MultipartFile file){
         try{
-            String docUrl = service.uploadDocument(file);
+            String docUrl = documentService.uploadDocument(file);
             return ResponseEntity.ok(Map.of(
                     "message", "Documento subido exitosamente",
                     "url", docUrl
@@ -62,7 +67,7 @@ public class CloudinaryController {
     @PostMapping("/upload-to-document-folder")
     public ResponseEntity<?> uploadDocument(@RequestParam("document")MultipartFile file, @RequestParam String folder){
         try {
-            String docUrl = service.UploadDocument(file,folder);
+            String docUrl = documentService.UploadDocument(file,folder);
             return ResponseEntity.ok(Map.of(
                     "message", "Documento en folder subido exitosamente",
                     "url", docUrl
