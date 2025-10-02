@@ -47,6 +47,7 @@ public class FacultiesService {
     public FacultiesDTO convertToFacultiesDTO(FacultiesEntity faculties) {
         FacultiesDTO dto = new FacultiesDTO();
         dto.setFacultyID(faculties.getFacultyID());
+        dto.setFacultyName(faculties.getFacultyName());
         dto.setFacultyCode(faculties.getFacultyCode());
         dto.setContactPhone(faculties.getContactPhone());
         dto.setCorrelativeCode(faculties.getCorrelativeCode());
@@ -56,6 +57,7 @@ public class FacultiesService {
     public FacultiesEntity convertToFacultiesEntity(FacultiesDTO dto) {
         FacultiesEntity entity = new FacultiesEntity();
         entity.setFacultyID(dto.getFacultyID());
+        entity.setFacultyName(dto.getFacultyName());
         entity.setFacultyCode(dto.getFacultyCode());
         entity.setContactPhone(dto.getContactPhone());
         entity.setCorrelativeCode(dto.getCorrelativeCode());
@@ -64,6 +66,7 @@ public class FacultiesService {
 
     public FacultiesDTO insertFaculty(FacultiesDTO dto) {
         if (dto == null ||
+                dto.getFacultyName() == null || dto.getFacultyName().isEmpty() ||
                 dto.getFacultyCode() == null || dto.getFacultyCode().isEmpty() ||
                 dto.getContactPhone() == null || dto.getContactPhone().isEmpty() ||
                 dto.getCorrelativeCode() == null || dto.getCorrelativeCode().isEmpty()) {
@@ -85,6 +88,7 @@ public class FacultiesService {
         FacultiesEntity existsFaculty = repo.findById(id)
                 .orElseThrow(() -> new ExceptionNoSuchElement("Facultad con ID " + id + " no encontrada."));
 
+        existsFaculty.setFacultyName(json.getFacultyName());
         existsFaculty.setFacultyCode(json.getFacultyCode());
         existsFaculty.setContactPhone(json.getContactPhone());
         existsFaculty.setCorrelativeCode(json.getCorrelativeCode());
