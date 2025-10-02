@@ -54,7 +54,8 @@ public class AuthService {
                         user.getPeople().getLastName(),
                         user.getPeople().getBirthDate(),
                         user.getPeople().getContactEmail(),
-                        user.getPeople().getPhone()
+                        user.getPeople().getPhone(),
+                        user.getUniversity().getUniversityID()
                 );
                 return Optional.of(dto);
             }

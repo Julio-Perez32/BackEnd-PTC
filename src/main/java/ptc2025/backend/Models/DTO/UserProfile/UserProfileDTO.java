@@ -22,4 +22,7 @@ public class UserProfileDTO {
     private String contactEmail;
     private String phone;
 
+    //datos university
+    private String universityID;
+
 }
