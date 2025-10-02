@@ -33,8 +33,3 @@ public class EvaluationPlansDTO {
 
     private String courseoffering;
 }
-/**evaluationPlanID
- courseOfferingID
- planName
- description
- createdAt*/

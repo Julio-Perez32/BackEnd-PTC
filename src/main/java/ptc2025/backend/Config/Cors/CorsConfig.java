@@ -19,7 +19,8 @@ public class CorsConfig {
         // Origins exactos (no "*")
         config.setAllowedOrigins(Arrays.asList(
                 "https://sapientiae-web.vercel.app",
-                "http://localhost:5173"
+                "http://localhost:5173",
+                "http://localhost:"
         ));
         config.setAllowedMethods(Arrays.asList("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
         // No necesitas listar Cookie/Set-Cookie
