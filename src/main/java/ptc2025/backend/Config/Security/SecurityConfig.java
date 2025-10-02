@@ -16,34 +16,43 @@ import ptc2025.backend.Utils.JwtCookieAuthFilter;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
     private final JwtCookieAuthFilter jwtCookieAuthFilter;
     private final CorsConfigurationSource corsConfigurationSource;
 
-    public SecurityConfig(JwtCookieAuthFilter jwtCookieAuthFilter, CorsConfigurationSource corsConfigurationSource){
+    public SecurityConfig(JwtCookieAuthFilter jwtCookieAuthFilter,
+                          CorsConfigurationSource corsConfigurationSource) {
         this.jwtCookieAuthFilter = jwtCookieAuthFilter;
         this.corsConfigurationSource = corsConfigurationSource;
     }
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())// Nuevo estilo lambda
+                .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
-                .authorizeHttpRequests(auth -> auth  // Cambia authorizeRequests por authorizeHttpRequests
-                        .requestMatchers(HttpMethod.POST
-                                )
-                        .permitAll()
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        // 🔓 Preflight siempre permitido
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // 🔓 Endpoints públicos de auth
+                        .requestMatchers("/api/Auth/login", "/api/Auth/logout").permitAll()
+
+                        // 🔐 Lo demás según rol / autenticado
                         .requestMatchers("/api/Auth/me").authenticated()
-                        .requestMatchers("/api/Admin-only").hasRole("administrador")
-                        .requestMatchers("/api/Register-only").hasRole("registro")
-                        .requestMatchers("/api/Rrhh-only").hasRole("recursos")
-                        .requestMatchers("/api/Teacher-only").hasRole("docente")
-                        .requestMatchers("/api/Students-only").hasRole("estudiante")
-                        .anyRequest().authenticated())
-                .sessionManagement(sess -> sess
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .requestMatchers("/api/Admin-only").hasRole("Administrador")
+                        .requestMatchers("/api/Register-only").hasRole("Registro académico")
+                        .requestMatchers("/api/Rrhh-only").hasRole("Recursos Humanos")
+                        .requestMatchers("/api/Teacher-only").hasRole("Docente")
+                        .requestMatchers("/api/Students-only").hasRole("Estudiante")
+                        .anyRequest().authenticated()
+                )
                 .addFilterBefore(jwtCookieAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
