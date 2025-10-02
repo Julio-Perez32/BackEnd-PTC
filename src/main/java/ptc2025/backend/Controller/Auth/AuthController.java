@@ -20,7 +20,14 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(
+        origins = {
+                "https://localhost", "http://localhost:5173",
+                "capacitor://localhost", "ionic://localhost",
+                "https://sapientiae-web.vercel.app"
+        },
+        allowCredentials = "true"
+)
 @RestController
 @RequestMapping("/api/Auth")
 public class AuthController {
