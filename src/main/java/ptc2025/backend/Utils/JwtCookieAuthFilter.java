@@ -47,7 +47,7 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
         }
 
         try {
-            String token = extractTokenFromCookies(request);
+            String token = resolveToken(request);
 
             if (token == null || token.isBlank()) {
                 // Para endpoints no públicos, requerimos token
@@ -122,5 +122,18 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
         return (path.equals("/api/Auth/login") && "POST".equals(method)) ||
                 (path.equals("/api/Auth/register") && "POST".equals(method)) ||
                 (path.equals("/api/Public/") && "GET".equals(method));
+    }
+
+    private String resolveToken(HttpServletRequest request) {
+        // 1) cookie
+        String cookieToken = extractTokenFromCookies(request);
+        if (cookieToken != null && !cookieToken.isBlank()) return cookieToken;
+
+        // 2) Authorization: Bearer
+        String auth = request.getHeader("Authorization");
+        if (auth != null && auth.startsWith("Bearer ")) {
+            return auth.substring(7);
+        }
+        return null;
     }
 }
