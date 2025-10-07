@@ -68,7 +68,7 @@ public class StudentsController {
         }
     }
 
-    @PostMapping("/updateStudents/{id}")
+    @PutMapping("/updateStudents/{id}")
     public ResponseEntity<?> updateStudent(@PathVariable String ID, @Valid @RequestBody StudentsDTO json, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
