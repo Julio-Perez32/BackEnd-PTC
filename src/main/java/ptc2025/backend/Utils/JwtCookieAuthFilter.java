@@ -1,4 +1,5 @@
 package ptc2025.backend.Utils;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -40,7 +41,7 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
-        // CORREGIDO: Mejor lógica para endpoints públicos
+        // 🔓 Permitir endpoints públicos
         if (isPublicEndpoint(request)) {
             filterChain.doFilter(request, response);
             return;
@@ -50,52 +51,52 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
             String token = resolveToken(request);
 
             if (token == null || token.isBlank()) {
-                // Para endpoints no públicos, requerimos token
-                if (!isPublicEndpoint(request)) {
-                    sendError(response, "Token no encontrado", HttpServletResponse.SC_UNAUTHORIZED);//SC_UNAUTHORIZED es un codigo 401
-                    return;
-                }
-                filterChain.doFilter(request, response);
+                sendError(response, "Token no encontrado", HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
 
             Claims claims = jwtUtils.parseToken(token);
 
+            // 🎯 Extraer rol desde el token
             String rol = jwtUtils.extractRol(token);
+            System.out.println("🎯 Rol extraído del token: '" + rol + "'");
 
             if (rol == null || rol.isBlank()) {
-                log.warn("⚠️ Token sin rol válido");
-                sendError(response, "Rol no válido en token", HttpServletResponse.SC_FORBIDDEN);
+                log.warn("⚠️ Token sin rol válido, no se puede autenticar");
+                sendError(response, "Rol no válido en token", HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
-            // Normalizar para que siempre funcione
-            rol = rol.replace("ROLE_", "").trim();              // quita prefijo si lo tiene
-            rol = rol.substring(0, 1).toUpperCase() + rol.substring(1).toLowerCase(); // pone mayúscula inicial
 
+            // 🔧 Normalizar para que siempre funcione
+            rol = rol.replace("ROLE_", "").trim(); // quitar prefijo duplicado si lo tuviera
+            if (!rol.isEmpty()) {
+                rol = rol.substring(0, 1).toUpperCase() + rol.substring(1).toLowerCase(); // ej: "DOCENTE" → "Docente"
+            }
+
+            // Crear autoridad válida para Spring
             Collection<? extends GrantedAuthority> authorities =
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + rol));
 
-            // CREAR AUTENTICACIÓN CON AUTHORITIES CORRECTOS
+            // Crear autenticación y guardarla en el contexto
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
-                            claims.getSubject(), // username
-                            null, // credentials
-                            authorities // ← ROLES REALES
+                            claims.getSubject(), // usuario (correo)
+                            null,
+                            authorities
                     );
 
-            // ESTABLECER AUTENTICACIÓN EN CONTEXTO
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
 
         } catch (ExpiredJwtException e) {
-            log.warn("Token expirado: {}", e.getMessage());
+            log.warn("⏰ Token expirado: {}", e.getMessage());
             sendError(response, "Token expirado", HttpServletResponse.SC_UNAUTHORIZED);
         } catch (MalformedJwtException e) {
-            log.warn("Token malformado: {}", e.getMessage());
+            log.warn("❌ Token malformado: {}", e.getMessage());
             sendError(response, "Token inválido", HttpServletResponse.SC_FORBIDDEN);
         } catch (Exception e) {
-            log.error("Error de autenticación", e);
+            log.error("💥 Error de autenticación: {}", e.getMessage());
             sendError(response, "Error de autenticación", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -118,23 +119,23 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
                 "{\"error\": \"%s\", \"status\": %d}", message, status));
     }
 
-    // MEJORADA: Lógica para endpoints públicos
     private boolean isPublicEndpoint(HttpServletRequest request) {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        // Endpoints públicos
+        // Endpoints que no requieren token
         return (path.equals("/api/Auth/login") && "POST".equals(method)) ||
-                (path.equals("/api/Auth/register") && "POST".equals(method)) ||
-                (path.equals("/api/Public/") && "GET".equals(method));
+                (path.equals("/api/Auth/logout") && "POST".equals(method)) ||
+                (path.startsWith("/api/Public/") && "GET".equals(method)) ||
+                (path.equals("/api/Auth/register") && "POST".equals(method));
     }
 
     private String resolveToken(HttpServletRequest request) {
-        // 1) cookie
+        // 1️⃣ Buscar en cookies
         String cookieToken = extractTokenFromCookies(request);
         if (cookieToken != null && !cookieToken.isBlank()) return cookieToken;
 
-        // 2) Authorization: Bearer
+        // 2️⃣ Buscar en header Authorization: Bearer
         String auth = request.getHeader("Authorization");
         if (auth != null && auth.startsWith("Bearer ")) {
             return auth.substring(7);
