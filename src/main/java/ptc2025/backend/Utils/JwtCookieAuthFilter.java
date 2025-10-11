@@ -119,13 +119,14 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
     }
 
     private boolean isPublicEndpoint(HttpServletRequest request) {
-        String path = request.getRequestURI();
-        String method = request.getMethod();
+        String p = (request.getRequestURI() == null ? "" : request.getRequestURI().trim().toLowerCase());
+        String m = (request.getMethod() == null ? "" : request.getMethod().trim().toUpperCase());
 
-        return (path.equals("/api/Auth/login") && "POST".equals(method)) ||
-                (path.equals("/api/Auth/logout") && "POST".equals(method)) ||
-                (path.startsWith("/api/Public/") && "GET".equals(method)) ||
-                (path.equals("/api/Auth/register") && "POST".equals(method));
+        boolean isLogin   = (p.equals("/api/auth/login")  || p.equals("/api/auth/login/"))  && (m.equals("POST") || m.equals("OPTIONS"));
+        boolean isLogout  = (p.equals("/api/auth/logout") || p.equals("/api/auth/logout/")) && (m.equals("POST") || m.equals("OPTIONS"));
+        boolean isPreflight = m.equals("OPTIONS"); // CORS preflight siempre pasa
+
+        return isLogin || isLogout || isPreflight;
     }
 
     private String resolveToken(HttpServletRequest request) {
