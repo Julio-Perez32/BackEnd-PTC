@@ -41,7 +41,6 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
-        // 🔓 Permitir endpoints públicos
         if (isPublicEndpoint(request)) {
             filterChain.doFilter(request, response);
             return;
@@ -57,7 +56,6 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
 
             Claims claims = jwtUtils.parseToken(token);
 
-            // 🎯 Extraer rol desde el token
             String rol = jwtUtils.extractRol(token);
             System.out.println("🎯 Rol extraído del token: '" + rol + "'");
 
@@ -67,26 +65,27 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
                 return;
             }
 
-            // 🔧 Normalizar para que siempre funcione
-            rol = rol.replace("ROLE_", "").trim(); // quitar prefijo duplicado si lo tuviera
+            // 🔧 Normalizar y limpiar rol
+            rol = rol.replace("ROLE_", "").trim();
+            rol = rol.replace(" ", "_"); // 🔥 evita errores por espacios
+
             if (!rol.isEmpty()) {
-                rol = rol.substring(0, 1).toUpperCase() + rol.substring(1).toLowerCase(); // ej: "DOCENTE" → "Docente"
+                rol = rol.substring(0, 1).toUpperCase() + rol.substring(1);
             }
 
-            // Crear autoridad válida para Spring
+            System.out.println("✅ Rol normalizado: " + rol);
+
             Collection<? extends GrantedAuthority> authorities =
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + rol));
 
-            // Crear autenticación y guardarla en el contexto
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
-                            claims.getSubject(), // usuario (correo)
+                            claims.getSubject(),
                             null,
                             authorities
                     );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
             filterChain.doFilter(request, response);
 
         } catch (ExpiredJwtException e) {
@@ -123,7 +122,6 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        // Endpoints que no requieren token
         return (path.equals("/api/Auth/login") && "POST".equals(method)) ||
                 (path.equals("/api/Auth/logout") && "POST".equals(method)) ||
                 (path.startsWith("/api/Public/") && "GET".equals(method)) ||
@@ -131,11 +129,9 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
     }
 
     private String resolveToken(HttpServletRequest request) {
-        // 1️⃣ Buscar en cookies
         String cookieToken = extractTokenFromCookies(request);
         if (cookieToken != null && !cookieToken.isBlank()) return cookieToken;
 
-        // 2️⃣ Buscar en header Authorization: Bearer
         String auth = request.getHeader("Authorization");
         if (auth != null && auth.startsWith("Bearer ")) {
             return auth.substring(7);
