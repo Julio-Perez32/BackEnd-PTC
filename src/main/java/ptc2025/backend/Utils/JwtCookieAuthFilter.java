@@ -61,12 +61,17 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
 
             Claims claims = jwtUtils.parseToken(token);
 
-            // EXTRAER EL ROL REAL del token
             String rol = jwtUtils.extractRol(token);
-            //Cliente
-            //ROLE_Cliente
 
-            // CREAR AUTHORITIES BASADO EN EL ROL REAL
+            if (rol == null || rol.isBlank()) {
+                log.warn("⚠️ Token sin rol válido");
+                sendError(response, "Rol no válido en token", HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+            // Normalizar para que siempre funcione
+            rol = rol.replace("ROLE_", "").trim();              // quita prefijo si lo tiene
+            rol = rol.substring(0, 1).toUpperCase() + rol.substring(1).toLowerCase(); // pone mayúscula inicial
+
             Collection<? extends GrantedAuthority> authorities =
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + rol));
 
