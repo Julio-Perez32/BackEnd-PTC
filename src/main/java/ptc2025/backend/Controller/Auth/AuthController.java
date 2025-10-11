@@ -76,13 +76,14 @@ public class AuthController {
                     user.getSystemRoles().getRoleName()
             );
 
-            ResponseCookie cookie = ResponseCookie.from("authToken", token) // ← mismo nombre que @CookieValue
-                    .httpOnly(true)           // que no sea accesible por JS
-                    .secure(true)             // OBLIGATORIO en cross-site (y Heroku va por HTTPS)
-                    .sameSite("None")         // OBLIGATORIO para que viaje desde Vercel → Heroku
-                    .path("/")                // que aplique a todo tu /api
-                    //.domain("sapientiae-api-bd9a54b3d7a1.herokuapp.com") // NORMALMENTE OMITE ESTO
-                    .maxAge(60 * 60 * 24)     // opcional: 1 día
+            boolean isLocal = System.getenv("IS_LOCAL") != null; // en tu .env local pon IS_LOCAL=true
+
+            ResponseCookie cookie = ResponseCookie.from("authToken", token)
+                    .httpOnly(true)
+                    .secure(!isLocal)
+                    .sameSite(isLocal ? "Lax" : "None")
+                    .path("/")
+                    .maxAge(60 * 60 * 24)
                     .build();
 
             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
