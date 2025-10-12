@@ -24,9 +24,14 @@ public class EvaluationPlansController {
     private EvaluationPlansService service;
 
     @GetMapping("/getEvaluationPlan")
-        public List<EvaluationPlansDTO> getEvaluationPlan(){
-        return service.getEvaluationPlans();
+    public ResponseEntity<?> getEvaluationPlan() {
+        List<EvaluationPlansDTO> list = service.getEvaluationPlans();
+        if (list == null || list.isEmpty()) {
+            return ResponseEntity.noContent().build(); // 204
+        }
+        return ResponseEntity.ok(list); // 200
     }
+
 
     @GetMapping("/getEvaluationPlansPagination")
     public ResponseEntity<Page<EvaluationPlansDTO>> getEvaluationPlansPagination(
