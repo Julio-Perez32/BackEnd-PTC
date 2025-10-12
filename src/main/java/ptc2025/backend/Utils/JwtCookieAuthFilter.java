@@ -56,6 +56,7 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
 
             Claims claims = jwtUtils.parseToken(token);
 
+            // Rol tal cual viene en el JWT (p.ej., "Docente", "Administrador", "Registro Académico")
             String rol = jwtUtils.extractRol(token);
             System.out.println("🎯 Rol extraído del token: '" + rol + "'");
 
@@ -65,16 +66,10 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
                 return;
             }
 
-            // 🔧 Normalizar y limpiar rol
-            rol = rol.replace("ROLE_", "").trim();
-            rol = rol.replace(" ", "_"); // 🔥 evita errores por espacios
+            // ❗ Opción B: NO normalizar, NO reemplazar espacios/acentos
+            rol = rol.trim();
 
-            if (!rol.isEmpty()) {
-                rol = rol.substring(0, 1).toUpperCase() + rol.substring(1);
-            }
-
-            System.out.println("✅ Rol normalizado: " + rol);
-
+            // Prefijo ROLE_ para que matchee con hasAnyRole(...)
             Collection<? extends GrantedAuthority> authorities =
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + rol));
 
@@ -84,6 +79,9 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
                             null,
                             authorities
                     );
+
+            // (Opcional) Log para verificar qué autoridad quedó
+            // log.info("Authorities -> {}", authentication.getAuthorities());
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
@@ -122,8 +120,8 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
         String p = (request.getRequestURI() == null ? "" : request.getRequestURI().trim().toLowerCase());
         String m = (request.getMethod() == null ? "" : request.getMethod().trim().toUpperCase());
 
-        boolean isLogin   = (p.equals("/api/auth/login")  || p.equals("/api/auth/login/"))  && (m.equals("POST") || m.equals("OPTIONS"));
-        boolean isLogout  = (p.equals("/api/auth/logout") || p.equals("/api/auth/logout/")) && (m.equals("POST") || m.equals("OPTIONS"));
+        boolean isLogin    = (p.equals("/api/auth/login")  || p.equals("/api/auth/login/"))  && (m.equals("POST") || m.equals("OPTIONS"));
+        boolean isLogout   = (p.equals("/api/auth/logout") || p.equals("/api/auth/logout/")) && (m.equals("POST") || m.equals("OPTIONS"));
         boolean isPreflight = m.equals("OPTIONS"); // CORS preflight siempre pasa
 
         return isLogin || isLogout || isPreflight;
