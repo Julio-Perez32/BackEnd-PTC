@@ -28,6 +28,7 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(JwtCookieAuthFilter.class);
     private static final String AUTH_COOKIE_NAME = "authToken";
+
     private final JWTUtils jwtUtils;
 
     @Autowired
@@ -36,10 +37,9 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
 
         if (isPublicEndpoint(request)) {
             filterChain.doFilter(request, response);
@@ -54,36 +54,36 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
                 return;
             }
 
+            // Valida y parsea
             Claims claims = jwtUtils.parseToken(token);
 
-            // Rol tal cual viene en el JWT (p.ej., "Docente", "Administrador", "Registro Académico")
-            String rol = jwtUtils.extractRol(token);
-            System.out.println("🎯 Rol extraído del token: '" + rol + "'");
-
+            // ⚠️ El rol viene en el claim "rol" según tu JWTUtils.create(...)
+            String rol = jwtUtils.extractRol(token); // p.ej.: "Docente", "Administrador", "Registro Académico"
             if (rol == null || rol.isBlank()) {
-                log.warn("⚠️ Token sin rol válido, no se puede autenticar");
+                log.warn("⚠️ Token sin rol válido");
                 sendError(response, "Rol no válido en token", HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
 
-            // ❗ Opción B: NO normalizar, NO reemplazar espacios/acentos
+            // ❗ NO normalizar (no reemplazar espacios/acentos). Solo trim.
             rol = rol.trim();
 
-            // Prefijo ROLE_ para que matchee con hasAnyRole(...)
+            // ✅ Prefija con ROLE_ para que matchee hasAnyRole(...)
             Collection<? extends GrantedAuthority> authorities =
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + rol));
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
-                            claims.getSubject(),
+                            claims.getSubject(), // correo (subject)
                             null,
                             authorities
                     );
 
-            // (Opcional) Log para verificar qué autoridad quedó
-            // log.info("Authorities -> {}", authentication.getAuthorities());
-
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            // Log de verificación
+            log.info("🔐 Authorities en contexto: {}", authentication.getAuthorities());
+
             filterChain.doFilter(request, response);
 
         } catch (ExpiredJwtException e) {
@@ -96,6 +96,30 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
             log.error("💥 Error de autenticación: {}", e.getMessage());
             sendError(response, "Error de autenticación", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    // ===== helpers =====
+
+    private boolean isPublicEndpoint(HttpServletRequest request) {
+        String p = (request.getRequestURI() == null ? "" : request.getRequestURI().trim().toLowerCase());
+        String m = (request.getMethod() == null ? "" : request.getMethod().trim().toUpperCase());
+
+        boolean isLogin     = (p.equals("/api/auth/login")  || p.equals("/api/auth/login/"))  && (m.equals("POST") || m.equals("OPTIONS"));
+        boolean isLogout    = (p.equals("/api/auth/logout") || p.equals("/api/auth/logout/")) && (m.equals("POST") || m.equals("OPTIONS"));
+        boolean isPreflight = m.equals("OPTIONS"); // CORS preflight
+
+        return isLogin || isLogout || isPreflight;
+    }
+
+    private String resolveToken(HttpServletRequest request) {
+        String cookieToken = extractTokenFromCookies(request);
+        if (cookieToken != null && !cookieToken.isBlank()) return cookieToken;
+
+        String auth = request.getHeader("Authorization");
+        if (auth != null && auth.startsWith("Bearer ")) {
+            return auth.substring(7);
+        }
+        return null;
     }
 
     private String extractTokenFromCookies(HttpServletRequest request) {
@@ -112,29 +136,6 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
     private void sendError(HttpServletResponse response, String message, int status) throws IOException {
         response.setContentType("application/json");
         response.setStatus(status);
-        response.getWriter().write(String.format(
-                "{\"error\": \"%s\", \"status\": %d}", message, status));
-    }
-
-    private boolean isPublicEndpoint(HttpServletRequest request) {
-        String p = (request.getRequestURI() == null ? "" : request.getRequestURI().trim().toLowerCase());
-        String m = (request.getMethod() == null ? "" : request.getMethod().trim().toUpperCase());
-
-        boolean isLogin    = (p.equals("/api/auth/login")  || p.equals("/api/auth/login/"))  && (m.equals("POST") || m.equals("OPTIONS"));
-        boolean isLogout   = (p.equals("/api/auth/logout") || p.equals("/api/auth/logout/")) && (m.equals("POST") || m.equals("OPTIONS"));
-        boolean isPreflight = m.equals("OPTIONS"); // CORS preflight siempre pasa
-
-        return isLogin || isLogout || isPreflight;
-    }
-
-    private String resolveToken(HttpServletRequest request) {
-        String cookieToken = extractTokenFromCookies(request);
-        if (cookieToken != null && !cookieToken.isBlank()) return cookieToken;
-
-        String auth = request.getHeader("Authorization");
-        if (auth != null && auth.startsWith("Bearer ")) {
-            return auth.substring(7);
-        }
-        return null;
+        response.getWriter().write(String.format("{\"error\":\"%s\",\"status\":%d}", message, status));
     }
 }
