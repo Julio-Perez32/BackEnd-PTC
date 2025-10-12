@@ -112,15 +112,20 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
     }
 
     private String resolveToken(HttpServletRequest request) {
-        String cookieToken = extractTokenFromCookies(request);
-        if (cookieToken != null && !cookieToken.isBlank()) return cookieToken;
-
         String auth = request.getHeader("Authorization");
         if (auth != null && auth.startsWith("Bearer ")) {
+            log.info("[JWT] usando token de Authorization (Bearer)");
             return auth.substring(7);
         }
+        String cookieToken = extractTokenFromCookies(request);
+        if (cookieToken != null && !cookieToken.isBlank()) {
+            log.info("[JWT] usando token de Cookie (authToken)");
+            return cookieToken;
+        }
+        log.info("[JWT] sin token (ni header ni cookie)");
         return null;
     }
+
 
     private String extractTokenFromCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
