@@ -32,19 +32,16 @@ public class EvaluationPlansController {
         return ResponseEntity.ok(list); // 200
     }
 
-
     @GetMapping("/getEvaluationPlansPagination")
     public ResponseEntity<Page<EvaluationPlansDTO>> getEvaluationPlansPagination(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        Page<EvaluationPlansDTO> levels = service.getEvaluationPlansPagination(page, size);
-
-        if(levels.isEmpty()){
-            return ResponseEntity.badRequest().body(Page.empty());
-        }
-        return ResponseEntity.ok(levels);
+        Page<EvaluationPlansDTO> p = service.getEvaluationPlansPagination(page, size);
+        // aunque no tenga elementos, responde 200 con Page vacío
+        return ResponseEntity.ok(p);
     }
+
 
 
     @PostMapping("/insertEvaluationPlan")
