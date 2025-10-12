@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ptc2025.backend.Exceptions.ExceptionNoSuchElement;
 import ptc2025.backend.Models.DTO.EvaluationPlans.EvaluationPlansDTO;
 import ptc2025.backend.Services.EvaluationPlans.EvaluationPlansService;
 
@@ -25,20 +26,21 @@ public class EvaluationPlansController {
 
     @GetMapping("/getEvaluationPlan")
     public ResponseEntity<?> getEvaluationPlan() {
-        List<EvaluationPlansDTO> list = service.getEvaluationPlans();
-        if (list == null || list.isEmpty()) {
-            return ResponseEntity.noContent().build(); // 204
+        try {
+            List<EvaluationPlansDTO> list = service.getEvaluationPlans();
+            if (list == null || list.isEmpty()) return ResponseEntity.noContent().build(); // 204
+            return ResponseEntity.ok(list); // 200
+        } catch (ExceptionNoSuchElement ex) {              // <- si el service la lanza
+            return ResponseEntity.noContent().build();     // 204 en vez de 500
         }
-        return ResponseEntity.ok(list); // 200
     }
 
     @GetMapping("/getEvaluationPlansPagination")
     public ResponseEntity<Page<EvaluationPlansDTO>> getEvaluationPlansPagination(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-
+        // NO 400 si viene vacío; devuelve 200 con Page vacío
         Page<EvaluationPlansDTO> p = service.getEvaluationPlansPagination(page, size);
-        // aunque no tenga elementos, responde 200 con Page vacío
         return ResponseEntity.ok(p);
     }
 
