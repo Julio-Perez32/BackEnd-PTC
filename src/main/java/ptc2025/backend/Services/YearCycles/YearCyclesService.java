@@ -56,26 +56,23 @@ public class YearCyclesService {
         return pageEntity.map(this::convertirADTO);
     }
 
-    private YearCyclesDTO convertirADTO(YearCyclesEntity yearCyclesEntity) {
+    private YearCyclesDTO convertirADTO(YearCyclesEntity e) {
         YearCyclesDTO dto = new YearCyclesDTO();
-        dto.setId(yearCyclesEntity.getId());
-        dto.setStartDate(yearCyclesEntity.getStartDate());
-        dto.setEndDate(yearCyclesEntity.getEndDate());
+        dto.setId(e.getId());
+        dto.setStartDate(e.getStartDate());
+        dto.setEndDate(e.getEndDate());
 
-        if (yearCyclesEntity.getACADEMICYEAR() != null) {
-            dto.setAcademicyear(yearCyclesEntity.getACADEMICYEAR().getAcademicYearId());
-        } else {
-            dto.setAcademicyear(null);
+        if (e.getACADEMICYEAR() != null) {
+            dto.setAcademicYearID(e.getACADEMICYEAR().getAcademicYearId());
+            dto.setAcademicyear(e.getACADEMICYEAR().getAcademicYearId());
         }
-
-        if (yearCyclesEntity.getCycleTypes() != null) {
-            dto.setCycletype(yearCyclesEntity.getCycleTypes().getId());
-        } else {
-            dto.setCycletype(null);
+        if (e.getCycleTypes() != null) {
+            dto.setCycleTypeID(e.getCycleTypes().getId());
+            dto.setCycletype(e.getCycleTypes().getId());
         }
-
         return dto;
     }
+
 
     public YearCyclesDTO insertarDatos(YearCyclesDTO data) {
         if (data == null) {
@@ -123,27 +120,25 @@ public class YearCyclesService {
         existente.setEndDate(json.getEndDate());
 
         if (json.getAcademicYearID() != null) {
-            AcademicYearEntity academicYear = academicYearRepo.findById(json.getCycleTypeID())
+            AcademicYearEntity ay = academicYearRepo.findById(json.getAcademicYearID())
                     .orElseThrow(() -> new ExceptionNoSuchElement(
-                            "Año académico no encontrado con ID: " + json.getCycleTypeID()
-                    ));
-            existente.setACADEMICYEAR(academicYear);
+                            "Año académico no encontrado con ID: " + json.getAcademicYearID()));
+            existente.setACADEMICYEAR(ay);
         } else {
             existente.setACADEMICYEAR(null);
         }
 
-        if (json.getCycletype() != null) {
-            CycleTypesEntity cycleTypes = cycleTypesRepo.findById(json.getCycleTypeID())
+        if (json.getCycleTypeID() != null) {
+            CycleTypesEntity ct = cycleTypesRepo.findById(json.getCycleTypeID())
                     .orElseThrow(() -> new ExceptionNoSuchElement(
-                            "Tipo de año no encontrado con ID: " + json.getCycleTypeID()
-                    ));
-            existente.setCycleTypes(cycleTypes);
+                            "Tipo de ciclo no encontrado con ID: " + json.getCycleTypeID()));
+            existente.setCycleTypes(ct);
         } else {
             existente.setCycleTypes(null);
         }
 
-        YearCyclesEntity RegistroActualizado = repo.save(existente);
-        return convertirADTO(RegistroActualizado);
+        YearCyclesEntity actualizado = repo.save(existente);
+        return convertirADTO(actualizado);
     }
 
     public boolean removerRegistro(String id) {
