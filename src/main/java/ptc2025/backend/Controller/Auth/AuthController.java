@@ -92,20 +92,20 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        boolean isLocal = true; // o detectar con request.getHeader("Origin")
+        // Si querés manejar local vs prod:
+        boolean isLocal = false; // tu API está en Heroku (HTTPS), así que secure=true está bien
+        ResponseCookie cookie = ResponseCookie.from("authToken", "")
+                .httpOnly(true)
+                .secure(!isLocal)          // true en Heroku
+                .sameSite(isLocal ? "Lax" : "None")
+                .path("/")
+                .maxAge(0)                 // <- borrar
+                .build();
 
-        Cookie cookie = new Cookie("authToken", null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(!isLocal);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-
-        return ResponseEntity.ok(Map.of(
-                "status", "success",
-                "message", "Sesión cerrada y cookie eliminada"
-        ));
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        return ResponseEntity.ok(Map.of("status","success","message","Sesión cerrada y cookie eliminada"));
     }
+
 
 
     private String resolveToken(HttpServletRequest request, String cookieToken) {
