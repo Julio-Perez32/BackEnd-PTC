@@ -46,7 +46,7 @@ public class YearCyclesController {
     }
 
 
-    @PostMapping("/addYearCyle")
+    @PostMapping("/addYearCycle")
     public ResponseEntity<?> nuevoRegistro(@Valid @RequestBody YearCyclesDTO json, HttpServletRequest request){
         try {
             YearCyclesDTO respuesta = service.insertarDatos(json);

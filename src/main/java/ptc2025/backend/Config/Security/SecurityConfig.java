@@ -305,9 +305,10 @@ public class SecurityConfig {
 
                         // === Year Cycles ===
                         .requestMatchers(HttpMethod.GET, "/api/YearCycles/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/YearCycles/**").hasAnyRole("Administrador", "Registro académico")
-                        .requestMatchers(HttpMethod.PUT, "/api/YearCycles/**").hasAnyRole("Administrador", "Registro académico")
-                        .requestMatchers(HttpMethod.DELETE, "/api/YearCycles/**").hasAnyRole("Administrador", "Registro académico")
+                        .requestMatchers(HttpMethod.POST, "/api/YearCycles/**").hasAnyRole("Administrador", "Registro académico", "Docente")
+                        .requestMatchers(HttpMethod.PUT, "/api/YearCycles/**").hasAnyRole("Administrador", "Registro académico", "Docente")
+                        .requestMatchers(HttpMethod.DELETE, "/api/YearCycles/**").hasAnyRole("Administrador", "Registro académico", "Docente")
+
 
 
 
