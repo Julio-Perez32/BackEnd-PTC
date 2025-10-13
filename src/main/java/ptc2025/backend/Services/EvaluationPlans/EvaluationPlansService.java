@@ -15,6 +15,7 @@ import ptc2025.backend.Models.DTO.EvaluationPlans.EvaluationPlansDTO;
 import ptc2025.backend.Respositories.CourseOfferings.CourseOfferingsRepository;
 import ptc2025.backend.Respositories.EvaluationPlans.EvaluationPlansRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -124,16 +125,24 @@ public class EvaluationPlansService {
 
     private EvaluationPlansEntity convertirAEntity(EvaluationPlansDTO dto) {
         EvaluationPlansEntity entity = new EvaluationPlansEntity();
-        entity.setEvaluationPlanID(dto.getEvaluationPlanID());
+        // NO setees evaluationPlanID (lo genera la DB)
         entity.setPlanName(dto.getPlanName());
         entity.setDescription(dto.getDescription());
-        entity.setCreatedAt(dto.getCreatedAt());
+
+        // respaldo por si alguien manda null: el @PrePersist igual lo cubrirá
+        if (entity.getCreatedAt() == null) {
+            entity.setCreatedAt(LocalDate.now());
+        }
 
         if (dto.getCourseOfferingID() != null) {
-            CourseOfferingsEntity courseOfferings = courseOfferingsRepo.findById(dto.getCourseOfferingID())
-                    .orElseThrow(() -> new ExceptionNoSuchElement("Oferta de cursos no encontrada con ID: " + dto.getCourseOfferingID()));
-            entity.setCourseOfferings(courseOfferings);
+            CourseOfferingsEntity offering = courseOfferingsRepo.findById(dto.getCourseOfferingID())
+                    .orElseThrow(() -> new ExceptionNoSuchElement(
+                            "Oferta de cursos no encontrada con ID: " + dto.getCourseOfferingID()));
+            entity.setCourseOfferings(offering);
+        } else {
+            throw new IllegalArgumentException("courseOfferingID es requerido");
         }
+
         return entity;
     }
 }

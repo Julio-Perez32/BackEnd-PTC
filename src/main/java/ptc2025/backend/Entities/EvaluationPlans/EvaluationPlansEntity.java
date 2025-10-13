@@ -32,7 +32,7 @@ public class EvaluationPlansEntity {
     private String planName;
     @Column(name ="DESCRIPTION" )
     private String description;
-    @Column(name = "CREATEDAT")
+    @Column(name = "CREATEDAT", nullable = false)
     private LocalDate createdAt;
 
     @OneToMany
@@ -42,8 +42,12 @@ public class EvaluationPlansEntity {
     @ManyToOne
     @JoinColumn(name = "COURSEOFFERINGID", referencedColumnName = "COURSEOFFERINGID")
     private CourseOfferingsEntity courseOfferings;
-    @OneToMany
 
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) createdAt = LocalDate.now(); // <-- CLAVE: evita ORA-01400
+    }
 
 
     @Override

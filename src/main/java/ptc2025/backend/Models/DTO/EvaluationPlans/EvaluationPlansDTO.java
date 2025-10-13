@@ -10,26 +10,23 @@ import lombok.ToString;
 
 import java.time.LocalDate;
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
+@Getter @Setter @ToString @EqualsAndHashCode
 public class EvaluationPlansDTO {
     private String evaluationPlanID;
 
-    @NotNull(message = "El campo es obligatorio")
-    @NotBlank(message = "El campo no puede estar vacío")
+    @NotBlank(message = "courseOfferingID es obligatorio")
     private String courseOfferingID;
 
-    @NotNull(message = "El campo  es obligatorio")
-    @NotBlank(message = "El campo  no puede estar vacío")
-    @Size(min = 4, max = 80, message = "El  debe tener entre 4 y 80 caracteres")
+    @NotBlank(message = "planName es obligatorio")
+    @Size(min = 4, max = 80, message = "planName debe tener entre 4 y 80 caracteres")
     private String planName;
 
-    @Size(max = 200, message = "La description no debe exceder los 200 caracteres")
+    @Size(max = 200, message = "description no debe exceder 200 caracteres")
     private String description;
+
 
     private LocalDate createdAt;
 
     private String courseoffering;
 }
+
