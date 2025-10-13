@@ -92,9 +92,11 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
+        boolean isLocal = true; // o detectar con request.getHeader("Origin")
+
         Cookie cookie = new Cookie("authToken", null);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        cookie.setSecure(!isLocal);
         cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
@@ -104,6 +106,7 @@ public class AuthController {
                 "message", "Sesión cerrada y cookie eliminada"
         ));
     }
+
 
     private String resolveToken(HttpServletRequest request, String cookieToken) {
         if (cookieToken != null && !cookieToken.isBlank()) return cookieToken;
