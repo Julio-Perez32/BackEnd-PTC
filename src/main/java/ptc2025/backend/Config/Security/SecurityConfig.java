@@ -229,7 +229,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/EvaluationPlanComponents/**").hasAnyRole("Administrador", "Registro académico")
 
                          // === Requirement Conditions ===
-                        .requestMatchers(HttpMethod.GET, "/api/RequirementConditions/**").hasAnyRole("Administrador", "Registro académico", "Docente")
+                        .requestMatchers(HttpMethod.GET, "/api/RequirementConditions/**").hasAnyRole("Administrador", "Registro académico", "Docente", "Estudiante")
                         .requestMatchers(HttpMethod.POST, "/api/RequirementConditions/**").hasAnyRole("Administrador", "Registro académico")
                         .requestMatchers(HttpMethod.PUT, "/api/RequirementConditions/**").hasAnyRole("Administrador", "Registro académico")
                         .requestMatchers(HttpMethod.DELETE, "/api/RequirementConditions/**").hasAnyRole("Administrador", "Registro académico")
