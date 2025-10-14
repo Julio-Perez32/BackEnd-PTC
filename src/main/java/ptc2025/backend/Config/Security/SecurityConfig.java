@@ -236,7 +236,7 @@ public class SecurityConfig {
 
 
                          // === Requirements ===
-                        .requestMatchers(HttpMethod.GET, "/api/Requirements/**").hasAnyRole("Administrador", "Registro académico", "Docente")
+                        .requestMatchers(HttpMethod.GET, "/api/Requirements/**").hasAnyRole("Administrador", "Registro académico", "Docente", "Estudiante")
                         .requestMatchers(HttpMethod.POST, "/api/Requirements/**").hasAnyRole("Administrador", "Registro académico")
                         .requestMatchers(HttpMethod.PUT, "/api/Requirements/**").hasAnyRole("Administrador", "Registro académico")
                         .requestMatchers(HttpMethod.DELETE, "/api/Requirements/**").hasAnyRole("Administrador", "Registro académico")
