@@ -85,8 +85,8 @@ public class SecurityConfig {
 
                         // === Course Offerings ===
                         .requestMatchers(HttpMethod.GET, "/api/CourseOfferings/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/CourseOfferings/**").hasAnyRole("Administrador", "Registro académico")
-                        .requestMatchers(HttpMethod.PUT, "/api/CourseOfferings/**").hasAnyRole("Administrador", "Registro académico")
+                        .requestMatchers(HttpMethod.POST, "/api/CourseOfferings/**").hasAnyRole("Administrador", "Registro académico", "Docente")
+                        .requestMatchers(HttpMethod.PUT, "/api/CourseOfferings/**").hasAnyRole("Administrador", "Registro académico", "Docente")
                         .requestMatchers(HttpMethod.DELETE, "/api/CourseOfferings/**").hasAnyRole("Administrador", "Registro académico")
 
 
