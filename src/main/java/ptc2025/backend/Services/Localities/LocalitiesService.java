@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ptc2025.backend.Entities.AcademicLevel.AcademicLevelsEntity;
 import ptc2025.backend.Entities.Localities.LocalitiesEntity;
 import ptc2025.backend.Entities.Universities.UniversityEntity;
 import ptc2025.backend.Exceptions.ExceptionBadRequest;
@@ -56,20 +55,32 @@ public class LocalitiesService {
     }
 
     public LocalitiesDTO insertarLocalidad(LocalitiesDTO dto){
-        if (dto.getUniversityID() == null || dto.getUniversityID().isBlank() ||
-                dto.getIsMainLocality() == null ||
-                dto.getAddress() == null || dto.getAddress().isBlank() ||
-                dto.getPhoneNumber() == null || dto.getPhoneNumber().isBlank()) {
-
-            throw new ExceptionBadRequest("Todos los campos obligatorios deben estar completos (universityID, isMainLocality, address, phoneNumber).");
+        // VALIDACIÓN CORREGIDA - isMainLocality puede ser false sin problema
+        if (dto.getUniversityID() == null || dto.getUniversityID().isBlank()) {
+            throw new ExceptionBadRequest("El ID de universidad es requerido");
         }
+
+        if (dto.getAddress() == null || dto.getAddress().isBlank()) {
+            throw new ExceptionBadRequest("La dirección es requerida");
+        }
+
+        if (dto.getPhoneNumber() == null || dto.getPhoneNumber().isBlank()) {
+            throw new ExceptionBadRequest("El número de teléfono es requerido");
+        }
+
+        // Asegurar que isMainLocality nunca sea null - usar false por defecto
+        if (dto.getIsMainLocality() == null) {
+            dto.setIsMainLocality(false);
+        }
+
         try{
             LocalitiesEntity entidad = convertirALocaltityEntity(dto);
             LocalitiesEntity guardar = repo.save(entidad);
+            log.info("Localidad creada exitosamente: {}", guardar.getLocalityID());
             return convertirALocaltityDTO(guardar);
         }catch (Exception e){
-            log.error("Error al registrar una nueva localidad" +  e.getMessage());
-            throw new RuntimeException("Error al intentar guardar la localidad");
+            log.error("Error al registrar una nueva localidad: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al intentar guardar la localidad: " + e.getMessage());
         }
     }
 
@@ -82,7 +93,8 @@ public class LocalitiesService {
                     return new ExceptionNoSuchElement("El dato no pudo ser actualizado. Localidad no encontrada con ID: " + id);
                 });
 
-        localidadExistente.setIsMainLocality(dto.getIsMainLocality());
+        // Actualizar campos - asegurar que isMainLocality nunca sea null
+        localidadExistente.setIsMainLocality(dto.getIsMainLocality() != null ? dto.getIsMainLocality() : false);
         localidadExistente.setAddress(dto.getAddress());
         localidadExistente.setPhoneNumber(dto.getPhoneNumber());
 
@@ -103,17 +115,20 @@ public class LocalitiesService {
         return convertirALocaltityDTO(actualizado);
     }
 
-    public boolean eliminarLocalidad (String id){
+    public boolean eliminarLocalidad(String id){
         try {
             LocalitiesEntity objLocalidad = repo.findById(id).orElse(null);
             if (objLocalidad != null){
                 repo.deleteById(id);
+                log.info("Localidad eliminada: {}", id);
                 return true;
             } else {
+                log.warn("Localidad no encontrada para eliminar: {}", id);
                 return false;
             }
         } catch (EmptyResultDataAccessException e) {
-            throw new EmptyResultDataAccessException("No se encontro ninguna localidad con el ID: " + id , 1);
+            log.error("Error al eliminar localidad: {}", id, e);
+            throw new EmptyResultDataAccessException("No se encontro ninguna localidad con el ID: " + id, 1);
         }
     }
 
@@ -121,10 +136,14 @@ public class LocalitiesService {
         try {
             LocalitiesDTO dto = new LocalitiesDTO();
             dto.setLocalityID(localities.getLocalityID());
-            dto.setIsMainLocality(localities.getIsMainLocality());
+
+            // Asegurar que isMainLocality nunca sea null en el DTO
+            dto.setIsMainLocality(localities.getIsMainLocality() != null ? localities.getIsMainLocality() : false);
+
             dto.setAddress(localities.getAddress());
             dto.setPhoneNumber(localities.getPhoneNumber());
 
+            // Manejo seguro de la relación con University
             if(localities.getUniversity() != null){
                 dto.setUniversityName(localities.getUniversity().getUniversityName());
                 dto.setUniversityID(localities.getUniversity().getUniversityID());
@@ -142,14 +161,19 @@ public class LocalitiesService {
     private LocalitiesEntity convertirALocaltityEntity(LocalitiesDTO dto){
         try {
             LocalitiesEntity entity = new LocalitiesEntity();
-            entity.setIsMainLocality(dto.getIsMainLocality());
+
+            // Asegurar que isMainLocality nunca sea null
+            entity.setIsMainLocality(dto.getIsMainLocality() != null ? dto.getIsMainLocality() : false);
+
             entity.setAddress(dto.getAddress());
             entity.setPhoneNumber(dto.getPhoneNumber());
 
-            if(dto.getUniversityID() != null){
+            if(dto.getUniversityID() != null && !dto.getUniversityID().isBlank()){
                 UniversityEntity university = repoUniversity.findById(dto.getUniversityID())
                         .orElseThrow(() -> new ExceptionNoSuchElement("Universidad no encontrada con ID: " + dto.getUniversityID()));
                 entity.setUniversity(university);
+            } else {
+                throw new ExceptionBadRequest("El ID de universidad es requerido");
             }
             return entity;
         } catch (Exception e) {
