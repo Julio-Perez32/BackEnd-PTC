@@ -87,9 +87,9 @@ public class CourseOfferingsTeachersController {
     }
 
     @DeleteMapping("/deleteCourseOfferingTeacher/{id}")
-    public ResponseEntity<?> deleteCourseOfferingTeacher(@PathVariable String ID){
+    public ResponseEntity<?> deleteCourseOfferingTeacher(@PathVariable String id){
         try{
-            if(!service.deleteCourseTeacher(ID)){
+            if(!service.deleteCourseTeacher(id)){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .header("Mensaje Error", "Estudiante no encontrado").body(Map.of(
                                 "Error", "Not found",

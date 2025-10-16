@@ -89,15 +89,23 @@ public class CourseOfferingsTeachersService {
     private CourseOfferingsTeachersEntity convertToOfferingsTeachersEntity(CourseOfferingsTeachersDTO dto){
         CourseOfferingsTeachersEntity entity = new CourseOfferingsTeachersEntity();
 
-        // Oferta
-        CourseOfferingsEntity offering = repoCourseOfferings.findById(dto.getCourseOfferingID())
-                .orElseThrow(() -> new ExceptionNotFound("Curso no encontrado con ID " + dto.getCourseOfferingID()));
-        entity.setCourseOfferings(offering);
+        // course offering obligatorio
+        if (dto.getCourseOfferingID() != null && !dto.getCourseOfferingID().isBlank()) {
+            CourseOfferingsEntity offering = repoCourseOfferings.findById(dto.getCourseOfferingID())
+                    .orElseThrow(() -> new ExceptionNotFound("Curso no encontrado con ID " + dto.getCourseOfferingID()));
+            entity.setCourseOfferings(offering);
+        } else {
+            throw new ExceptionBadRequest("CourseOfferingID es obligatorio");
+        }
 
-        // Empleado
-        EmployeeEntity employee = repoEmployee.findById(dto.getEmployeeID())
-                .orElseThrow(() -> new ExceptionNotFound("Empleado no encontrado con ID " + dto.getEmployeeID()));
-        entity.setEmployee(employee);
+        // employee obligatorio
+        if (dto.getEmployeeID() != null && !dto.getEmployeeID().isBlank()) {
+            EmployeeEntity employee = repoEmployee.findById(dto.getEmployeeID())
+                    .orElseThrow(() -> new ExceptionNotFound("Empleado no encontrado con ID " + dto.getEmployeeID()));
+            entity.setEmployee(employee);
+        } else {
+            throw new ExceptionBadRequest("EmployeeID es obligatorio");
+        }
 
         return entity;
     }
@@ -108,25 +116,16 @@ public class CourseOfferingsTeachersService {
                 || dto.getEmployeeID() == null || dto.getEmployeeID().isBlank()){
             throw new ExceptionBadRequest("Los campos deben de estar completos");
         }
-
-
-        // si permites varios docentes por curso pero único por (curso, empleado):
-        // if (repo.existsByCourseOfferings_CourseOfferingIDAndEmployee_Id(dto.getCourseOfferingID(), dto.getEmployeeID())) {
-        //     throw new ExceptionBadRequest("El docente ya está asignado a este curso.");
-        // }
-
-        try {
+        try{
             CourseOfferingsTeachersEntity entity = convertToOfferingsTeachersEntity(dto);
-            CourseOfferingsTeachersEntity saved  = repo.save(entity);
+            CourseOfferingsTeachersEntity saved = repo.save(entity);
             return convertToOfferingsTeachersDTO(saved);
-        } catch (DataIntegrityViolationException ex) {
-            // mapea violaciones de unique/fk a 409/400 en vez de 500
-            throw new ExceptionBadRequest("Violación de integridad: " + ex.getMostSpecificCause().getMessage());
         } catch (Exception e){
-            log.error("Error al registrar el docente", e);
-            throw new ExceptionServerError("Error al registrar el docente");
+            log.error("Error al registrar el docente", e); // <-- con stack completo
+            throw new ExceptionServerError("Error al registrar el docente: " + e.getMessage());
         }
     }
+
 
 
 
