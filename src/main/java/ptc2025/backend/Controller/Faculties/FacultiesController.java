@@ -64,7 +64,7 @@ public class FacultiesController {
         }
     }
     @PutMapping("/updateFaculty/{id}")
-    public ResponseEntity<?> updateFaculty(@PathVariable String ID, @Valid @RequestBody FacultiesDTO json, BindingResult bindingResult){
+    public ResponseEntity<?> updateFaculty(@PathVariable String id, @Valid @RequestBody FacultiesDTO json, BindingResult bindingResult){
 
         if(bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
@@ -73,7 +73,7 @@ public class FacultiesController {
             return ResponseEntity.badRequest().body(errores);
         }
         try{
-            FacultiesDTO dto = service.updateFaculty(ID, json);
+            FacultiesDTO dto = service.updateFaculty(id, json);
             return ResponseEntity.ok(dto);
         }catch (IllegalArgumentException e){
             return ResponseEntity.notFound().build();
@@ -86,9 +86,9 @@ public class FacultiesController {
     }
 
     @DeleteMapping("/deleteFaculty/{id}")
-    public ResponseEntity<?> deleteFaculty(@PathVariable String ID){
+    public ResponseEntity<?> deleteFaculty(@PathVariable String id){
         try{
-            if(!service.deleteFaculty(ID)){
+            if(!service.deleteFaculty(id)){
                 //Error
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .header("Mensaje Error", "Facultad no encontrada")
