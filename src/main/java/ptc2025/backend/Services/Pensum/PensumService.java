@@ -41,6 +41,7 @@ public class PensumService {
         return pageEntity.map(this::convertToPensumDTO);
     }
 
+    // ✅ CORRECCIÓN: Incluir el nombre de la carrera
     private PensumDTO convertToPensumDTO(PensumEntity entity) {
         PensumDTO dto = new PensumDTO();
         dto.setPensumID(entity.getPensumID());
@@ -49,8 +50,11 @@ public class PensumService {
 
         if (entity.getCareer() != null) {
             dto.setCareerID(entity.getCareer().getId());
+            // ✅ Agregar el nombre de la carrera para mostrar en el frontend
+            dto.setCareer(entity.getCareer().getNameCareer());
         } else {
             dto.setCareerID(null);
+            dto.setCareer(null);
         }
 
         return dto;
@@ -73,18 +77,30 @@ public class PensumService {
     }
 
     public PensumDTO insertPensum(PensumDTO dto) {
-        if (dto == null || dto.getCareerID() == null || dto.getCareerID().isEmpty()
-                || dto.getVersion() == null || dto.getVersion().isEmpty()
-                || dto.getEffectiveYear() == null) {
-            throw new ExceptionBadRequest("Los campos deben de estar completos.");
+        // ✅ Validación mejorada
+        if (dto == null) {
+            throw new ExceptionBadRequest("El DTO no puede ser nulo");
         }
+        if (dto.getCareerID() == null || dto.getCareerID().isEmpty()) {
+            throw new ExceptionBadRequest("El ID de la carrera es obligatorio");
+        }
+        if (dto.getVersion() == null || dto.getVersion().isEmpty()) {
+            throw new ExceptionBadRequest("La versión es obligatoria");
+        }
+        if (dto.getEffectiveYear() == null) {
+            throw new ExceptionBadRequest("El año efectivo es obligatorio");
+        }
+
         try {
             PensumEntity entity = convertToPensumEntity(dto);
             PensumEntity savedPensum = repo.save(entity);
             return convertToPensumDTO(savedPensum);
+        } catch (ExceptionNoSuchElement e) {
+            // Re-lanzar excepciones de validación
+            throw e;
         } catch (Exception e) {
-            log.error("Error al registrar el pensum: " + e.getMessage());
-            throw new RuntimeException("Error al registrar el pensum");
+            log.error("Error al registrar el pensum: " + e.getMessage(), e);
+            throw new RuntimeException("Error al registrar el pensum: " + e.getMessage());
         }
     }
 

@@ -25,7 +25,9 @@ public class PensumController {
     PensumService service;
 
     @GetMapping("/getPensa")
-    public List<PensumDTO> getPensa(){return service.getPensa();}
+    public List<PensumDTO> getPensa(){
+        return service.getPensa();
+    }
 
     @GetMapping("/getPensumPagination")
     public ResponseEntity<Page<PensumDTO>> getPensumPagination(
@@ -41,7 +43,20 @@ public class PensumController {
     }
 
     @PostMapping("/newPensum")
-    public ResponseEntity<?> newPensum(@Valid @RequestBody PensumDTO json, HttpServletRequest request){
+    public ResponseEntity<?> newPensum(@Valid @RequestBody PensumDTO json, BindingResult bindingResult, HttpServletRequest request){
+        // ✅ Verificar errores de validación PRIMERO
+        if(bindingResult.hasErrors()){
+            Map<String, String> errores = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errores.put(error.getField(), error.getDefaultMessage())
+            );
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "Validación fallida",
+                    "errorType", "VALIDATION_ERROR",
+                    "errors", errores
+            ));
+        }
+
         try{
             PensumDTO response = service.insertPensum(json);
             if(response == null){
@@ -66,19 +81,34 @@ public class PensumController {
 
     @PutMapping("/updatePensum/{id}")
     public ResponseEntity<?> updatePensum(@PathVariable String id, @Valid @RequestBody PensumDTO json, BindingResult bindingResult){
+        // ✅ CORRECCIÓN: Verificar errores ANTES de actualizar
         if(bindingResult.hasErrors()){
-            PensumDTO dto = service.updatePensum(id, json);
             Map<String, String> errores = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error -> errores.put(error.getField(), error.getDefaultMessage()));
+            bindingResult.getFieldErrors().forEach(error ->
+                    errores.put(error.getField(), error.getDefaultMessage())
+            );
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "Validación fallida",
+                    "errorType", "VALIDATION_ERROR",
+                    "errors", errores
+            ));
         }
+
         try{
             PensumDTO dto = service.updatePensum(id, json);
-            return ResponseEntity.ok(dto);
+            return ResponseEntity.ok(Map.of(
+                    "status", "Success",
+                    "data", dto
+            ));
         }catch (IllegalArgumentException e){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                    "status", "Not Found",
+                    "message", "Pensum no encontrado",
+                    "detail", e.getMessage()
+            ));
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
-                    "error", "Datos duplicados",
+                    "error", "Error al actualizar",
                     "detail", e.getMessage()
             ));
         }
@@ -89,7 +119,7 @@ public class PensumController {
         try{
             if(!service.deletePensum(id)){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .header("Message Error", "Usuario no encontrado")
+                        .header("Message Error", "Pensum no encontrado")
                         .body(Map.of(
                                 "Error", "Not found",
                                 "Mensaje", "El pensum no ha sido encontrado",
