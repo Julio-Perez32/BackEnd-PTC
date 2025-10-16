@@ -1,6 +1,7 @@
 package ptc2025.backend.Models.DTO.Localities;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
@@ -14,8 +15,10 @@ import lombok.ToString;
 @EqualsAndHashCode
 public class LocalitiesDTO {
     private String localityID;
-    @NotBlank
+    @NotBlank(message = "La universidad es requerida")
     private String universityID;
+
+    @NotNull(message = "Debe especificar si es sede principal")
     private Boolean isMainLocality;
     @NotBlank(message = "La direccion no puede estar vacia")
     @Size(max = 500, message = "La direccion no puede ser mayor de 500 caracteres")

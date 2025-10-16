@@ -29,16 +29,30 @@ public class LocalitiesService {
     UniversityRespository repoUniversity;
 
     public List<LocalitiesDTO> getLocalitiesService(){
-        List<LocalitiesEntity> localidad = repo.findAll();
-        return localidad.stream()
-                .map(this::convertirALocaltityDTO)
-                .collect(Collectors.toList());
+        try {
+            log.debug("Obteniendo todas las localidades");
+            List<LocalitiesEntity> localidad = repo.findAll();
+            log.debug("Se encontraron {} localidades", localidad.size());
+            return localidad.stream()
+                    .map(this::convertirALocaltityDTO)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error al obtener localidades", e);
+            throw new RuntimeException("Error al obtener localidades: " + e.getMessage(), e);
+        }
     }
 
     public Page<LocalitiesDTO> getLocalitiesPagination(int page, int size){
-        Pageable pageable = PageRequest.of(page, size);
-        Page<LocalitiesEntity> pageEntity = repo.findAll(pageable);
-        return pageEntity.map(this::convertirALocaltityDTO);
+        try {
+            log.debug("Obteniendo localidades paginadas - página: {}, tamaño: {}", page, size);
+            Pageable pageable = PageRequest.of(page, size);
+            Page<LocalitiesEntity> pageEntity = repo.findAll(pageable);
+            log.debug("Página obtenida con {} elementos", pageEntity.getNumberOfElements());
+            return pageEntity.map(this::convertirALocaltityDTO);
+        } catch (Exception e) {
+            log.error("Error al obtener localidades paginadas", e);
+            throw new RuntimeException("Error al obtener localidades paginadas: " + e.getMessage(), e);
+        }
     }
 
     public LocalitiesDTO insertarLocalidad(LocalitiesDTO dto){
@@ -60,23 +74,32 @@ public class LocalitiesService {
     }
 
     public LocalitiesDTO modificarLocalidad(String id, LocalitiesDTO dto){
+        log.info("Modificando localidad con ID: {}", id);
+
         LocalitiesEntity localidadExistente = repo.findById(id)
-                .orElseThrow(() -> new ExceptionNoSuchElement("El dato no pudo ser actualizado. Localidad no encontrada con ID: " + id));
+                .orElseThrow(() -> {
+                    log.warn("Localidad no encontrada con ID: {}", id);
+                    return new ExceptionNoSuchElement("El dato no pudo ser actualizado. Localidad no encontrada con ID: " + id);
+                });
 
         localidadExistente.setIsMainLocality(dto.getIsMainLocality());
         localidadExistente.setAddress(dto.getAddress());
         localidadExistente.setPhoneNumber(dto.getPhoneNumber());
 
-
-        if(dto.getUniversityID() != null && ! dto.getUniversityID().isBlank()){
-            UniversityEntity university = repoUniversity.findById(dto.getUniversityID())
-                    .orElseThrow(() -> new ExceptionNoSuchElement("Universidad no encontrada con ID: " + dto.getUniversityID()));
-            localidadExistente.setUniversity(university);
-        } else {
-            localidadExistente.setUniversity(null);
+        if(dto.getUniversityID() == null || dto.getUniversityID().isBlank()){
+            log.warn("Intento de actualizar localidad sin universityID");
+            throw new ExceptionBadRequest("El ID de universidad es requerido");
         }
 
+        UniversityEntity university = repoUniversity.findById(dto.getUniversityID())
+                .orElseThrow(() -> {
+                    log.warn("Universidad no encontrada con ID: {}", dto.getUniversityID());
+                    return new ExceptionNoSuchElement("Universidad no encontrada con ID: " + dto.getUniversityID());
+                });
+        localidadExistente.setUniversity(university);
+
         LocalitiesEntity actualizado = repo.save(localidadExistente);
+        log.info("Localidad actualizada exitosamente: {}", id);
         return convertirALocaltityDTO(actualizado);
     }
 
@@ -95,36 +118,43 @@ public class LocalitiesService {
     }
 
     private LocalitiesDTO convertirALocaltityDTO(LocalitiesEntity localities) {
-        LocalitiesDTO dto = new LocalitiesDTO();
-        dto.setLocalityID(localities.getLocalityID());
+        try {
+            LocalitiesDTO dto = new LocalitiesDTO();
+            dto.setLocalityID(localities.getLocalityID());
+            dto.setIsMainLocality(localities.getIsMainLocality());
+            dto.setAddress(localities.getAddress());
+            dto.setPhoneNumber(localities.getPhoneNumber());
 
-        dto.setIsMainLocality(localities.getIsMainLocality());
-        dto.setAddress(localities.getAddress());
-        dto.setPhoneNumber(localities.getPhoneNumber());
-
-        if(localities.getUniversity() != null){
-            dto.setUniversityName(localities.getUniversity().getUniversityName());
-            dto.setUniversityID(localities.getUniversity().getUniversityID());
-        } else {
-            dto.setUniversityName("Sin Universidad Asignada");
-            dto.setUniversityID(null);
+            if(localities.getUniversity() != null){
+                dto.setUniversityName(localities.getUniversity().getUniversityName());
+                dto.setUniversityID(localities.getUniversity().getUniversityID());
+            } else {
+                dto.setUniversityName("Sin Universidad Asignada");
+                dto.setUniversityID(null);
+            }
+            return dto;
+        } catch (Exception e) {
+            log.error("Error al convertir LocalitiesEntity a DTO", e);
+            throw new RuntimeException("Error en conversión a DTO: " + e.getMessage(), e);
         }
-        return dto;
     }
 
     private LocalitiesEntity convertirALocaltityEntity(LocalitiesDTO dto){
-        LocalitiesEntity entity = new LocalitiesEntity();
+        try {
+            LocalitiesEntity entity = new LocalitiesEntity();
+            entity.setIsMainLocality(dto.getIsMainLocality());
+            entity.setAddress(dto.getAddress());
+            entity.setPhoneNumber(dto.getPhoneNumber());
 
-        entity.setIsMainLocality(dto.getIsMainLocality());
-        entity.setAddress(dto.getAddress());
-        entity.setPhoneNumber(dto.getPhoneNumber());
-
-        if(dto.getUniversityID() != null){
-            UniversityEntity university = repoUniversity.findById(dto.getUniversityID())
-                    .orElseThrow(() -> new ExceptionNoSuchElement("Universidad no encontrada con ID: " + dto.getUniversityID()));
-            entity.setUniversity(university);
+            if(dto.getUniversityID() != null){
+                UniversityEntity university = repoUniversity.findById(dto.getUniversityID())
+                        .orElseThrow(() -> new ExceptionNoSuchElement("Universidad no encontrada con ID: " + dto.getUniversityID()));
+                entity.setUniversity(university);
+            }
+            return entity;
+        } catch (Exception e) {
+            log.error("Error al convertir DTO a LocalitiesEntity", e);
+            throw new RuntimeException("Error en conversión a Entity: " + e.getMessage(), e);
         }
-
-        return entity;
     }
 }
