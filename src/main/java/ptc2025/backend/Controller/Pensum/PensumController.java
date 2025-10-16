@@ -65,13 +65,14 @@ public class PensumController {
     }
 
     @PutMapping("/updatePensum/{id}")
-    public ResponseEntity<?> updatePensum(@PathVariable String ID, @Valid @RequestBody PensumDTO json, BindingResult bindingResult){
+    public ResponseEntity<?> updatePensum(@PathVariable String id, @Valid @RequestBody PensumDTO json, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
+            PensumDTO dto = service.updatePensum(id, json);
             Map<String, String> errores = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error -> errores.put(error.getField(), error.getDefaultMessage()));
         }
         try{
-            PensumDTO dto = service.updatePensum(ID, json);
+            PensumDTO dto = service.updatePensum(id, json);
             return ResponseEntity.ok(dto);
         }catch (IllegalArgumentException e){
             return ResponseEntity.notFound().build();
@@ -84,9 +85,9 @@ public class PensumController {
     }
 
     @DeleteMapping("/deletePensum/{id}")
-    public ResponseEntity<?> deletePensum(@PathVariable String ID){
+    public ResponseEntity<?> deletePensum(@PathVariable String id){
         try{
-            if(!service.deletePensum(ID)){
+            if(!service.deletePensum(id)){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .header("Message Error", "Usuario no encontrado")
                         .body(Map.of(
