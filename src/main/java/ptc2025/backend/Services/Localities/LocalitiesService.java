@@ -69,7 +69,7 @@ public class LocalitiesService {
 
         LocalitiesEntity actualizado = repo.save(localidadExistente);
 
-        if(dto.getLocalityID() != null){
+        if(dto.getUniversityID() != null){
             UniversityEntity university = repoUniversity.findById(dto.getLocalityID())
                     .orElseThrow(() -> new ExceptionNoSuchElement("Universidad no encontrada con ID: " + dto.getLocalityID()));
             localidadExistente.setUniversity(university);
@@ -120,7 +120,7 @@ public class LocalitiesService {
         entity.setPhoneNumber(dto.getPhoneNumber());
 
         if(dto.getUniversityID() != null){
-            UniversityEntity university = repoUniversity.findById(dto.getLocalityID())
+            UniversityEntity university = repoUniversity.findById(dto.getUniversityID())
                     .orElseThrow(() -> new ExceptionNoSuchElement("Universidad no encontrada con ID: " + dto.getUniversityID()));
             entity.setUniversity(university);
         }
