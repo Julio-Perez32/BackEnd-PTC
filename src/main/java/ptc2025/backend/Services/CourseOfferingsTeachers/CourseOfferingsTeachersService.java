@@ -88,28 +88,36 @@ public class CourseOfferingsTeachersService {
     private CourseOfferingsTeachersEntity convertToOfferingsTeachersEntity(CourseOfferingsTeachersDTO dto){
         CourseOfferingsTeachersEntity entity = new CourseOfferingsTeachersEntity();
 
-        if(dto.getEmployeeID() != null){
-            EmployeeEntity employee = repoEmployee.findById(dto.getEmployeeID())
-                    .orElseThrow(() -> new ExceptionNotFound("Empleado no encontrado con ID " + dto.getEmployeeID()));
-            entity.setEmployee(employee);
-        }
+        // Oferta
+        CourseOfferingsEntity offering = repoCourseOfferings.findById(dto.getCourseOfferingID())
+                .orElseThrow(() -> new ExceptionNotFound("Curso no encontrado con ID " + dto.getCourseOfferingID()));
+        entity.setCourseOfferings(offering);
+
+        // Empleado
+        EmployeeEntity employee = repoEmployee.findById(dto.getEmployeeID())
+                .orElseThrow(() -> new ExceptionNotFound("Empleado no encontrado con ID " + dto.getEmployeeID()));
+        entity.setEmployee(employee);
+
         return entity;
     }
 
+
     public CourseOfferingsTeachersDTO insertOfferingTeacher(CourseOfferingsTeachersDTO dto){
-        if (dto == null || dto.getCourseOfferingID() == null || dto.getCourseOfferingID().isEmpty() ||
-                dto.getEmployeeID() == null || dto.getEmployeeID().isEmpty()){
+        if (dto == null || dto.getCourseOfferingID() == null || dto.getCourseOfferingID().isBlank()
+                || dto.getEmployeeID() == null || dto.getEmployeeID().isBlank()){
             throw new ExceptionBadRequest("Los campos deben de estar completos");
         }
+
         try{
             CourseOfferingsTeachersEntity entity = convertToOfferingsTeachersEntity(dto);
-            CourseOfferingsTeachersEntity savedOfferingTeacher = repo.save(entity);
-            return convertToOfferingsTeachersDTO(savedOfferingTeacher);
-        }catch (Exception e){
-            log.error("Error al registrar el docente: " + e.getMessage());
+            CourseOfferingsTeachersEntity saved = repo.save(entity);
+            return convertToOfferingsTeachersDTO(saved);
+        } catch (Exception e){
+            log.error("Error al registrar el docente: {}", e.getMessage(), e);
             throw new ExceptionServerError("Error al registrar el docente");
         }
     }
+
 
     public CourseOfferingsTeachersDTO updateCourseTeacher(String ID, CourseOfferingsTeachersDTO json){
         CourseOfferingsTeachersEntity existsCourseTeacher = repo.findById(ID)
