@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@Getter @Setter @EqualsAndHashCode @ToString @NotBlank
+@Getter @Setter @EqualsAndHashCode @ToString
 public class SubjectDefinitionsDTO {
 
     private String SubjectID;
