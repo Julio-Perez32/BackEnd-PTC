@@ -68,7 +68,7 @@ public class LocalitiesService {
         localidadExistente.setPhoneNumber(dto.getPhoneNumber());
 
 
-        if(dto.getUniversityID() != null){
+        if(dto.getUniversityID() != null && ! dto.getUniversityID().isBlank()){
             UniversityEntity university = repoUniversity.findById(dto.getUniversityID())
                     .orElseThrow(() -> new ExceptionNoSuchElement("Universidad no encontrada con ID: " + dto.getUniversityID()));
             localidadExistente.setUniversity(university);
