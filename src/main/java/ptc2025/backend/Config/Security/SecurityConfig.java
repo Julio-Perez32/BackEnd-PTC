@@ -121,10 +121,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/DegreeTypes/**").hasAnyRole("Administrador", "Registro académico")
 
                         // === Departments ===
-                        .requestMatchers(HttpMethod.GET, "/api/Departments/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/Departments/**").hasAnyRole("Administrador", "Registro académico")
-                        .requestMatchers(HttpMethod.PUT, "/api/Departments/**").hasAnyRole("Administrador", "Registro académico")
-                        .requestMatchers(HttpMethod.DELETE, "/api/Departments/**").hasAnyRole("Administrador", "Registro académico")
+                        .requestMatchers(HttpMethod.GET, "/api/Departments/**").permitAll()                                       //.authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/Departments/**").permitAll()                                //.hasAnyRole("Administrador", "Registro académico")
+                        .requestMatchers(HttpMethod.PUT, "/api/Departments/**").permitAll()                               //.hasAnyRole("Administrador", "Registro académico")
+                        .requestMatchers(HttpMethod.DELETE, "/api/Departments/**").permitAll()                          //.hasAnyRole("Administrador", "Registro académico")
 
 
                         // === Document Categories ===

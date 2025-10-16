@@ -2,6 +2,7 @@ package ptc2025.backend.Services.CourseOfferingsTeachers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -108,15 +109,25 @@ public class CourseOfferingsTeachersService {
             throw new ExceptionBadRequest("Los campos deben de estar completos");
         }
 
-        try{
+
+        // si permites varios docentes por curso pero único por (curso, empleado):
+        // if (repo.existsByCourseOfferings_CourseOfferingIDAndEmployee_Id(dto.getCourseOfferingID(), dto.getEmployeeID())) {
+        //     throw new ExceptionBadRequest("El docente ya está asignado a este curso.");
+        // }
+
+        try {
             CourseOfferingsTeachersEntity entity = convertToOfferingsTeachersEntity(dto);
-            CourseOfferingsTeachersEntity saved = repo.save(entity);
+            CourseOfferingsTeachersEntity saved  = repo.save(entity);
             return convertToOfferingsTeachersDTO(saved);
+        } catch (DataIntegrityViolationException ex) {
+            // mapea violaciones de unique/fk a 409/400 en vez de 500
+            throw new ExceptionBadRequest("Violación de integridad: " + ex.getMostSpecificCause().getMessage());
         } catch (Exception e){
-            log.error("Error al registrar el docente: {}", e.getMessage(), e);
+            log.error("Error al registrar el docente", e);
             throw new ExceptionServerError("Error al registrar el docente");
         }
     }
+
 
 
     public CourseOfferingsTeachersDTO updateCourseTeacher(String ID, CourseOfferingsTeachersDTO json){
