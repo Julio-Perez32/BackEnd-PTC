@@ -110,7 +110,7 @@ public class LocalitiesController {
             ));
         }
     }
-    @DeleteMapping("/deleteLocation/{id}")
+    @DeleteMapping("/deleteLocaties/{id}")
     public ResponseEntity<Map<String, Object>> eliminarLocalidad(@PathVariable String id){
         try{
             if(!service.eliminarLocalidad(id)){
