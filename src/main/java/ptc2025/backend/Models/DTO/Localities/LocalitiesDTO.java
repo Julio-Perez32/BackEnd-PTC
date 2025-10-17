@@ -18,7 +18,6 @@ public class LocalitiesDTO {
     @NotBlank(message = "La universidad es requerida")
     private String universityID;
 
-    @NotNull(message = "Debe especificar si es sede principal")
     private Boolean isMainLocality;
     @NotBlank(message = "La direccion no puede estar vacia")
     @Size(max = 500, message = "La direccion no puede ser mayor de 500 caracteres")
