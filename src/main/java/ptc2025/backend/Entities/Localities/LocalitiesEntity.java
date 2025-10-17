@@ -25,10 +25,14 @@ public class LocalitiesEntity {
     @GeneratedValue (generator = "idLocality")
     @Column(name = "LOCALITYID")
     private String localityID;
+
+    // CAMBIO: Usar Integer en lugar de Boolean
     @Column(name = "ISMAINLOCALITY")
-    private Boolean isMainLocality;
+    private Integer isMainLocality; // 0 = false, 1 = true
+
     @Column(name = "ADDRESS")
     private String address;
+
     @Column (name = "PHONENUMBER")
     private String phoneNumber;
 
@@ -48,5 +52,4 @@ public class LocalitiesEntity {
                 ", address='" + address + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'';
     }
-    //se me cerro el push bro
 }

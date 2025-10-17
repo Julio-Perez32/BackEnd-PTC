@@ -55,7 +55,6 @@ public class LocalitiesService {
     }
 
     public LocalitiesDTO insertarLocalidad(LocalitiesDTO dto){
-        // VALIDACIÓN CORREGIDA - isMainLocality puede ser false sin problema
         if (dto.getUniversityID() == null || dto.getUniversityID().isBlank()) {
             throw new ExceptionBadRequest("El ID de universidad es requerido");
         }
@@ -93,8 +92,11 @@ public class LocalitiesService {
                     return new ExceptionNoSuchElement("El dato no pudo ser actualizado. Localidad no encontrada con ID: " + id);
                 });
 
-        // Actualizar campos - asegurar que isMainLocality nunca sea null
-        localidadExistente.setIsMainLocality(dto.getIsMainLocality() != null ? dto.getIsMainLocality() : false);
+        // CONVERSIÓN: Boolean -> Integer (0 o 1)
+        // false -> 0, true -> 1
+        Integer isMainValue = (dto.getIsMainLocality() != null && dto.getIsMainLocality()) ? 1 : 0;
+        localidadExistente.setIsMainLocality(isMainValue);
+
         localidadExistente.setAddress(dto.getAddress());
         localidadExistente.setPhoneNumber(dto.getPhoneNumber());
 
@@ -137,8 +139,10 @@ public class LocalitiesService {
             LocalitiesDTO dto = new LocalitiesDTO();
             dto.setLocalityID(localities.getLocalityID());
 
-            // Asegurar que isMainLocality nunca sea null en el DTO
-            dto.setIsMainLocality(localities.getIsMainLocality() != null ? localities.getIsMainLocality() : false);
+            // CONVERSIÓN: Integer -> Boolean
+            // 1 -> true, 0 o null -> false
+            Boolean isMain = localities.getIsMainLocality() != null && localities.getIsMainLocality() == 1;
+            dto.setIsMainLocality(isMain);
 
             dto.setAddress(localities.getAddress());
             dto.setPhoneNumber(localities.getPhoneNumber());
@@ -162,8 +166,10 @@ public class LocalitiesService {
         try {
             LocalitiesEntity entity = new LocalitiesEntity();
 
-            // Asegurar que isMainLocality nunca sea null
-            entity.setIsMainLocality(dto.getIsMainLocality() != null ? dto.getIsMainLocality() : false);
+            // CONVERSIÓN: Boolean -> Integer (0 o 1)
+            // false -> 0, true -> 1, null -> 0
+            Integer isMainValue = (dto.getIsMainLocality() != null && dto.getIsMainLocality()) ? 1 : 0;
+            entity.setIsMainLocality(isMainValue);
 
             entity.setAddress(dto.getAddress());
             entity.setPhoneNumber(dto.getPhoneNumber());
