@@ -25,8 +25,13 @@ public class PensumController {
     PensumService service;
 
     @GetMapping("/getPensa")
-    public List<PensumDTO> getPensa(){
-        return service.getPensa();
+    public ResponseEntity<List<PensumDTO>> getPensa(){
+        try {
+            List<PensumDTO> pensa = service.getPensa();
+            return ResponseEntity.ok(pensa);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(List.of());
+        }
     }
 
     @GetMapping("/getPensumPagination")
@@ -70,6 +75,12 @@ public class PensumController {
                     "status", "Success",
                     "data", response
             ));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", "Error de validación",
+                    "errorType", "VALIDATION_ERROR",
+                    "message", e.getMessage()
+            ));
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "status", "Error",
@@ -81,7 +92,7 @@ public class PensumController {
 
     @PutMapping("/updatePensum/{id}")
     public ResponseEntity<?> updatePensum(@PathVariable String id, @Valid @RequestBody PensumDTO json, BindingResult bindingResult){
-        // ✅ CORRECCIÓN: Verificar errores ANTES de actualizar
+        // ✅ Verificar errores ANTES de actualizar
         if(bindingResult.hasErrors()){
             Map<String, String> errores = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->

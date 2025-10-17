@@ -41,7 +41,6 @@ public class PensumService {
         return pageEntity.map(this::convertToPensumDTO);
     }
 
-    // ✅ CORRECCIÓN: Incluir el nombre de la carrera
     private PensumDTO convertToPensumDTO(PensumEntity entity) {
         PensumDTO dto = new PensumDTO();
         dto.setPensumID(entity.getPensumID());
@@ -50,7 +49,6 @@ public class PensumService {
 
         if (entity.getCareer() != null) {
             dto.setCareerID(entity.getCareer().getId());
-            // ✅ Agregar el nombre de la carrera para mostrar en el frontend
             dto.setCareer(entity.getCareer().getNameCareer());
         } else {
             dto.setCareerID(null);
@@ -68,7 +66,7 @@ public class PensumService {
 
         if (dto.getCareerID() != null) {
             CareerEntity career = repoCareer.findById(dto.getCareerID())
-                    .orElseThrow(() -> new ExceptionNoSuchElement("Carrera no encontrada con ID " + dto.getCareerID()));
+                    .orElseThrow(() -> new IllegalArgumentException("Carrera no encontrada con ID " + dto.getCareerID()));
             entity.setCareer(career);
         } else {
             entity.setCareer(null);
@@ -79,24 +77,23 @@ public class PensumService {
     public PensumDTO insertPensum(PensumDTO dto) {
         // ✅ Validación mejorada
         if (dto == null) {
-            throw new ExceptionBadRequest("El DTO no puede ser nulo");
+            throw new IllegalArgumentException("El DTO no puede ser nulo");
         }
         if (dto.getCareerID() == null || dto.getCareerID().isEmpty()) {
-            throw new ExceptionBadRequest("El ID de la carrera es obligatorio");
+            throw new IllegalArgumentException("El ID de la carrera es obligatorio");
         }
         if (dto.getVersion() == null || dto.getVersion().isEmpty()) {
-            throw new ExceptionBadRequest("La versión es obligatoria");
+            throw new IllegalArgumentException("La versión es obligatoria");
         }
         if (dto.getEffectiveYear() == null) {
-            throw new ExceptionBadRequest("El año efectivo es obligatorio");
+            throw new IllegalArgumentException("El año efectivo es obligatorio");
         }
 
         try {
             PensumEntity entity = convertToPensumEntity(dto);
             PensumEntity savedPensum = repo.save(entity);
             return convertToPensumDTO(savedPensum);
-        } catch (ExceptionNoSuchElement e) {
-            // Re-lanzar excepciones de validación
+        } catch (IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
             log.error("Error al registrar el pensum: " + e.getMessage(), e);
@@ -106,14 +103,14 @@ public class PensumService {
 
     public PensumDTO updatePensum(String Id, PensumDTO dto) {
         PensumEntity existsPensum = repo.findById(Id)
-                .orElseThrow(() -> new ExceptionNoSuchElement("Pensum no encontrado con ID: " + Id));
+                .orElseThrow(() -> new IllegalArgumentException("Pensum no encontrado con ID: " + Id));
 
         existsPensum.setVersion(dto.getVersion());
         existsPensum.setEffectiveYear(dto.getEffectiveYear());
 
         if (dto.getCareerID() != null) {
             CareerEntity career = repoCareer.findById(dto.getCareerID())
-                    .orElseThrow(() -> new ExceptionNoSuchElement("Carrera no encontrada con ID " + dto.getCareerID()));
+                    .orElseThrow(() -> new IllegalArgumentException("Carrera no encontrada con ID " + dto.getCareerID()));
             existsPensum.setCareer(career);
         } else {
             existsPensum.setCareer(null);
@@ -133,7 +130,7 @@ public class PensumService {
                 return false;
             }
         } catch (EmptyResultDataAccessException e) {
-            throw new ExceptionNoSuchElement("No se encontró pensum con ID: " + Id + " para eliminar");
+            throw new IllegalArgumentException("No se encontró pensum con ID: " + Id + " para eliminar");
         }
     }
 }
